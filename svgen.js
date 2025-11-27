@@ -104,7 +104,7 @@ function svgColors(colorCount = svgconf.colors.default) {
       b.toString(16).padStart(2, '0')+
       a.toString(16).padStart(2, '0');
     colors[i] = c;
-    output   += '  --c' + i + ': ' + c + ((i % 5) ? ';' : ';\r\n'); 
+    output   += '  --c' + i + ': ' + c + ((i % 5) ? ';' : ';\r\n');
   }
   output += '  --c-count: '+colorCount+';\r\n';
   return output;
@@ -230,24 +230,30 @@ let pointlighting =
 }
 
 //Generates rectangles based on config
-function svgRect (svgid) {
-  if (svgconf.shapes.rectangles = 0) return '<!-- No Rectangles -->\r\n';
-
+function svgRect (svgid, square = false) {
+  let rectangles = svgconf.shapes.rectangles;
+  let squares    = svgconf.shapes.squares;
+  let shapeCount = square ? squares : rectangles;
+  
+  if (( square) && (squares    = 0)) return '<!-- No Squares -->\r\n';
+  if ((!square) && (rectangles = 0)) return '<!-- No Rectangles -->\r\n';
+  
   let output = '';
   let open   = '<rect ';
   let close  = ' />\r\n';
   let h,w,f,x,y = 1;
 
-  for (i=1; i<=svgconf.shapes.rectangles; i++) {
+  for (i=1; i<=shapeCount; i++) {
     f  = filters[randomInt(0, filterCount)];
     x  = randomInt(0,  width);
     y  = randomInt(0,  height);
     x -= randomInt(1, x); //reduce likelihood of large x
-    y -= randomInt(1, y); //reduce likelihood of large y    
+    y -= randomInt(1, y); //reduce likelihood of large y
     w  = randomInt(50, width  / 2);
     h  = randomInt(50, height / 2);
     w += randomInt(1, w); //increase likelihood of large x
     h += randomInt(1, h); //increase likelihood of large y
+    if (square) w = h;    //make squares when requested
 
     output += open;
     output += `id="rect-${svgid}-${i}" `;
@@ -277,11 +283,10 @@ function svgCircle (svgid) {
     x  = randomInt(0,  width  * 1.5);
     y  = randomInt(0,  height * 1.5);
     x -= randomInt(1, x); //reduce likelihood of large x
-    y -= randomInt(1, y); //reduce likelihood of large y    
+    y -= randomInt(1, y); //reduce likelihood of large y
     r  = randomInt(50, height / 2 );
     r += randomInt(1, r / 2 ); //increase likelihood of large x
 
-//<circle fill="url(#mwlg)" cx="1420" cy="-405" r="1190"/>
     output += open;
     output += `id="circle-${svgid}-${i}" `;
     output += `fill="url(#grad-${svgid}-${i})" `;
@@ -297,23 +302,22 @@ function svgCircle (svgid) {
 
 //Based on config adds enables elements
 function svgContent(svgid) {
-  let output  = ''; 
-  output += '<rect '; //Add a bounding box
+  let output  = '';
+  output += '<rect ';  //Add a bounding box
   output += `id="box-${svgid}" `;
   output += `width="${width}" `;
-  output += `height="${height}" `;
-  output += `stroke="currentColor" />\r\n`; //allow the parent element to control the border color
+  output += `height="${height}" `; 
+  output += `stroke="currentColor" />\r\n`;  //allow the parent element to control the border color
 
-  /*STILL LEFT TO DO*/
   //blobs      = svgBlob(svgid);
-  //squares    = svgRect(svgid, true);
   //ellipses   = svgElps(svgid);
   //polygons   = svgPoly(svgid, 'pentagon');
   //triangles  = svgPoly(svgid, 'triangle');
   rectangles = svgRect(svgid); 
+  squares    = svgRect(svgid, true);
   circles    = svgCircle(svgid);
   
-  output += rectangles + circles;
+  output += rectangles + squares + circles;
 
   return output;
 }
@@ -327,12 +331,12 @@ function svgTag() {
   let xlink   = "http://www.w3.org/1999/xlink";
   let open    = '<svg ';
   let close   = '</svg>\r\n';
-  open       += `xmlns="${xmlns}" `;
-  open       += `xmlns:xlink="${xlink}" `;
-  //open       += `width="${width}" height="${height}" `;
+  //open     += `width="${width}" height="${height}" `;
   open       += `viewBox="0 0 ${width} ${height}" `;
   open       += `id="svg-${svgid}" `;
-  open       += `fill="none">\r\n`;
+  open       += `fill="none" `;
+  open       += `xmlns="${xmlns}" `;
+  open       += `xmlns:xlink="${xlink}" >\r\n`;
   output     += open; 
   output     += svgStyle(svgid); 
   output     += svgDefs(svgid);
