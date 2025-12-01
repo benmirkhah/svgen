@@ -497,9 +497,9 @@ function svgRect (oid = 'no-order-id', square = false, filter='') {
 //Generates a circle based on config-------------------------------------------
 function svgCircle (oid = 'no-order-id', filter = '') {
   let sid    = svgid+'-'+oid;
-  let output = '';
-  let open   = '<circle id="circ-'+sid+'"';
+  let open   = '<circle id="circ-'+sid+'" ';
   let close  = '</circle>\r\n';
+  let output = '';
   let x,y,r,f = 1;
 
   f  = filters[randomInt(0, filterCount)];
@@ -517,7 +517,6 @@ function svgCircle (oid = 'no-order-id', filter = '') {
   output += `r="${r}" `;
   output += `filter="url(#${f})">`;
   output += close;
-  
   
   return output;
 }//----------------------------------------------------------------------------
@@ -782,6 +781,7 @@ function svgContent() {
   output += `width="${width}" `;
   output += `height="${height}" `; 
   output += `fill="${bgcolor}" `;
+  //output += `stroke="currentColor"`
   output += `></rect>\r\n`;  //allow parent element to control border color
 
   for (oid=1; oid < svgconf.order.length; oid++) {
@@ -824,12 +824,68 @@ function svgTag() {
   output     += svgFilters(svgid)
   output     += svgContent(svgid);
   output     += close;
+
+  idStack.unshift('svg-'+svgid); //Newest id on top
+  svgFiles['svg-'+svgid] = output; console.log(svgFiles); //DEBUG
+  //svgDLButton('svg-'+svgid); //console.log(idStack);
+
   return output;
 }//----------------------------------------------------------------------------
 
+//Encodes and sends the file to user-------------------------------------------
+function svgDownload(fid) {
+  if (!fid) return console.log('no file to download');
+  if (Object.hasOwn(svgFiles,fid)) {
+    let  link = document.createElement('a');
+    link.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgFiles[fid]);
+    link.download = fid+'.svg';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    //let blob = new Blob([svgFiles[fid]], { type: 'image/svg+xml' });
+    //let furl = URL.createObjectURL(blob);
+    //URL.revokeObjectURL(furl);
+  }
+}//----------------------------------------------------------------------------
+
+//Creates a Next button-----------------------------------------------------
+function svgNext() {
+  let style = 'position: absolute; bottom: 20px; left: 180px; opacity: 0.35;';
+  let mouse = 'onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0.35"';
+  return `<button type="button" name="nextsvg" style="${style}" onclick="svgInsert(this.parentNode)" ${mouse}>Next</button>\r\n`;
+}//----------------------------------------------------------------------------
+
+//Creates a Previous button-----------------------------------------------
+function svgLast() {
+  if (idStack.length > 1) {
+    let style = 'position: absolute; bottom: 20px; left: 20px; opacity: 0.35;';
+    let mouse = 'onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0.35"';
+    //return `<button type="button" name="lastsvg" style="${style}" onclick="svgInsert(this.parentNode, '${idStack[lastIndex-1]}')" ${mouse}>Last</button>\r\n`;
+  }
+  return '';
+}//----------------------------------------------------------------------------
+
+//Creates a file download button-----------------------------------------------
+function svgDLButton() {
+  let style = 'position: absolute; bottom: 20px; left: 80px; opacity: 0.35;';
+  let mouse = 'onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0.35"';
+  return `<button type="button" name="downloadsvg" style="${style}" onclick="svgDownload('svg-${svgid}')" ${mouse}>Download</button>\r\n`;
+}//----------------------------------------------------------------------------
+
 //Inserts the <svg> in the dom-------------------------------------------------
-function svgInsert(element) {
-  element.innerHTML = svgTag();
+function svgInsert(element, fileid = '') {
+  let svgText = '';
+  if (fileid) {
+    svgText = svgFiles[fileid];
+    lastIndex--;
+  } else {
+    svgText = svgTag();
+    lastIndex++;
+  }
+
+  element.innerHTML = svgText+svgLast()+svgNext()+svgDLButton();
+  return svgText;
 }//----------------------------------------------------------------------------
 
 //Good old JQuery function that should've been built into JS-------------------
@@ -858,6 +914,9 @@ const initializeSVGen = svgOnce(function() {
 //-----------------------------------------------------------------------------
 
 //Set global variables and run-------------------------------------------------
+let svgFiles    = {};
+let idStack     = [];
+let lastIndex   = 0;
 let svgid       = '123456789';
 let svgconf     = parseConf(); //console.log(svgconf);
 let filters     = Object.keys(svgconf.filters);
