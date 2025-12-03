@@ -1,3 +1,4 @@
+let version = 0.014; //commits + 1
 //Creates the default config object
 function svgdefaults() { 
   //Don't include default JS prototypes
@@ -14,27 +15,28 @@ function svgdefaults() {
   let gradients = Object.create(null);
 
   shapes = { //TODO: each shape should have config for min max etc.
-    blobs: 0,
-    claws: 0,
-    clouds: 3,
-    circles: 12,  //'random',
-    squares: 2,   //'default',
-    ellipses: 0,  //TODO
-    hexagons: 0,  //TODO
-    octagons: 0,  //TODO
-    polygons: 0,  //TODO
-    pentagons: 0, //TODO
-    triangles: 0, //TODO
-    mountains: 0, //TODO
+    blobs:      0,
+    claws:      0,
+    clouds:     3,
+    circles:    8,  //'random',
+    squares:    2,  //'default',
+    flowers:    2,
+    ellipses:   0,  //TODO
+    hexagons:   0,  //TODO
+    octagons:   0,  //TODO
+    polygons:   0,  //TODO
+    pentagons:  0,  //TODO
+    triangles:  0,  //TODO
+    mountains:  0,  //TODO
     rectangles: 0,
   };
 
   enabled = {
-    stroke: false,
-    points: false,     //true, false, or color
-    anchors: false,    //true, false, or color
-    filters: true,
-    bgcolor: true,     //true (currentColor), false, or color
+    stroke:    false,
+    points:    false,  //true, false, or color
+    anchors:   false,  //true, false, or color
+    filters:   true,
+    bgcolor:   true,   //true (currentColor), false, or color
     gradients: true,
     variants:  false,  //TODO
     animation: false,  //TODO
@@ -88,11 +90,15 @@ function svgdefaults() {
   };
 
   filters = {
-    displacement: true,
-    gaussianblur: true,
-    glow: true,
+    glow:          true,
+    tile:          false,
+    dance:         true,
+    watercolor:    false,
+    motionblurX:   false,
+    motionblurY:   false,
+    displacement:  true,
+    gaussianblur:  true,
     pointlighting: true,
-    tile: false,
   };
 
   duration = {
@@ -126,7 +132,7 @@ function svgdefaults() {
   return conf;
 }//----------------------------------------------------------------------------
 
-//Decipher what elements need to random----------------------------------------
+//Decipher what needs to be exact and what needs randomization-----------------
 function parseConf() {
   let order    = Array();
   let parsed   = Object.create(null);
@@ -145,9 +151,8 @@ function parseConf() {
   let t = 0; //Total number of objects = shapes * variations of each shape
   let types = 0; //Shape types count
 
-  //Elements configuration values are not exposed to the user, hence no need to parse
-  if (isNaN(w)) w = (w == 'random') ? roundX(defaults.width.min,         defaults.width.max     ) : defaults.width.default;
-  if (isNaN(h)) h = (h == 'random') ? roundX(defaults.height.min,        defaults.height.max    ) : defaults.height.default;
+  if (isNaN(w)) w = (w == 'random') ?    roundX(defaults.width.min,      defaults.width.max     ) : defaults.width.default;
+  if (isNaN(h)) h = (h == 'random') ?    roundY(defaults.height.min,     defaults.height.max    ) : defaults.height.default;
   if (isNaN(c)) c = (c == 'random') ? randomInt(defaults.colors.min,     defaults.colors.max    ) : defaults.colors.default;
   if (isNaN(d)) d = (d == 'random') ? randomInt(defaults.duration.min,   defaults.duration.max  ) : defaults.duration.default;
   if (isNaN(v)) v = (v == 'random') ? randomInt(defaults.variants.min,   defaults.variants.max  ) : defaults.variants.default;
@@ -167,8 +172,9 @@ function parseConf() {
     alert('Warning: number of objects exceed ' + defaults.objects.max);
   }
 
+  total = t; //Copy the count value into the global variable
+
   parsed = {
-    elements: t, 
     width: w,
     height: h,
     colors: c,
@@ -370,7 +376,7 @@ function svgGrad(gid, gtype = 'L') {
 function svgGradients(type = 'L') {
   let output = '';
   if (svgconf.enabled.gradients) {
-    for (let i=1; i <= elements; i++) {
+    for (let i=1; i <= total; i++) {
       output += svgGrad(svgid+'-'+i, ((i % 2) ? 'L' : 'R'));
     }
   } else {
@@ -441,7 +447,7 @@ function svgFilters(svgid) {
     pointlighting += `    <fePointLight x="${x}" y="${y}" z="${z}" />\r\n`;
     pointlighting += '  </feDiffuseLighting>\r\n';
     pointlighting += '  <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" />\r\n';
-    pointlighting += '  </filter>\r\n';
+    pointlighting += '</filter>\r\n';
   }
 
   //TILE-----------------------------------------------------------------------
@@ -458,6 +464,45 @@ function svgFilters(svgid) {
     output += tile;
   }
 
+  //STROKE DANCE---------------------------------------------------------------
+  if (svgconf.filters.dance) {
+    let dance = '';
+    dance += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    dance += '  <feMorphology operator="dilate" radius="8 8" in="SourceAlpha" result="morphology"/>\r\n';
+    dance += '  <feFlood flood-color="#000000" flood-opacity="0.5" result="flood"/>\r\n';
+    dance += '  <feComposite in="flood" in2="morphology" operator="in" result="composite"/>\r\n';
+    dance += '  <feComposite in="composite" in2="SourceAlpha" operator="out" result="composite1"/>\r\n';
+    dance += '  <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="1" seed="0" stitchTiles="stitch" result="turbulence"/>\r\n';
+    dance += '  <feDisplacementMap in="composite1" in2="turbulence" scale="17" xChannelSelector="A" yChannelSelector="A" result="displacementMap"/>\r\n';
+    dance += '  <feMerge result="merge">\r\n';
+    dance += '    <feMergeNode in="SourceGraphic" result="mergeNode"/>\r\n';
+    dance += '    <feMergeNode in="displacementMap" result="mergeNode1"/>\r\n';
+    dance += '  </feMerge>\r\n';
+    dance += '</filter>\r\n';
+    output += dance;
+  }
+
+  //STROKE DANCE---------------------------------------------------------------
+  if (svgconf.filters.watercolor) {
+    let water = '';
+    water += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    water += '  <feTurbulence type="fractalNoise" baseFrequency="0.09 0.09" numOctaves="7" seed="1" stitchTiles="stitch" result="turbulence"/>\r\n';
+    water += '  <feDiffuseLighting surfaceScale="0.5" diffuseConstant="3.2" lighting-color="#ffffff" in="turbulence" result="diffuseLighting">\r\n';
+    water += '    <feDistantLight azimuth="250" elevation="16"/>\r\n';
+    water += '  </feDiffuseLighting>\r\n';
+    water += '  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.004" numOctaves="2" seed="3" stitchTiles="noStitch" result="turbulence1"/>\r\n';
+    water += '  <feColorMatrix type="saturate" values="3" in="turbulence1" result="colormatrix"/>\r\n';
+    water += '  <feColorMatrix type="matrix" values=\r\n';
+    water += '    "2 0   0 0 0\r\n';
+    water += '     0 1.5 0 0 0\r\n';
+    water += '     0 0   2 0 0\r\n';
+    water += '     0 0   0 2 0" in="colormatrix" result="colormatrix1"/>\r\n';
+    water += '  <feBlend mode="multiply" in="diffuseLighting" in2="colormatrix1" result="blend"/>\r\n';
+    water += '  <feComposite in="blend" in2="SourceAlpha" operator="in" result="composite1"/>\r\n';
+    water += '</filter>\r\n';
+    output += water;
+  }  
+
   return output;
 }//----------------------------------------------------------------------------
 
@@ -465,7 +510,7 @@ function svgFilters(svgid) {
 function svgRect (oid = 'no-order-id', square = false, filter='') {
   let sid    = svgid+'-'+oid;  
   let output = '';
-  let open   = '<rect ';
+  let open   = '<rect   ';
   let close  = '</rect>\r\n';
   let h,w,f,x,y = 1;
 
@@ -482,12 +527,12 @@ function svgRect (oid = 'no-order-id', square = false, filter='') {
 
   output += open;
   output += `id="rect-${sid}" `;
-  output += 'class ="'+( square ? 'square' : 'rectangle' )+'" ';
   output += `fill="url(#grad-${sid})" `;
   output += `x="${x}" `;
   output += `y="${y}" `;
   output += `width="${w}" `;
   output += `height="${h}" `;
+  output += 'class="'+( square ? 'square' : 'rectangle' )+'" ';
   output += `filter="url(#${f})">`;
   output += close;
   
@@ -525,7 +570,7 @@ function svgCircle (oid = 'no-order-id', filter = '') {
 function svgBearClaw(oid = 'no-order-id', filter = '') {
   let sid    = svgid+'-'+oid; //shape-id
   let output = '';
-  let open   = '<path id="claw-'+sid+'" class="bearclaw" ';
+  let open   = '<path   id="claw-'+sid+'" class="bearclaw" ';
   let close  = '</path>\r\n';
   let j,k,p    = 0;
   let u,v,x,y  = 0;
@@ -627,6 +672,27 @@ function svg8Points(xmax = width, ymax = height) {
   return points;
 }//----------------------------------------------------------------------------
 
+//Generates n number of uniform radial point to make shapes with-----------------------
+function svgRadialPoints(n = 12, cx = roundX(100,width-100), cy = roundY(100,height-100), r = roundY(100,height/3)) {
+  let points = [ { x:cx , y:cy, r:r } ];  //index 0 is the center mark 
+  let nudge  = (2 * Math.PI)/n; //360 degrees is (2 * Pi) in radians
+  let radian = 0; //angle in radian
+  let angle  = 0; //angle in degrees
+  let x      = 0;
+  let y      = 0;
+  
+  for (let i=0; i<=n; i++) { 
+    radian = nudge * (i + 0.001); //Fixes rounding error
+    angle  = roundInt(radian*(180/Math.PI),1)
+    x = roundInt(cx + (r * Math.cos(radian)),1);
+    y = roundInt(cy + (r * Math.sin(radian)),1);
+    points[i+1] = { x:x , y:y, a:angle }; //skip index 0
+  } //console.log(points); //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+
 //Sugar wrapper for the various count points generators------------------------
 function svgPoints( xmax = width, ymax = height, count = 4, option = '') {
   points = [];
@@ -658,7 +724,7 @@ function svgCloud(oid = 'no-order-id', filter = '') {
   let sid    = svgid+'-'+oid;
   let pcount = 2 * randomInt(2,5);
   let points = svgPoints(width, height, pcount); //console.log(points); //DEBUG
-  let open   = '<path ';
+  let open   = '<path   ';
   let close  = '\r\n</path>\r\n';
   let output = '';
   let fill   = '';
@@ -769,37 +835,113 @@ function svgCloud(oid = 'no-order-id', filter = '') {
   return output;
 }//----------------------------------------------------------------------------
 
+//Generates flower-------------------------------------------------------------
+function svgFlower(oid = 'no-order-id', filter = '') {
+  let sid    = svgid+'-'+oid;
+  let pcount = randomInt(5,8);
+  let points = svgRadialPoints(pcount); //console.log(points); //DEBUG
+  let open   = '  <path ';
+  let close  = '  </path>\r\n';
+  let render = '';
+  let output = '';
+  let fill   = '';
+  let path   = '';
+  let x,y    = 0;
+  let u,v    = 0;
+  let dx,dy  = 0;
+  let ax,ay  = 0;
+  let startx = points[0].x;
+  let starty = points[0].y;
+  let scolor = svgconf.objects.scolor;
+  filter     = filter ? filter : filters[randomInt(0, filterCount)];
+  filter     = 'url(#'+filter+')';
+  
+  if (svgconf.enabled.gradients) {
+    fill = `url(#grad-${sid})`;
+  } else {
+    if (svgconf.objects.fill == "solid") {
+      fill = `var(--c${sid})`;
+    } else {
+      fill = svgconf.objects.fill;
+    }
+  }
+
+  render = '<g id="flower-'+sid+'" class="flower" fill="'+fill+'" filter="'+filter+'">\r\n';
+  let d  = '  d="\r\n    M '+startx+' '+starty+' \r\n';
+  
+  for (i=1; i<=pcount; i++) {
+    x = points[i].x;
+    y = points[i].y;
+    u = points[i+1].x;
+    v = points[i+1].y;
+ 
+    path  = open+'id="petal-'+sid+'-'+i+'" class="flower petal" fill="'+fill+'"'+d;
+    path += '    L '+x+','+y            +'\r\n'; //from center to the first point
+    path += '    A 45,45 0,0,1 '+u+','+v+'\r\n';
+    path += '    L '+startx+','+starty  +'\r\n'; //from second point to the center
+    path += '    Z"'+(svgconf.enabled.stroke ? ` stroke="${svgconf.paths.line}" >` : '>')+'\r\n'+close;
+    render += path;
+
+    //Calculate the half way point and the anchor point x,y
+    dx = (x+u)/2;
+    dy = (y+v)/2;
+    ax = (dx+((dy-y)));
+    ay = (dy-((dx-x))); 
+        
+    pcolor = (svgconf.enabled.points === true) ? scolor : svgconf.enabled.points;  
+    if (svgconf.enabled.anchors) output += svgDrawPoint(ax, ay, 6, svgconf.paths.arc, 'point anchor arc ');
+    if (svgconf.enabled.points ) output += svgDrawPoint( x,  y, 2, pcolor, 'point');     
+  }
+
+  output += render+'</g>\r\n';
+
+  return output;
+}//----------------------------------------------------------------------------
+
 //Adds elements enabled in config----------------------------------------------
 function svgContent() {
   let output  = '';
+  let render  = '';
   let bgcolor = '';
   bgcolor     = (svgconf.enabled.bgcolor === true) ? 'currentColor' : svgconf.enabled.bgcolor;
   bgcolor     = (!svgconf.enabled.bgcolor        ) ? 'none'         : bgcolor;
-  output += '<rect '; //Add a bounding box
-  output += `id="box-${svgid}" `;
-  output += `x="0" y="0" `;
-  output += `width="${width}" `;
-  output += `height="${height}" `; 
-  output += `fill="${bgcolor}" `;
-  //output += `stroke="currentColor"`
-  output += `></rect>\r\n`;  //allow parent element to control border color
+  render     += '<rect '; //Add a bounding box
+  render     += `x="0" y="0" `;
+  render     += `id="box-${svgid  }" `;
+  render     += ` width="${width  }" `;
+  render     += `height="${height }" `; 
+  render     += `  fill="${bgcolor}" `;
+  render     += `></rect>\r\n`;  //allow parent element to control border color
+  let data    = { type:"rect", x:0, y:0, w:width, h:height, fill:bgcolor };
+  elements[0] = { z:0, render:render, data:data }; //bounding box takes care of index zero
 
+  output += render;
+  
   for (oid=1; oid < svgconf.order.length; oid++) {
+    render = '';
+    data   = '';
+    elements[oid] = { z:oid, render:render, data:data }; //insert blank data
+
     switch( svgconf.order[oid] ) {      
-      case 'claws'      : output += svgBearClaw(oid);   break;
-      case 'clouds'     : output += svgCloud(oid);      break;
-      case 'circles'    : output += svgCircle(oid);     break;
-      case 'squares'    : output += svgRect(oid, true); break;
-      case 'rectangles' : output += svgRect(oid);       break;
-    //case 'ellipses'   : output += svgElps(oid);       break;
-    //case 'triangles'  : output += svgPoly(oid, 3);    break;
-    //case 'pentagons'  : output += svgPoly(oid, 5);    break;
-    //case 'hexagons'   : output += svgPoly(oid, 6);    break;
-    //case 'octagons'   : output += svgPoly(oid, 8);    break;
-    //case 'polygons'   : output += svgPoly(oid, 9);    break;
-    //case 'blobs'      : output += svgBlob(oid);       break;
+      case 'flowers'    : render += svgFlower(oid);     break;      
+      case 'claws'      : render += svgBearClaw(oid);   break;
+      case 'clouds'     : render += svgCloud(oid);      break;
+      case 'circles'    : render += svgCircle(oid);     break;
+      case 'squares'    : render += svgRect(oid, true); break;
+      case 'rectangles' : render += svgRect(oid);       break;
+      /*
+      case 'triangles'  : render += svgPoly(oid, 3);    break;
+      case 'pentagons'  : render += svgPoly(oid, 5);    break;
+      case 'hexagons'   : render += svgPoly(oid, 6);    break;
+      case 'octagons'   : render += svgPoly(oid, 8);    break;
+      case 'polygons'   : render += svgPoly(oid, 9);    break;
+      case 'ellipses'   : render += svgElps(oid);       break;
+      case 'blobs'      : render += svgBlob(oid);       break;
+      */
     }
-  }
+    elements[oid].render = render;
+    output += render;
+  } //console.log(elements);  //DEBUG
 
   return output;
 }//----------------------------------------------------------------------------
@@ -812,12 +954,12 @@ function svgTag() {
   let open    = '<svg ';
   let close   = '</svg>\r\n';
   svgid       = epoch() + randomInt(100,999); //Create new ID for each inserted instance
-//open       += `width="${width}" height="${height}" `;
   open       += `viewBox="0 0 ${width} ${height}" `;
   open       += `id="svg-${svgid}" `;
   open       += `fill="none" `;
   open       += `xmlns="${xmlns}" `;
   open       += `xmlns:xlink="${xlink}" >\r\n`;
+  open       += 'preserveAspectRatio="slice" ' //TODO add to congig
   output     += open; 
   output     += svgStyle(svgid);
   output     += svgDefs(svgid);
@@ -826,8 +968,11 @@ function svgTag() {
   output     += close;
 
   idStack.unshift('svg-'+svgid); //Newest id on top
-  svgFiles['svg-'+svgid] = output; console.log(svgFiles); //DEBUG
-  //svgDLButton('svg-'+svgid); //console.log(idStack);
+  svgFiles['svg-'+svgid] = output; //console.log(svgFiles); //DEBUG
+  if (idStack.length > 10) { //Only keep 10 files 
+    tokill = idStack.pop();  //console.log(tokill); //DEBUG
+    delete svgFiles[tokill];
+  }
 
   return output;
 }//----------------------------------------------------------------------------
@@ -843,9 +988,6 @@ function svgDownload(fid) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    //let blob = new Blob([svgFiles[fid]], { type: 'image/svg+xml' });
-    //let furl = URL.createObjectURL(blob);
-    //URL.revokeObjectURL(furl);
   }
 }//----------------------------------------------------------------------------
 
@@ -902,10 +1044,15 @@ function svgOnce(fn, context) {
 
 //Find every element with class="svgen" to add our SVG to----------------------
 const initializeSVGen = svgOnce(function() {
-  console.log("elements : "+elements);
-  console.log("  colors : "+colors);
-  console.log("  height : "+height);
-  console.log("   width : "+width);
+  let info = '';
+  info += "-----------------------\r\n";
+  info += "[  elements : "+String(total  ).padStart(5, ' ')+'   ]\r\n';
+  info += "[   version : "+String(version).padStart(5, ' ')+'   ]\r\n';
+  info += "[    colors : "+String(colors ).padStart(5, ' ')+'   ]\r\n';
+  info += "[    height : "+String(height ).padStart(5, ' ')+'   ]\r\n';
+  info += "[     width : "+String(width  ).padStart(5, ' ')+'   ]\r\n';
+  info += "-----------------------\r\n";
+  console.log(info);
   const svgens = document.querySelectorAll('.svgen');
   svgens.forEach(svgen => { svgInsert(svgen)});
   console.log("SVGen initialized");
@@ -914,18 +1061,19 @@ const initializeSVGen = svgOnce(function() {
 //-----------------------------------------------------------------------------
 
 //Set global variables and run-------------------------------------------------
-let svgFiles    = {};
-let idStack     = [];
+let svgFiles    = {}; //Final rendered file output
+let idStack     = []; //Keeps track of previous render 
+let elements    = []; //Keeps track of each element variables and rendered output
+let total       = 0;
 let lastIndex   = 0;
 let svgid       = '123456789';
-let svgconf     = parseConf(); //console.log(svgconf);
+let svgconf     = parseConf(); //console.log(svgconf); //DEBUG
 let filters     = Object.keys(svgconf.filters);
 let filterCount = filters.length;
 let width       = svgconf.width;
 let height      = svgconf.height;
 let colors      = svgconf.colors;
-let elements    = svgconf.elements;
-//console.log(svgconf.order);  //DEBUG
+//console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load
 window.addEventListener('load', initializeSVGen);
