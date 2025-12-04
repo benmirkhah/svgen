@@ -1,4 +1,6 @@
-let version = 0.014; //commits + 1
+let version = 0.015; //commits + 1
+//TODO: Bring points & anchors to the front
+
 //Creates the default config object
 function svgdefaults() { 
   //Don't include default JS prototypes
@@ -13,86 +15,100 @@ function svgdefaults() {
   let variants  = Object.create(null);
   let duration  = Object.create(null);
   let gradients = Object.create(null);
+  let random    = 'random';   //syntax sugar
+  let solid     = 'solid';    //syntax sugar
+  let color     = '#CCC6';  //default color
+  let none      = 'none';     //syntax sugar
+  let gold      = 'gold';     //syntax sugar
+  let lime      = 'lime';     //syntax sugar
 
-  shapes = { //TODO: each shape should have config for min max etc.
-    blobs:      0,
-    claws:      0,
-    clouds:     3,
-    circles:    8,  //'random',
-    squares:    2,  //'default',
-    flowers:    2,
-    ellipses:   0,  //TODO
-    hexagons:   0,  //TODO
-    octagons:   0,  //TODO
-    polygons:   0,  //TODO
-    pentagons:  0,  //TODO
-    triangles:  0,  //TODO
-    mountains:  0,  //TODO
-    rectangles: 0,
+  shapes = {    //TODO: each shape should have config for min max etc.
+    //Boxes
+    blob:      { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FFCC9966',  fill:random, }, //'#FFCC9966'
+    claw:      { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#99CCFF66',  fill:random, }, //'#99CCFF66'
+    cloud:     { count:  2,  max: 10,  swidth:  2,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FFFFFF33',  fill:random, }, //'#FF99FF66'
+    square:    { count:  1,  max: 20,  swidth:  1,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#00000099',  fill:random, }, //'#FFFF9966'
+    ellipse:   { count:  0,  max: 20,  swidth:  0,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#CC666666',  fill:random, }, //'#CC666666'
+    mountain:  { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#6600CC66',  fill:random, }, //'#6600CC66'
+    rectangle: { count:  0,  max: 20,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FF663333',  fill:random, }, //'#FF663366'
+    //Radials                                                                                                                                               //                  
+    circle:    { count:  5,  max: 20,  swidth:100,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#99CC9933',  fill:random, }, //'#99CC9966'
+    flower:    { count:  2,  max: 10,  swidth:  0,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#99999966',  fill:random, }, //'#9999FF66'
+    hexagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#3399CC66',  fill:random, }, //'#3399CC66'
+    octagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#6666FF66',  fill:random, }, //'#6666FF66'
+    oddagon:   { count:  1,  max: 20,  swidth:  2,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#33993366',  fill:random, }, //'#33993366'
+    polygon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#3333CC66',  fill:random, }, //'#3333CC66'
+    dexagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#CC333366',  fill:random, }, //'#CC333366'
+    randogon:  { count:  1,  max: 20,  swidth:  0,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#CCCC0066',  fill:random, }, //'#CCCC0066'
+    pentagon:  { count:  0,  max: 20,  swidth:  2,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#FFFFFF66',  fill:random, }, //'#00CCCC66'
+    triangle:  { count:  2,  max: 20,  swidth: 40,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#00000033',  fill:random, }, //'#33669966'
   };
 
   enabled = {
-    stroke:    false,
-    points:    false,  //true, false, or color
-    anchors:   false,  //true, false, or color
-    filters:   true,
-    bgcolor:   true,   //true (currentColor), false, or color
-    gradients: true,
-    variants:  false,  //TODO
-    animation: false,  //TODO
+    stroke:     true,
+    points:     false,  //true, false, or color
+    center:     gold,   //true, false, or color
+    anchors:    false,  //true, false, or color
+    filters:    true,
+    bgcolor:    true,  //true (currentColor), false, or color
+    gradients:  true,
+    variants:   false,  //TODO
+    animation:  false,  //TODO
   }; 
 
   objects = {
-    min: 1,
-    max: 250,
-    default: 5,
-    selected: 10,
-    fill:   'none',   //TODO: color, radial, linear, both, solid, random, none
-    scolor: 'gold',   //TODO: Stroke: black, white, uniform, random
-    swidth: 'thick',  //TODO: Stroke: thin, thick, random
+    min:        1,
+    max:      250,
+    maxshape:  50,
+    default:    5,     //NOT IN USE
+    selected:  10,     //NOT IN USE
+    swidth:    16,
+    scolor:    lime,
+    fill:      color,  //true, false or color, used only when shape setting is 'default'
   };
   
   paths = {
-    type: 'cube',     //arc, quad, cube, line, all, TODO: random 
-    arc:  'skyblue',  //false,      //
-    cube: 'lime',     //false,      //
-    quad: 'orange',   //false,      //
-    line: 'black',    //false,      //
+    type: 'cube',  //arc, quad, cube, line, all, TODO: random 
+    arc:    true,  //true, false or color
+    cube:   true,  //true, false or color
+    quad:   true,  //true, false or color
+    line:   true,  //true, false or color
   }
 
-  width = {
-    min: 100,
-    max: 3000,
-    default: 640,
+  width = {  //Canvas Width
+    min:       100,
+    max:      3000,
+    default:   640,
     selected: 1920,
   };
 
-  height = {
-    min: 100,
-    max: 3000,
-    defualt: 480,
-    selected: 957,
+  height = {  //Canvas Height
+    min:       100,
+    max:      3000,
+    defualt:   480,
+    selected:  957,
   };
 
-  colors = {
-    min: 3,
-    max: 256,
-    default: 10,
-    selected: 100,
+  colors = {  //Global Palette
+    min:         3,
+    max:       256,
+    default:    10,
+    selected:  100,
   };
 
-  gradients = {
-    min: 2,
-    max: 9,
-    default: 3,
-    selected: 4,
+  gradients = {  //Number of colors per gradient
+    min:         2,
+    max:         5,
+    default:     3,
+    selected:    3,
     orientation: 'both', //TODO: horiz, vertical, both, aligned, random
   };
 
-  filters = {
+  filters = {  //Global
     glow:          true,
     tile:          false,
     dance:         true,
+    chaotic:       false,
     watercolor:    false,
     motionblurX:   false,
     motionblurY:   false,
@@ -101,32 +117,32 @@ function svgdefaults() {
     pointlighting: true,
   };
 
-  duration = {
-    min: 100,
-    max: 36000,
-    default: 0,
-    selected: 'random',
+  duration = {  //TODO: Animation
+    min:           100,
+    max:         36000,
+    default:         0,
+    selected:   random,
   };
   
-  variants = {
-    min: 1,
-    max: 10,
-    default: 0,
-    selected: 'random',
+  variants = {  //TODO: Transforms
+    min:             1,
+    max:            10,
+    default:         0,
+    selected:   random,
   };
 
-  conf = {
-    enabled: enabled,
-    objects: objects,
-    width: width,
-    height: height,
-    colors: colors,
-    paths: paths,
-    shapes: shapes,
-    filters: filters,
-    variants: variants, //TODO
-    duration: duration, //TODO
-    gradients: gradients,
+  conf = {  //Export object
+      enabled:enabled,
+      objects:objects,
+       colors:colors,
+       height:height,
+        width:width,
+        paths:paths,
+       shapes:shapes,
+      filters:filters,
+     variants:variants, //TODO
+     duration:duration, //TODO
+    gradients:gradients,
   };
 
   return conf;
@@ -135,11 +151,11 @@ function svgdefaults() {
 //Decipher what needs to be exact and what needs randomization-----------------
 function parseConf() {
   let order    = Array();
+  let shapes   = Object.create(null);
   let parsed   = Object.create(null);
+  let filters  = Object.create(null);
   let defaults = svgdefaults();
   let paths    = defaults.paths;
-  let shapes   = defaults.shapes;
-  let filters  = defaults.filters;
   let enabled  = defaults.enabled;
   let objects  = defaults.objects;
   let w = defaults.width.selected;
@@ -148,8 +164,8 @@ function parseConf() {
   let d = defaults.duration.selected;
   let v = defaults.variants.selected;
   let g = defaults.gradients.selected;
+  let f = 0; //Total number of enabled filters
   let t = 0; //Total number of objects = shapes * variations of each shape
-  let types = 0; //Shape types count
 
   if (isNaN(w)) w = (w == 'random') ?    roundX(defaults.width.min,      defaults.width.max     ) : defaults.width.default;
   if (isNaN(h)) h = (h == 'random') ?    roundY(defaults.height.min,     defaults.height.max    ) : defaults.height.default;
@@ -158,14 +174,26 @@ function parseConf() {
   if (isNaN(v)) v = (v == 'random') ? randomInt(defaults.variants.min,   defaults.variants.max  ) : defaults.variants.default;
   if (isNaN(g)) g = (g == 'random') ? randomInt(defaults.gradients.min,  defaults.gradients.max ) : defaults.gradients.default;
 
-  Object.keys(shapes).forEach(shape => {
-    if (isNaN(shapes[shape])) {  //All shapes are objects 
-      shapes[shape] = (shapes[shape] == 'random') ? randomInt(defaults.objects.min, defaults.objects.max) : defaults.objects.default;
+  if (defaults.enabled.filters) {  //Only if filters are enabled
+    Object.keys(defaults.filters).forEach(filter => { //Only keep the enabled filters, discared others
+      if (defaults.filters[filter]) {
+        filters[filter] = filter;
+        f++;
+      }
+    }); 
+  }
+  
+  Object.keys(defaults.shapes).forEach(shape => {
+    if (isNaN(defaults.shapes[shape].count)) {  //assign the random/default requests
+      defaults.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(defaults.objects.min, shapes[shape].max) : defaults.objects.default;
     }
-    //Create the shapes order array
-    for (i=0; i < shapes[shape]; i++) order[t+i] = shape; 
-    t += shapes[shape];
-    types++; 
+
+    if (defaults.shapes[shape].count) { //Only keep the enabled shapes, discard others
+      shapes[shape] = defaults.shapes[shape];
+      //Create orders for each count of the enabled shapes
+      for (i=0; i < shapes[shape].count; i++) order[t+i] = shape; 
+      t += shapes[shape].count;
+    }
   }); 
   
   if (t > defaults.objects.max) { 
@@ -174,19 +202,36 @@ function parseConf() {
 
   total = t; //Copy the count value into the global variable
 
+  //Now that we know our total number of shapes let's decipher the rest of variable
+  Object.keys(shapes).forEach(shape => {
+    if (defaults.enabled.filters) { //Determine to use random, preselected or no filter per shape
+      if (shapes[shape].filter) { //true means random, otherwise preselected
+        shapes[shape].filter = (shapes[shape].filter === true) ? 'random' : shapes[shape].filter; 
+      }
+    } else { shapes[shape].filter = false; } //none if filters are disabled globally
+  
+    if (shapes[shape].fill) { //Determine what kind of fill to use per shape
+      if (shapes[shape].fill ===  true    ) shapes[shape].fill = 'solid'; //true means solid
+      if (shapes[shape].fill === 'solid'  ) shapes[shape].fill = 'var(--c'+randomInt(1, total)+')';
+      if (shapes[shape].fill === 'default') shapes[shape].fill = objects.fill;
+      if (shapes[shape].fill === 'none'   ) shapes[shape].fill = false;
+      //All else means it's either set to random or a preselected #color
+    }  
+  });
+
   parsed = {
-    width: w,
-    height: h,
-    colors: c,
-    variants: v,
-    duration: d,
+    width:     w,
+    height:    h,
+    colors:    c,
+    variants:  v,
+    duration:  d,
     gradients: g,
-    paths:   paths,
-    shapes:  shapes,
-    filters: filters,
-    objects: objects,
-    enabled: enabled,
-    order: ['zero', ...randomize(order)],
+    paths:     paths,
+    shapes:    shapes,
+    filters:   filters,
+    objects:   objects,
+    enabled:   enabled,
+    order:     ['zero', ...randomize(order)],
   }
 
   return parsed;
@@ -464,7 +509,7 @@ function svgFilters(svgid) {
     output += tile;
   }
 
-  //STROKE DANCE---------------------------------------------------------------
+  //DANCE----------------------------------------------------------------------
   if (svgconf.filters.dance) {
     let dance = '';
     dance += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
@@ -482,7 +527,7 @@ function svgFilters(svgid) {
     output += dance;
   }
 
-  //STROKE DANCE---------------------------------------------------------------
+  //WATERCOLOR-----------------------------------------------------------------
   if (svgconf.filters.watercolor) {
     let water = '';
     water += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
@@ -503,18 +548,45 @@ function svgFilters(svgid) {
     output += water;
   }  
 
+  //CHAOTIC--------------------------------------------------------------------
+  if (svgconf.filters.chaotic) {
+    let chaos = '';  
+    chaos += '<filter id="chaotic" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    chaos += '  <feTurbulence type="turbulence" baseFrequency="0.015 0.015" numOctaves="3" seed="8" stitchTiles="stitch" result="turbulence"/>\r\n';
+    chaos += '  <feMorphology operator="dilate" radius="35 35" in="turbulence" result="morphology"/>\r\n';
+    chaos += '  <feColorMatrix type="matrix" values=\r\n';
+    chaos += '    "1 0 0 0 0\r\n';
+    chaos += '     0 1 0 0 0\r\n';
+    chaos += '     0 0 1 0 0\r\n';
+    chaos += '     0 0 0 10 0" in="morphology" result="colormatrix"/>\r\n';
+    chaos += '  <feColorMatrix type="saturate" values="10" in="colormatrix" result="colormatrix1"/>\r\n';
+    chaos += '  <feComposite in="colormatrix1" in2="SourceAlpha" operator="in" result="composite"/>\r\n';
+    chaos += '</filter>\r\n';
+    output += chaos;
+  }
+
   return output;
 }//----------------------------------------------------------------------------
 
 //Generates squares & rectangles based on config-------------------------------
-function svgRect (oid = 'no-order-id', square = false, filter='') {
-  let sid    = svgid+'-'+oid;  
-  let output = '';
-  let open   = '<rect   ';
-  let close  = '</rect>\r\n';
-  let h,w,f,x,y = 1;
+function svgRect (oid = 'no-order-id', square = false, options) {
+  let sid     = svgid+'-'+oid;  
+  let output  = '';
+  let render  = '';
+  let stroke  = '';
+  let filter  = '';
+  let fill    = '';
+  let shape   = (square) ? 'square' : 'rectangle';
+  let open    = '<rect   ';
+  let close   = '</rect>\r\n';
+  let h,w,x,y = 1;
+  filter      = (options.filter) ? ' filter="url(#'+options.filter+')" ': ''; 
+  fill        = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
-  f  = filters[randomInt(0, filterCount)];
+  if (svgconf.shapes[shape].stroke) {
+    stroke = `" stroke-width="${svgconf.shapes[shape].swidth}" stroke="${svgconf.shapes[shape].stroke}" `;
+  } 
+
   x  = randomInt(0,  width);
   y  = randomInt(0,  height);
   x -= randomInt(1, x); //reduce likelihood of large x
@@ -525,29 +597,40 @@ function svgRect (oid = 'no-order-id', square = false, filter='') {
   h += randomInt(1, h); //increase likelihood of large y
   if (square) w = h;    //make squares when requested
 
-  output += open;
-  output += `id="rect-${sid}" `;
-  output += `fill="url(#grad-${sid})" `;
-  output += `x="${x}" `;
-  output += `y="${y}" `;
-  output += `width="${w}" `;
-  output += `height="${h}" `;
-  output += 'class="'+( square ? 'square' : 'rectangle' )+'" ';
-  output += `filter="url(#${f})">`;
-  output += close;
+  render += open;
+  render += `id="rect-${sid}" `;
+  render += `x="${x}" `;
+  render += `y="${y}" `;
+  render += `width="${w}" `;
+  render += `height="${h}" `;
+  render += 'class="'+( square ? 'square' : 'rectangle' )+'" ';
+  render += fill;
+  render += stroke;
+  render += filter+'>';
+  render += close;
+  output += render;
   
   return output;
 }//----------------------------------------------------------------------------
 
 //Generates a circle based on config-------------------------------------------
-function svgCircle (oid = 'no-order-id', filter = '') {
+function svgCircle (oid = 'no-order-id', options) {
   let sid    = svgid+'-'+oid;
   let open   = '<circle id="circ-'+sid+'" ';
   let close  = '</circle>\r\n';
   let output = '';
-  let x,y,r,f = 1;
+  let render = '';
+  let stroke = '';
+  let filter = '';
+  let fill   = '';
+  let x,y,r  = 1;
+  filter     = (options.filter) ? ' filter="url(#'+options.filter+')" ': ''; 
+  fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
-  f  = filters[randomInt(0, filterCount)];
+  if (svgconf.shapes.circle.stroke) {
+    stroke += `" stroke-width="${svgconf.shapes.circle.swidth}" stroke="${svgconf.shapes.circle.stroke}" `;
+  } 
+
   x  = randomInt(0,  width  * 1.5);
   y  = randomInt(0,  height * 1.5);
   x -= randomInt(1, x); //reduce likelihood of large x
@@ -555,59 +638,15 @@ function svgCircle (oid = 'no-order-id', filter = '') {
   r  = randomInt(50, height / 2 );
   r += randomInt(1, r / 2 ); //increase likelihood of large x
 
-  output += open;
-  output += `fill="url(#grad-${sid})" `;
-  output += `cx="${x}" `;
-  output += `cy="${y}" `;
-  output += `r="${r}" `;
-  output += `filter="url(#${f})">`;
-  output += close;
-  
-  return output;
-}//----------------------------------------------------------------------------
-
-//Makes Bear Claws-------------------------------------------------------------
-function svgBearClaw(oid = 'no-order-id', filter = '') {
-  let sid    = svgid+'-'+oid; //shape-id
-  let output = '';
-  let open   = '<path   id="claw-'+sid+'" class="bearclaw" ';
-  let close  = '</path>\r\n';
-  let j,k,p    = 0;
-  let u,v,x,y  = 0;
-  let segCount = randomInt(2, 9);
-  let startx   = randomInt(width  * 0.15, width  * 0.5);
-  let starty   = randomInt(height * 0.15, height * 0.5);
-  startx       = 100 * Math.trunc(startx/100);
-  starty       = 50  * Math.trunc(starty/100);
-  
-  output += open
-  output += svgconf.enabled.stroke ? 'stroke="'+svgconf.objects.scolor+'" ' :  'stroke="none" ';
-  output += `fill="url(#grad-${sid})" `;
-  output += 'd="M '+startx+' '+starty+' \r\n';
-  
-  j  =  randomInt(1, 25) * 10;
-  k  =  randomInt(1, 25) * 10;
-  u  =  randomInt(1, 25) * 10;
-  v  =  randomInt(1, 25) * 10;
-  x  =  startx;
-  y  =  starty;
-  
-  for (i=1; i<segCount; i++) {
-    p = ' c ';
-    p += (x - Math.min(j,u))+',0 ';
-    p += (x - Math.min(k,v))+',50 ';
-    p += (Math.max(j,u))+',';
-    p += (Math.max(k,v))+' ';
-    
-    x  =  x + j;
-    y  =  y + k;
-    u  =  randomInt(1,  10) * i * 10;
-    v  =  randomInt(1,  10) * i * 10;
-
-    output += p+' \r\n ';
-  }
-
-  output += ' Q '+(startx-300)+','+(starty)+' '+startx+' '+starty+' Z">\r\n'+close;
+  render += open;
+  render += ` r="${r}" `;
+  render += `cx="${x}" `;
+  render += `cy="${y}" `;
+  render += fill;
+  render += stroke;
+  render += filter+'">';
+  render += close;  
+  output += render;
 
   return output;
 }//----------------------------------------------------------------------------
@@ -692,7 +731,6 @@ function svgRadialPoints(n = 12, cx = roundX(100,width-100), cy = roundY(100,hei
   return points;
 }//----------------------------------------------------------------------------
 
-
 //Sugar wrapper for the various count points generators------------------------
 function svgPoints( xmax = width, ymax = height, count = 4, option = '') {
   points = [];
@@ -720,13 +758,15 @@ function svgDrawPoint(x = 100, y=100, r=5, c='white', classname='point') {
 }//----------------------------------------------------------------------------
 
 //Generate clouds--------------------------------------------------------------
-function svgCloud(oid = 'no-order-id', filter = '') {
+function svgCloud(oid = 'no-order-id', options) {
   let sid    = svgid+'-'+oid;
   let pcount = 2 * randomInt(2,5);
   let points = svgPoints(width, height, pcount); //console.log(points); //DEBUG
   let open   = '<path   ';
   let close  = '\r\n</path>\r\n';
   let output = '';
+  let filter = '';
+  let stroke = '';
   let fill   = '';
   let line   = '';
   let cube   = '';
@@ -741,18 +781,10 @@ function svgCloud(oid = 'no-order-id', filter = '') {
   let startx = mx+points[1].x;
   let starty = my+points[1].y;
   let scolor = svgconf.objects.scolor;
+  filter     = (options.filter) ? ' filter="url(#'+options.filter+')" ': ''; 
+  fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
-  if (svgconf.enabled.gradients) {
-    fill = `url(#grad-${sid})`;
-  } else {
-    if (svgconf.objects.fill == "solid") {
-      fill = `var(--c${sid})`;
-    } else {
-      fill = svgconf.objects.fill;
-    }
-  }
-
-  fill = `fill="${fill}" d="\r\n  M `+startx+' '+starty+' \r\n';
+  fill = fill+filter+' d="\r\n  M '+startx+' '+starty+' \r\n';
   arc  = open+'id="cloud-'+sid+'-a" class="cloud arc"  '+fill;
   cube = open+'id="cloud-'+sid+'-c" class="cloud cube" '+fill;
   quad = open+'id="cloud-'+sid+'-q" class="cloud quad" '+fill;
@@ -812,12 +844,17 @@ function svgCloud(oid = 'no-order-id', filter = '') {
   let quadStroke = '>';
   let lineStroke = '>';
 
-  if (svgconf.enabled.stroke) { 
-    arcStroke  = ` stroke="${svgconf.paths.arc }">`;
-    cubeStroke = ` stroke="${svgconf.paths.cube}">`; 
-    quadStroke = ` stroke="${svgconf.paths.quad}">`;
-    lineStroke = ` stroke="${svgconf.paths.line}">`;
-  }
+  if (svgconf.shapes.cloud.stroke) {
+    stroke    += ` stroke-width="${svgconf.shapes.cloud.swidth}" `;
+    svgconf.paths.arc  = (svgconf.paths.arc  === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.arc ;
+    svgconf.paths.cube = (svgconf.paths.cube === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.cube;
+    svgconf.paths.quad = (svgconf.paths.quad === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.quad;
+    svgconf.paths.line = (svgconf.paths.line === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.line;
+    arcStroke  = stroke+` stroke="${svgconf.paths.arc }">`;
+    cubeStroke = stroke+` stroke="${svgconf.paths.cube}">`; 
+    quadStroke = stroke+` stroke="${svgconf.paths.quad}">`;
+    lineStroke = stroke+` stroke="${svgconf.paths.line}">`;
+  } 
 
   arc    += '  Z" '+arcStroke +close; 
   cube   += '  Z" '+cubeStroke+close;
@@ -836,12 +873,14 @@ function svgCloud(oid = 'no-order-id', filter = '') {
 }//----------------------------------------------------------------------------
 
 //Generates flower-------------------------------------------------------------
-function svgFlower(oid = 'no-order-id', filter = '') {
+function svgFlower(oid = 'no-order-id', options) {
   let sid    = svgid+'-'+oid;
   let pcount = randomInt(5,8);
   let points = svgRadialPoints(pcount); //console.log(points); //DEBUG
   let open   = '  <path ';
   let close  = '  </path>\r\n';
+  let filter = '';
+  let stroke = '';
   let render = '';
   let output = '';
   let fill   = '';
@@ -852,22 +891,15 @@ function svgFlower(oid = 'no-order-id', filter = '') {
   let ax,ay  = 0;
   let startx = points[0].x;
   let starty = points[0].y;
-  let scolor = svgconf.objects.scolor;
-  filter     = filter ? filter : filters[randomInt(0, filterCount)];
-  filter     = 'url(#'+filter+')';
-  
-  if (svgconf.enabled.gradients) {
-    fill = `url(#grad-${sid})`;
-  } else {
-    if (svgconf.objects.fill == "solid") {
-      fill = `var(--c${sid})`;
-    } else {
-      fill = svgconf.objects.fill;
-    }
-  }
+  filter     = (options.filter) ? ' filter="url(#'+options.filter+')" ': ''; 
+  fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
-  render = '<g id="flower-'+sid+'" class="flower" fill="'+fill+'" filter="'+filter+'">\r\n';
-  let d  = '  d="\r\n    M '+startx+' '+starty+' \r\n';
+  if (svgconf.shapes.flower.stroke) {
+    stroke += `" stroke-width="${svgconf.shapes.flower.swidth}" stroke="${svgconf.shapes.flower.stroke}"`;
+  } 
+  
+  render = '<g id="flower-'+sid+'" class="flower" '+fill+filter+'>\r\n';
+  let d  = stroke + '  d="\r\n    M '+startx+' '+starty+' \r\n';
   
   for (i=1; i<=pcount; i++) {
     x = points[i].x;
@@ -875,11 +907,15 @@ function svgFlower(oid = 'no-order-id', filter = '') {
     u = points[i+1].x;
     v = points[i+1].y;
  
-    path  = open+'id="petal-'+sid+'-'+i+'" class="flower petal" fill="'+fill+'"'+d;
-    path += '    L '+x+','+y            +'\r\n'; //from center to the first point
-    path += '    A 45,45 0,0,1 '+u+','+v+'\r\n';
-    path += '    L '+startx+','+starty  +'\r\n'; //from second point to the center
-    path += '    Z"'+(svgconf.enabled.stroke ? ` stroke="${svgconf.paths.line}" >` : '>')+'\r\n'+close;
+    path    = open+'id="petal-'+sid+'-'+i+'" class="flower petal"';
+    path   += fill;
+    path   += filter;
+    path   += d;
+    path   += '    L '+x+','+y            +'\r\n'; //from center to the first point
+    path   += '    A 45,45 0,0,1 '+u+','+v+'\r\n';
+    path   += '    L '+startx+','+starty  +'\r\n'; //from second point to the center
+    path   += '    Z">';
+    path   += '\r\n'+close;
     render += path;
 
     //Calculate the half way point and the anchor point x,y
@@ -889,12 +925,64 @@ function svgFlower(oid = 'no-order-id', filter = '') {
     ay = (dy-((dx-x))); 
         
     pcolor = (svgconf.enabled.points === true) ? scolor : svgconf.enabled.points;  
-    if (svgconf.enabled.anchors) output += svgDrawPoint(ax, ay, 6, svgconf.paths.arc, 'point anchor arc ');
-    if (svgconf.enabled.points ) output += svgDrawPoint( x,  y, 2, pcolor, 'point');     
+    if (svgconf.enabled.anchors)   output += svgDrawPoint(     ax,     ay, 4, svgconf.paths.arc, 'point anchor arc ');
+    if (svgconf.enabled.points ) { output += svgDrawPoint(      x,      y, 3, pcolor, 'point');      
+                                   output += svgDrawPoint( startx, starty, 3, center, 'center');
+    }
   }
 
   output += render+'</g>\r\n';
 
+  return output;
+}//----------------------------------------------------------------------------
+
+//Generates Polygons, Hexagon by default---------------------------------------
+function svgPolygon(oid = 'no-order-id', pcount=6, options) {
+  let sid    = svgid+'-'+oid;
+  let points = svgRadialPoints(pcount); //console.log(points); //DEBUG
+  let open   = '  <polygon ';
+  let close  = '  </polygon>\r\n';
+  let render = '';
+  let output = '';
+  let filter = '';
+  let fill   = '';
+  let x,y    = 0;
+  let startx = points[0].x;
+  let starty = points[0].y;
+  let polyn  = options.name;
+  let cname  = polyn;
+  let data   = { type:polyn };
+  filter     = (options.filter) ? ' filter="url(#'+options.filter+')" ': ''; 
+  fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
+  
+  cname  += ((polyn == 'oddagon') || (polyn == 'randogon')) ? ' poly'+pcount : '';
+  render += open+'id="'+polyn+'-'+sid+'-'+i+'" ';
+  render += 'class="'+cname+'"';
+  render += fill+filter+' points="';
+  
+  for (i=1; i<=pcount; i++) {
+    x = points[i].x;
+    y = points[i].y;
+ 
+    render += x+','+y+' ';
+    
+    if (svgconf.enabled.points ) { 
+      pcolor = (svgconf.enabled.points === true) ? scolor : svgconf.enabled.points;  
+      output += svgDrawPoint( startx, starty, 3, center, 'center');
+      output += svgDrawPoint(      x,      y, 3, pcolor, 'point' );
+    } 
+  }
+  
+  if (svgconf.shapes[polyn].stroke) {
+    render += `" stroke-width="${svgconf.shapes[polyn].swidth}" stroke="${svgconf.shapes[polyn].stroke}">\r\n`+close+'\r\n';
+  } else {
+    render += '">' +'\r\n'+close+'\r\n';
+  }
+  
+  output   += render;
+  data[polyn] = { pcount:pcount, points:points }
+  elements[oid].data = data;
+  
   return output;
 }//----------------------------------------------------------------------------
 
@@ -903,8 +991,12 @@ function svgContent() {
   let output  = '';
   let render  = '';
   let bgcolor = '';
-  bgcolor     = (svgconf.enabled.bgcolor === true) ? 'currentColor' : svgconf.enabled.bgcolor;
-  bgcolor     = (!svgconf.enabled.bgcolor        ) ? 'none'         : bgcolor;
+  let anchors = '';
+  let filter  = '';
+  let shape   = '';
+  let fill    = '';
+  bgcolor     = ( svgconf.enabled.bgcolor === true) ? 'currentColor' : svgconf.enabled.bgcolor;
+  bgcolor     = (!svgconf.enabled.bgcolor         ) ? 'none'         : bgcolor;
   render     += '<rect '; //Add a bounding box
   render     += `x="0" y="0" `;
   render     += `id="box-${svgid  }" `;
@@ -912,32 +1004,54 @@ function svgContent() {
   render     += `height="${height }" `; 
   render     += `  fill="${bgcolor}" `;
   render     += `></rect>\r\n`;  //allow parent element to control border color
-  let data    = { type:"rect", x:0, y:0, w:width, h:height, fill:bgcolor };
-  elements[0] = { z:0, render:render, data:data }; //bounding box takes care of index zero
-
-  output += render;
+  output     += render;
+  let data    = { type:"rectangle", rectangle:{x:0, y:0, w:width, h:height, fill:bgcolor} };
+  elements[0] = { z:0, render:render, anchors:anchors, data:data }; //bounding box takes care of index zero
   
+  rr = randomInt(3,16);  //For Randogons
+  oo = randomInt(3,15);  //For Oddagons
+  oo = (oo % 2) ? oo : oo-1; //Only odd
+
   for (oid=1; oid < svgconf.order.length; oid++) {
     render = '';
     data   = '';
+    fill   = 'var(--c'+oid+')';
+    shape  = svgconf.order[oid];
     elements[oid] = { z:oid, render:render, data:data }; //insert blank data
 
-    switch( svgconf.order[oid] ) {      
-      case 'flowers'    : render += svgFlower(oid);     break;      
-      case 'claws'      : render += svgBearClaw(oid);   break;
-      case 'clouds'     : render += svgCloud(oid);      break;
-      case 'circles'    : render += svgCircle(oid);     break;
-      case 'squares'    : render += svgRect(oid, true); break;
-      case 'rectangles' : render += svgRect(oid);       break;
-      /*
-      case 'triangles'  : render += svgPoly(oid, 3);    break;
-      case 'pentagons'  : render += svgPoly(oid, 5);    break;
-      case 'hexagons'   : render += svgPoly(oid, 6);    break;
-      case 'octagons'   : render += svgPoly(oid, 8);    break;
-      case 'polygons'   : render += svgPoly(oid, 9);    break;
-      case 'ellipses'   : render += svgElps(oid);       break;
-      case 'blobs'      : render += svgBlob(oid);       break;
-      */
+    if (svgconf.shapes[shape].filter) { 
+      filter = svgconf.shapes[shape].filter; //preselected
+      filter = (filter == 'random') ? filters[randomInt(0, fcount)] : filter;
+    }
+        
+    if (svgconf.shapes[shape].fill) { 
+      fill = svgconf.shapes[shape].fill; //preselected
+      fill = ((fill == 'random') && svgconf.enabled.gradients) ? 'url(#grad-'+svgid+'-'+oid+')' : fill;
+    }
+
+    let options    = Object.create(null);    
+    options.oid    = oid;
+    options.name   = shape;
+    options.filter = filter;
+    options.fill   = fill;
+    //console.log(options);  //DEBUG
+
+    switch(shape) {      
+    //case 'blob'      : render += svgBlob(oid,options);       break;
+    //case 'ellipse'   : render += svgellipse(oid,options);    break;
+    //case 'claw'      : render += svgBearClaw(oid,options);   break;      
+      case 'cloud'     : render += svgCloud(oid,options);      break;
+      case 'circle'    : render += svgCircle(oid,options);     break;
+      case 'flower'    : render += svgFlower(oid,options);     break;
+      case 'square'    : render += svgRect(oid,true ,options); break;
+      case 'rectangle' : render += svgRect(oid,false,options); break;
+      case 'triangle'  : render += svgPolygon(oid, 3,options); break;
+      case 'pentagon'  : render += svgPolygon(oid, 5,options); break;
+      case 'hexagon'   : render += svgPolygon(oid, 6,options); break;
+      case 'octagon'   : render += svgPolygon(oid, 8,options); break;
+      case 'dexagon'   : render += svgPolygon(oid,10,options); break;
+      case 'oddagon'   : render += svgPolygon(oid,oo,options); break;
+      case 'randogon'  : render += svgPolygon(oid,rr,options); break;
     }
     elements[oid].render = render;
     output += render;
@@ -1044,35 +1158,42 @@ function svgOnce(fn, context) {
 
 //Find every element with class="svgen" to add our SVG to----------------------
 const initializeSVGen = svgOnce(function() {
+  const svgens = document.querySelectorAll('.svgen');
+  let icount = svgens.length;
   let info = '';
   info += "-----------------------\r\n";
+  info += "[ svgen ver : "+String(version).padStart(5, ' ')+'   ]\r\n';
+  info += "[ instances : "+String(icount ).padStart(5, ' ')+'   ]\r\n';
   info += "[  elements : "+String(total  ).padStart(5, ' ')+'   ]\r\n';
-  info += "[   version : "+String(version).padStart(5, ' ')+'   ]\r\n';
+  info += "[   filters : "+String(fcount ).padStart(5, ' ')+'   ]\r\n';
+  info += "[    shapes : "+String(scount ).padStart(5, ' ')+'   ]\r\n';
   info += "[    colors : "+String(colors ).padStart(5, ' ')+'   ]\r\n';
   info += "[    height : "+String(height ).padStart(5, ' ')+'   ]\r\n';
   info += "[     width : "+String(width  ).padStart(5, ' ')+'   ]\r\n';
   info += "-----------------------\r\n";
   console.log(info);
-  const svgens = document.querySelectorAll('.svgen');
   svgens.forEach(svgen => { svgInsert(svgen)});
   console.log("SVGen initialized");
   return "Done!";
 }, this);
 //-----------------------------------------------------------------------------
 
-//Set global variables and run-------------------------------------------------
+//Initialize the global variables and generate---------------------------------
 let svgFiles    = {}; //Final rendered file output
 let idStack     = []; //Keeps track of previous render 
-let elements    = []; //Keeps track of each element variables and rendered output
+let elements    = []; //Keeps track of each element data and rendered outputs
 let total       = 0;
 let lastIndex   = 0;
 let svgid       = '123456789';
-let svgconf     = parseConf(); //console.log(svgconf); //DEBUG
+let svgconf     = parseConf();
 let filters     = Object.keys(svgconf.filters);
-let filterCount = filters.length;
+let scount      = Object.keys(svgconf.shapes).length; //number of enabled shapes
+let fcount      = filters.length;                     //number of enabled filters
 let width       = svgconf.width;
 let height      = svgconf.height;
 let colors      = svgconf.colors;
+let scolor      = svgconf.objects.scolor;
+let center      = svgconf.enabled.center;  //center point color
 //console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load
