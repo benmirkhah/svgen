@@ -1,4 +1,4 @@
-let version = 0.015; //commits + 1
+let version = 0.017; //commits + 1
 //TODO: Bring points & anchors to the front
 
 //Creates the default config object
@@ -21,27 +21,28 @@ function svgdefaults() {
   let none      = 'none';     //syntax sugar
   let gold      = 'gold';     //syntax sugar
   let lime      = 'lime';     //syntax sugar
+  let pink      = 'hotpink';  //syntax sugar
 
   shapes = {    //TODO: each shape should have config for min max etc.
     //Boxes
     blob:      { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FFCC9966',  fill:random, }, //'#FFCC9966'
     claw:      { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#99CCFF66',  fill:random, }, //'#99CCFF66'
-    cloud:     { count:  2,  max: 10,  swidth:  2,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FFFFFF33',  fill:random, }, //'#FF99FF66'
+    cloud:     { count:  1,  max: 10,  swidth:  2,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FFFFFF33',  fill:random, }, //'#FF99FF66'
     square:    { count:  1,  max: 20,  swidth:  1,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#00000099',  fill:random, }, //'#FFFF9966'
     ellipse:   { count:  0,  max: 20,  swidth:  0,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#CC666666',  fill:random, }, //'#CC666666'
     mountain:  { count:  0,  max: 10,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#6600CC66',  fill:random, }, //'#6600CC66'
     rectangle: { count:  0,  max: 20,  swidth: 10,  minw: 200,  maxw: 1200,  minh: 100,  maxh: 800,  filter:random,  stroke:'#FF663333',  fill:random, }, //'#FF663366'
     //Radials                                                                                                                                               //                  
-    circle:    { count:  5,  max: 20,  swidth:100,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#99CC9933',  fill:random, }, //'#99CC9966'
-    flower:    { count:  2,  max: 10,  swidth:  0,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#99999966',  fill:random, }, //'#9999FF66'
+    circle:    { count:  9,  max: 20,  swidth:100,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#99CC9933',  fill:random, }, //'#99CC9966'
+    flower:    { count:  1,  max: 10,  swidth:  0,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#99999966',  fill:random, }, //'#9999FF66'
     hexagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#3399CC66',  fill:random, }, //'#3399CC66'
     octagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#6666FF66',  fill:random, }, //'#6666FF66'
     oddagon:   { count:  1,  max: 20,  swidth:  2,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#33993366',  fill:random, }, //'#33993366'
     polygon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#3333CC66',  fill:random, }, //'#3333CC66'
     dexagon:   { count:  0,  max: 20,  swidth: 10,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#CC333366',  fill:random, }, //'#CC333366'
-    randogon:  { count:  1,  max: 20,  swidth:  0,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#CCCC0066',  fill:random, }, //'#CCCC0066'
+    randogon:  { count:  0,  max: 20,  swidth:  0,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#CCCC0066',  fill:random, }, //'#CCCC0066'
     pentagon:  { count:  0,  max: 20,  swidth:  2,  minr: 100,  maxr:  600,                          filter:random,  stroke:'#FFFFFF66',  fill:random, }, //'#00CCCC66'
-    triangle:  { count:  2,  max: 20,  swidth: 40,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#00000033',  fill:random, }, //'#33669966'
+    triangle:  { count:  0,  max: 20,  swidth: 40,  minr: 100,  maxr:  600,                          filter:'glow',  stroke:'#00000033',  fill:random, }, //'#33669966'
   };
 
   enabled = {
@@ -98,9 +99,9 @@ function svgdefaults() {
 
   gradients = {  //Number of colors per gradient
     min:         2,
-    max:         5,
+    max:         9,
     default:     3,
-    selected:    3,
+    selected:    5,
     orientation: 'both', //TODO: horiz, vertical, both, aligned, random
   };
 
@@ -112,7 +113,7 @@ function svgdefaults() {
     watercolor:    false,
     motionblurX:   false,
     motionblurY:   false,
-    displacement:  true,
+    displacement:  false,
     gaussianblur:  true,
     pointlighting: true,
   };
@@ -584,7 +585,7 @@ function svgRect (oid = 'no-order-id', square = false, options) {
   fill        = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
   if (svgconf.shapes[shape].stroke) {
-    stroke = `" stroke-width="${svgconf.shapes[shape].swidth}" stroke="${svgconf.shapes[shape].stroke}" `;
+    stroke = ` stroke-width="${svgconf.shapes[shape].swidth}" stroke="${svgconf.shapes[shape].stroke}" `;
   } 
 
   x  = randomInt(0,  width);
@@ -628,7 +629,7 @@ function svgCircle (oid = 'no-order-id', options) {
   fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
   if (svgconf.shapes.circle.stroke) {
-    stroke += `" stroke-width="${svgconf.shapes.circle.swidth}" stroke="${svgconf.shapes.circle.stroke}" `;
+    stroke += ` stroke-width="${svgconf.shapes.circle.swidth}" stroke="${svgconf.shapes.circle.stroke}" `;
   } 
 
   x  = randomInt(0,  width  * 1.5);
@@ -895,7 +896,7 @@ function svgFlower(oid = 'no-order-id', options) {
   fill       = (options.fill  ) ?        ' fill="'+options.fill  +'" ' : ''; 
 
   if (svgconf.shapes.flower.stroke) {
-    stroke += `" stroke-width="${svgconf.shapes.flower.swidth}" stroke="${svgconf.shapes.flower.stroke}"`;
+    stroke += ` stroke-width="${svgconf.shapes.flower.swidth}" stroke="${svgconf.shapes.flower.stroke}"`;
   } 
   
   render = '<g id="flower-'+sid+'" class="flower" '+fill+filter+'>\r\n';

@@ -104,8 +104,8 @@ section {
 .svgen { 
   width: 100%;
   display: inline-block;
-  line-height: 0;  /* Removes bottom padding */
-  color: black;    /* used by SVG bounding box */
+  line-height: 0;  /* Removes unwanted padding */
+  color: black;  /* used by SVG bounding box */
   overflow: hidden;
 
   svg { 
