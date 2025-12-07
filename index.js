@@ -1,4 +1,4 @@
-let version = '0.020'; //commits + 1
+let version = '0.021'; //commits + 1
 //Creates the default config object
 function svgdefaults() { 
   //Don't include default JS prototypes
@@ -23,27 +23,48 @@ function svgdefaults() {
   let radial    = 'radial';   //syntax sugar
   let fixed     = 'fixed';    //syntax sugar
   let solid     = 'solid';    //syntax sugar
-  let color     = '#333';   //default color
-  let grid      = 'grid';     //syntax sugar
-  let none      = 'none';     //syntax sugar
-  let gold      = 'gold';     //syntax sugar
-  let lime      = 'lime';     //syntax sugar
-  let red       = 'red';      //syntax sugar
-  let pink      = 'hotpink';  //syntax sugar
   let black     = 'black';    //syntax sugar
   let white     = 'white';    //syntax sugar
-  let scolor    = 'scolor';   //syntax sugar
+  let FFF3      = '#FFF3';    //syntax sugar
+  let FFF6      = '#FFF6';    //syntax sugar
+  let FFF9      = '#FFF9';    //syntax sugar
+  let FFFC      = '#FFFC';    //syntax sugar
+  let FF03      = '#FF03';    //syntax sugar
+  let FF06      = '#FF06';    //syntax sugar
+  let FF09      = '#FF09';    //syntax sugar
+  let FF0C      = '#FF0C';    //syntax sugar
+  let color     = '#333F';    //default color
+  let gold      = 'gold';     //syntax sugar
+  let lime      = 'lime';     //syntax sugar
+  let pink      = 'hotpink';  //syntax sugar
+  let grid      = 'grid';     //syntax sugar
+  let none      = 'none';     //syntax sugar
+  let glow      = 'glow';     //syntax sugar
+  let quad      = 'quad';     //syntax sugar
+  let cube      = 'cube';     //syntax sugar
+  let line      = 'line';     //syntax sugar
+  let arc       = 'arc';      //syntax sugar
+  let red       = 'red';      //syntax sugar
 
   grids = { 
-    type:  'radial', //true (normal), false, radial or diagonal
-    mark:   0, 
-    mcolor: pink, 
-    start:  { x:0, y:0 }, 
-    end:    { x:'width', y:'height' }, 
-    dx: 100, 
-    dy: 100, 
-    r:  500, 
-    a:   15, 
+    type:  radial, //true = normal,  radial, spiral (TODO: diagonal)
+    show:  true,
+    text:  0, //FF06,
+    bound: true,   //false = keep / true = delete positions that fall outside of artbox boundry  
+    order: normal, //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
+    start: { x:0, y:0 }, 
+    end:   { x:0, y:0 }, 
+    dx:    160, 
+    dy:    160,
+    //Radial/Spiral
+    r:     800, 
+    a:       0,
+    dr:    100,
+    da:     30,
+    cx:      0,
+    cy:      0, 
+    sr:      1,  //For spirals
+    sa:      4,  //For spirals
   }
 
   positions = { 
@@ -135,10 +156,12 @@ function svgdefaults() {
   };
 
   enabled = {
-    stroke:     true,
+    grids:      FFF3,   //true, false, or color
+    stroke:     true,   //true, false, or color
     points:     false,  //true, false, or color
     centers:    false,  //true, false, or color
     anchors:    false,  //true, false, or color
+    position:   gold,   //true, false, or color
     filters:    true,
     bgcolor:    color,  //true (currentColor), false, or color
     gradients:  true,
@@ -238,7 +261,7 @@ function svgdefaults() {
      variants:variants, //TODO
      duration:duration, //TODO
     gradients:gradients,
-  };
+  }; //console.log(conf); //DEBUG
 
   return conf;
 }//----------------------------------------------------------------------------
@@ -589,6 +612,242 @@ function svgPoints( xmax = width, ymax = height, count = 4, option = '') {
   return points;
 }//----------------------------------------------------------------------------
 
+function svgGridPoints() {
+  let grid = []
+  switch (svgconf.grids) {
+    case 'normal'  : grid = svgCartesianGrid(); break;
+    case 'radial'  : grid = svgRadialGrid(); break;
+    case 'spiral'  : grid = svgSpiralGrid(); break;
+    case 'diagonal': grid = svgCartesianGrid('diagonal'); break
+    default        : grid = svgCartesianGrid();
+  }
+  return grid;
+}//----------------------------------------------------------------------------
+
+//Radial R,A grid--------------------------------------------------------------
+function svgRadialGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, bound="?" ) {
+  r  = r  ? r : svgconf.grids.r;
+  a  = a  ? a : svgconf.grids.a;
+  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
+  da = da ? da: svgconf.grids.da; //Angle incremental delta
+  cx = cx ? cx: roundInt(width/2,1);
+  cy = cy ? cy: roundInt(height/2,1);
+  b  = bound;
+  b  = (b="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
+  let points = [ { z:'ignore-zero', x:cx , y:cy, r:r, a:a } ]; //index 0 is the center mark 
+  let rings  = Math.trunc(r   / dr); //Number of rings
+  let jewels = Math.trunc(360 / da); //Jewels per ring
+  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
+  let ignore = 0; //Number of ignored points
+  let radius = 0; //Radius of each ring
+  let radian = 0; //Angle in radian
+  let angle  = 0; //Angle in degrees
+  let msg    = '';
+  let num    = 1;
+  let x      = 0;
+  let y      = 0;
+
+  //Radial Clockwise
+  for (let ring=1; ring<=rings; ring++) {
+    for(let jewel=0; jewel<jewels; jewel++) {
+      radius = ring*dr;
+      radian = nudge * (jewel + 0.001); //Fixes rounding error
+      angle  = roundInt(radian*(180/Math.PI),1)
+      x = roundInt(cx + (radius * Math.cos(radian)),1);
+      y = roundInt(cy + (radius * Math.sin(radian)),1);
+      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
+        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
+        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
+        msg += '\r\n';
+        ignore++;        
+      } else {
+        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
+        num++;
+      }
+    }
+  }
+
+  if (bound) console.log(ignore+' points where ignored for being out of bounds');
+  //console.log(points);  //console.log(msg);  //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Spiral R,A grid--------------------------------------------------------------
+function svgSpiralGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, sr=0, sa=0, bound="?" ) {
+  r  = r  ? r : svgconf.grids.r;
+  a  = a  ? a : svgconf.grids.a;
+  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
+  da = da ? da: svgconf.grids.da; //Angle incremental delta
+  sr = sr ? sr: svgconf.grids.sr; //Spiral radius delta
+  sa = sa ? sa: svgconf.grids.sa; //Spiral angle delta
+  cx = cx ? cx: roundInt(width/2,1);
+  cy = cy ? cy: roundInt(height/2,1);
+  b  = bound;
+  b  = (b="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
+  let points = [ { z:'ignore-zero', x:cx , y:cy, r:r, a:a } ]; //index 0 is the center mark 
+  let rings  = Math.trunc(r   / dr); //Number of rings
+  let jewels = Math.trunc(360 / da); //Jewels per ring
+  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
+  let ignore = 0; //Number of ignored points
+  let radius = 0; //Radius of each ring
+  let radian = 0; //Angle in radian
+  let angle  = 0; //Angle in degrees
+  let msg    = '';
+  let num    = 1;
+  let x      = 0;
+  let y      = 0;
+
+  //Spiral Clockwise
+  radius = 0;
+  radian = 0;
+  for (let ring=1; ring<=rings; ring++) {
+    //radius += dr; //roundInt(da/sr,1);
+    for(let jewel=0; jewel<jewels; jewel++) {
+      angle  = roundInt(radian*(180/Math.PI),1);
+      x = roundInt(cx + (radius * Math.cos(radian)),1);
+      y = roundInt(cy + (radius * Math.sin(radian)),1);
+      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
+        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
+        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
+        msg += '\r\n';
+        ignore++;        
+      } else {
+        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
+        num++;
+      }
+      radian += nudge + (sa*(180/Math.PI)); //Fixes rounding error
+      radius += (dr+(jewel*Math.sqrt(sr*jewel)))/jewels;
+    }
+  }
+
+  if (bound) console.log(ignore+' points where ignored for being out of bounds');
+  //console.log(points);  //console.log(msg);  //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Normal X,Y grid--------------------------------------------------------------
+function svgCartesianGrid(diagnal = false) {  
+  let sx = svgconf.grids.start.x;
+  let sy = svgconf.grids.start.y;
+  let ex = svgconf.grids.end.x ? svgconf.grids.end.x : width;
+  let ey = svgconf.grids.end.y ? svgconf.grids.end.y : height;
+  let dx = svgconf.grids.dx;
+  let dy = svgconf.grids.dy;
+  let points  = ['ignore-zeor'];
+  let xlength = ex - sx;
+  let ylength = ey - sy;
+  let rows = Math.trunc(ylength / dy); //Number of rows
+  let cols = Math.trunc(xlength / dx); //Number of cols
+
+  svgconf.grids.order = 'vertiback';
+  switch (svgconf.grids.order) { 
+    case 'normal':    points = svgGridOrderNormal(dx,dy,rows,cols); break;
+    case 'backward':  points = svgGridOrderBackward(dx,dy,rows,cols); break;
+    case 'vertical':  points = svgGridOrderVertical(dx,dy,rows,cols); break;
+    case 'vertiback': points = svgGridOrderVertiBack(dx,dy,rows,cols); break;
+    // case 'snake':
+    // case 'vsnake':
+    // case 'spiral':
+  }
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Normal Left to right---------------------------------------------------------
+function svgGridOrderNormal(dx=160, dy=160, rows=10, cols=6) {
+  let pos    = Object.create(null);
+  let table  = ['ignore-row-zero'];
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let x      = dx;
+  let y      = dy;
+
+  for (let r=1; r<rows; r++) {
+    x = dx;
+    table[r]=[];
+
+    for (let c=1; c<cols; c++) {
+      pos = { x:x , y:y }
+      table[r][c] = pos;
+      points[num] = pos;
+      x += dx;
+      num++;
+    }
+    y += dy;
+  } //console.log(table);  //DEBUG
+  
+  return points;
+}//----------------------------------------------------------------------------
+
+//Backward Right to left-------------------------------------------------------
+function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
+  let pos    = Object.create(null);
+  let table  = [];
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let x      = dx;
+  let y      = dy;
+
+  for (let r=1; r<rows; r++) {
+    x = dx;
+    table[r]=[];
+
+    for (let c=1; c<cols; c++) {
+      pos = { x:x , y:y }
+      table[r][cols-c] = pos;
+      x += dx;
+    }
+    y += dy;
+  } //console.log(table);  //DEBUG
+
+  for (let r=1; r<rows; r++) {
+    for (let c=1; c<cols; c++) {
+      points[num] = table[r][c];
+      num++;
+    }
+  } 
+  
+  return points;
+}//----------------------------------------------------------------------------
+
+//Top Left to Bottom Right-----------------------------------------------------
+function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
+  let pos    = Object.create(null);
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let r      = 1;
+  let c      = 1;
+  let x      = dx;
+  let y      = dy;
+  
+  for (c=1; c<cols; c++) {
+    y = dy;
+    for (r=1; r<=rows; r++) {
+      pos = { x:x , y:y }
+      points[num] = pos;
+      y += dy;
+      num++;
+    }
+    x += dx;
+  }
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Reverse Bottom Right to Top Left---------------------------------------------
+function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
+  let points = svgGridOrderVertical(dx,dy,rows,cols);
+  points.shift();  //Gets rid of 'ignore-zero'
+  let reversed = ['ignore-zero', ...points.reverse()];  //console.log(reversed); //DEBUG
+  return reversed;
+}//----------------------------------------------------------------------------
+
+//Everyrow switch between L2R/R2L----------------------------------------------
+function svgGridOrderSnake(dx=160, dy=160, rows=10, cols=6){
+}//----------------------------------------------------------------------------
+
 /*********** Where all the functions that generate shapes are kept ***********/
 
 //Generates Bear Claws---------------------------------------------------------
@@ -665,16 +924,17 @@ function svgRect (oid = 'no-order-id', square = false, options = opt) {
   h += randomInt(1, h); //increase likelihood of large y
   if (square) w = h;    //make squares when requested
   
+  cx  = x + w/2;
+  cy  = y + h/2;
+  anchors += center ? svgCrossHair(cx, cy, 5, center, 'center mark') : '';
+
   if (svgconf.enabled.points) { //Find the center anchor
-    cx  = x + w/2;
-    cy  = y + h/2;
-    anchors += '<g class="'+ (square ? 'square' : 'rectangle')+' anchors">\r\n';
-    anchors += '  '+svgDrawPoint(  cx,  cy, 3, center, 'center'   );
+    anchors  = '  '+anchors;  //Indent the center point
     anchors += '  '+svgDrawPoint(   x,   y, 3, pcolor, 'point tlc');
     anchors += '  '+svgDrawPoint( w+x,   y, 3, pcolor, 'point trc');
     anchors += '  '+svgDrawPoint(   x, h+y, 3, pcolor, 'point blc');
     anchors += '  '+svgDrawPoint( w+x, h+y, 3, pcolor, 'point brc');
-    anchors += '\r\n</g>\r\n';
+    anchors  = '<g class="'+ (square ? 'square' : 'rectangle')+' anchors">\r\n'+anchors+'\r\n</g>\r\n';
   }
 
   render += open;
@@ -723,7 +983,7 @@ function svgCircle (oid = 'no-order-id', options = opt) {
   render += filter;
   render += events+'">';
   render += close;  
-  render += svgconf.enabled.points ? svgDrawPoint(x, y, 3, center, 'center') : '';
+  render += svgconf.enabled.centers ? svgCrossHair(x, y, 5, center, 'center mark') : '';
   output += render;
 
   return output;
@@ -776,8 +1036,6 @@ function svgCloud(oid = 'no-order-id', options = opt) {
     //Sum up all x & y values as their average is cx/cy 
     cx += x;
     cy += y;
-    console.log('cx: '+cx);
-    console.log('cy: '+cy);  
 
     //Calculate the half way point
     dx = (x+u)/2;
@@ -811,14 +1069,9 @@ function svgCloud(oid = 'no-order-id', options = opt) {
     if (svgconf.enabled.points) anchors += svgDrawPoint(x, y, 2, pcolor, 'point');
   }
 
-  console.log('pc: '+pcount);
-  console.log('cx: '+cx);
-  console.log('cy: '+cy);
   cx = roundInt(cx/pcount);
   cy = roundInt(cy/pcount);
-  console.log('cx: '+cx);
-  console.log('cy: '+cy);
-  if (svgconf.enabled.centers) anchors += svgDrawPoint(cx, cy, 2, center, 'center');
+  if (svgconf.enabled.centers) anchors += svgCrossHair(cx, cy, 5, center, 'center mark');
 
   let arcStroke  = '>';
   let cubeStroke = '>';
@@ -851,9 +1104,8 @@ function svgCloud(oid = 'no-order-id', options = opt) {
   }
 
   let group = svgconf.enabled.points || svgconf.enabled.anchors;
-  anchors   = group ? '<g class="'+cname+' anchors">\r\n'+anchors+'\r\n</g>\r\n' : anchors;
-
-  output += '<g class="cloud anchors">\r\n'+anchors+'\r\n</g>\r\n'; 
+  anchors   = group ? '<g class="cload anchors">\r\n'+anchors+'\r\n</g>\r\n' : anchors;
+  output   += anchors; 
 
   return output;
 }//----------------------------------------------------------------------------
@@ -906,10 +1158,9 @@ function svgFlower(oid = 'no-order-id', options = opt) {
     ax = (dx+((dy-y)));
     ay = (dy-((dx-x))); 
 
-    if (svgconf.enabled.anchors)   output += svgDrawPoint(     ax,     ay, 4, svgconf.paths.arc, 'point anchor arc ');
-    if (svgconf.enabled.points ) { output += svgDrawPoint(      x,      y, 3, pcolor, 'point');      
-                                   output += svgDrawPoint( startx, starty, 3, center, 'center');
-    }
+    if (svgconf.enabled.anchors) output += svgDrawPoint(     ax,     ay, 4, svgconf.paths.arc, 'point anchor arc ');
+    if (svgconf.enabled.points ) output += svgDrawPoint(      x,      y, 3, pcolor, 'point');
+    if (svgconf.enabled.centers) output += svgCrossHair( startx, starty, 5, center, 'center mark'); 
   }
 
   output += render+'</g>\r\n';
@@ -940,7 +1191,7 @@ function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
   render  += open+'id="'+polyn+'-'+sid+'-'+i+'" ';
   render  += 'class="'+cname+'"';
   render  += fill+stroke+filter+events+' points="';
-  anchors += (svgconf.enabled.centers) ? '  '+svgDrawPoint( startx, starty, 3, center, 'center') : '';
+  anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair( startx, starty, 5, center, 'center mark') : '';
 
   for (i=1; i<=pcount; i++) {
     render  += points[i].x+','+points[i].y+' ';     
@@ -957,17 +1208,22 @@ function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
   return output;
 }//----------------------------------------------------------------------------
 
-
 //Decipher what needs to be exact and what needs randomization-----------------
 function parseConf() {
   let order    = Array();
+  let defaults = Object.create(null);
+  let grids    = Object.create(null);
+  let paths    = Object.create(null);
   let shapes   = Object.create(null);
   let parsed   = Object.create(null);
+  let enabled  = Object.create(null);
+  let objects  = Object.create(null);
   let filters  = Object.create(null);
-  let defaults = svgdefaults();
-  let paths    = defaults.paths;
-  let enabled  = defaults.enabled;
-  let objects  = defaults.objects;
+  defaults = svgdefaults();
+  grids    = defaults.grids;
+  paths    = defaults.paths;
+  enabled  = defaults.enabled;
+  objects  = defaults.objects;
   let w = defaults.width.selected;
   let h = defaults.height.selected;
   let c = defaults.colors.selected;
@@ -1041,6 +1297,7 @@ function parseConf() {
     variants:  v,
     duration:  d,
     gradients: g,
+    grids:     grids,
     paths:     paths,
     shapes:    shapes,
     filters:   filters,
@@ -1090,7 +1347,7 @@ function svgVars(svgid) {
 //Adds the <style> element-----------------------------------------------------
 function svgStyle(svgid) {
   let open    = '<style>\r\n';
-  let content = svgVars(svgid);
+  let content = 'text { font-size:0.65em; }\r\n'+svgVars(svgid);
   let close   = '</style>\r\n';
   let output  = open + content + close;
   return output;
@@ -1143,6 +1400,37 @@ function svgDrawPoint(x = 100, y=100, r=5, c='white', classname='point') {
   circle += `class="${classname}" `; 
   circle += `/> \r\n`;
   return circle;
+}//----------------------------------------------------------------------------
+
+//Adds illustrator style grid points-------------------------------------------
+function svgXMark(x = 100, y=100, r=4, c='white', classname='xmark', gnum = 0) {
+  let mark = '';
+  mark += '<path d="';
+  mark += ' M '+(x-r)+','+(y+r);
+  mark += ' L '+(x+r)+','+(y-r);
+  mark += ' M '+(x+r)+','+(y+r);
+  mark += ' L '+(x-r)+','+(y-r);
+  mark += `" stroke="${c}" `;
+  mark += `class="${classname}" `; 
+  mark += `/>\r\n`;
+  mark += gnum ? mark += `<text fill="${svgconf.grids.text}" x="${x-r}" y="${y+r+10}">${gnum}</text>` : '';
+  //mark += svgconf.enabled.grid ? mark += `<text x="${x+r}" y="${y}">${x},${y} </text>` : '';
+  
+  return mark;
+}//----------------------------------------------------------------------------
+
+//Adds illustrator style center points-----------------------------------------
+function svgCrossHair(x = 100, y=100, r=5, c='white', classname='mark') {
+  let mark = '';
+  mark += '<path d="';
+  mark += ' M '+(x-r)+','+y;
+  mark += ' L '+(x+r)+','+y;
+  mark += ' M '+ x   +','+(y-r);
+  mark += ' L '+ x   +','+(y+r);
+  mark += `" stroke="${c}" `;
+  mark += `class="${classname}" `; 
+  mark += `/> \r\n`;
+  return mark;
 }//----------------------------------------------------------------------------
 
 //Adds elements enabled in config----------------------------------------------
@@ -1219,7 +1507,7 @@ function svgContent() {
     switch(shape) {      
     //case 'blob'      : render += svgBlob(oid,options);       break;
     //case 'ellipse'   : render += svgellipse(oid,options);    break;
-      case 'claw'      : render += svgBearClaw(oid,options);   break;      
+    //case 'claw'      : render += svgBearClaw(oid,options);   break;      
       case 'cloud'     : render += svgCloud(oid,options);      break;
       case 'circle'    : render += svgCircle(oid,options);     break;
       case 'flower'    : render += svgFlower(oid,options);     break;
@@ -1237,6 +1525,24 @@ function svgContent() {
     output += render;
   } //console.log(elements);  //DEBUG
 
+  return output
+}//----------------------------------------------------------------------------
+
+function svgShowGrid() {
+  let output  = '';
+  if (svgconf.enabled.grids && svgconf.grids.show) {
+    let points = Array();
+    //points = svgCartesianGrid();
+    //points = svgRadialGrid();
+    points = svgSpiralGrid();
+
+    for (let i=1; i<points.length; i++) {
+      let x = points[i].x;
+      let y = points[i].y;
+      output += svgXMark ( x, y, 4, svgconf.enabled.grids, 'grid', i);
+      output += svgDrawPoint(x,y,(5+i),'#9999');
+    }
+  }
   return output;
 }//----------------------------------------------------------------------------
 
@@ -1251,13 +1557,14 @@ function svgTag() {
   open       += `viewBox="0 0 ${width} ${height}" `;
   open       += `id="svg-${svgid}" `;
   open       += `fill="none" `;
+  open       += 'preserveAspectRatio="xMinYMid slice" '; //TODO add to config
   open       += `xmlns="${xmlns}" `;
   open       += `xmlns:xlink="${xlink}" >\r\n`;
-  open       += 'preserveAspectRatio="slice" ' //TODO add to congig
   output     += open; 
   output     += svgStyle(svgid);
   output     += svgDefs();
   output     += svgContent();
+  //output     += svgShowGrid();
   output     += close;
 
   idStack.unshift('svg-'+svgid); //Newest id on top
