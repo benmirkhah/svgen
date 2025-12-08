@@ -1,359 +1,403 @@
-let version   = '0.022'; //Commits + 1
+let version   = '0.023'; //Commits + 1
 
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
   let w = Object.create(null);  //Width
   let h = Object.create(null);  //Height
   let c = Object.create(null);  //Canvas
-  
-  w = {
-    min:       100,
-    max:      3000,
-    default:   640,
-    selected: 1920,
-  };
-
-  h = {
-    min:       100,
-    max:      3000,
-    defualt:   480,
-    selected:  957,
-  };
-
-  c = {
-    width:  w,
-    height: h,
-  };
-
+  w['min'     ] =  100;
+  w['max'     ] = 3000;
+  w['default' ] =  640;
+  w['selected'] = 1920;
+  h['min'     ] =  100;
+  h['max'     ] = 3000;
+  h['default' ] =  480;
+  h['selected'] =  957;
+  c['width'   ] =    w;
+  c['height'  ] =    h;
+  //console.log(c);  //DEBUG
   return c;
+}//----------------------------------------------------------------------------
+
+//Default number of shape types per instance-----------------------------------
+function defaultShapeCount() {
+  let out = Object.create(null);
+  out[blob     ] = 0;
+  out[claw     ] = 0;
+  out[cloud    ] = 0;
+  out[square   ] = 1;
+  out[ellipse  ] = 0;
+  out[mountain ] = 0;
+  out[rectangle] = 0;
+  out[circle   ] = 5;
+  out[flower   ] = 1;
+  out[hexagon  ] = 0;
+  out[octagon  ] = 0;
+  out[oddagon  ] = 1;
+  out[polygon  ] = 0;
+  out[dexagon  ] = 0;
+  out[randogon ] = 0;
+  out[pentagon ] = 0;
+  out[triangle ] = 1;  
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default enabled features-----------------------------------------------------
 function defaultEnabled() {
-  let enabled = Object.create(null);
-
-  enabled = {
-    grids:      FFF3,   //true, false, or color
-    stroke:     true,   //true, false, or color
-    points:     false,  //true, false, or color
-    centers:    false,  //true, false, or color
-    anchors:    false,  //true, false, or color
-    position:   gold,   //true, false, or color
-    bgcolor:    color,  //true (currentColor), false, or color
-    filters:    true,
-    gradients:  true,
-    variants:   false,  //TODO
-    animation:  false,  //TODO
-  };
-
-  return enabled;
+  let out = Object.create(null);
+  out['grids'    ] = FFF3;   //true, false, or color
+  out['stroke'   ] = true;   //true, false, or color
+  out['points'   ] = false;  //true, false, or color
+  out['centers'  ] = false;  //true, false, or color
+  out['anchors'  ] = false;  //true, false, or color
+  out['position' ] = gold;   //true, false, or color
+  out['bgcolor'  ] = color;  //true (currentColor), false, or color
+  out['filters'  ] = true;
+  out['variants' ] = false;  //TODO
+  out['gradients'] = true;
+  out['animation'] = false;  //TODO
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default enabled filters------------------------------------------------------
 function defaultFilters() {
-  let filters = Object.create(null);
-  
-  filters = { //Global
-    glow:          true,
-    tile:          false,
-    dance:         true,
-    chaotic:       false,
-    watercolor:    false,
-    motionblurX:   false,
-    motionblurY:   false,
-    displacement:  false,
-    gaussianblur:  true,
-    pointlighting: true,
-  };
-  
-  return filters;
+  let out = Object.create(null);
+  out[glow         ] = true;
+  out[tile         ] = false;
+  out[dance        ] = true;
+  out[chaotic      ] = false;
+  out[watercolor   ] = false;
+  out[motionblurX  ] = false;
+  out[motionblurY  ] = false;
+  out[displacement ] = false;
+  out[gaussianblur ] = true;
+  out[pointlighting] = true;
+  return out;
 }//----------------------------------------------------------------------------
 
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
   let grids = Object.create(null);
-
-  grids = { 
-    type:  radial, //true = normal, radial, spiral (TODO: diagonal)
-    show:  true,
-    text:  0,      //FF06,
-    bound: true,   //false = keep / true = delete positions that fall outside of artbox boundry  
-    order: normal, //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
-    start: { x:0, y:0 }, 
-    end:   { x:0, y:0 }, 
-    dx:    160, 
-    dy:    160,
-    //Radial/Spiral
-    r:     800, 
-    a:       0,
-    dr:    100,
-    da:     30,
-    cx:      0,
-    cy:      0, 
-    sr:      1,  //For spirals
-    sa:      4,  //For spirals
-  };
-
+  let point = Object.create(null);
+  point['x'] = 0;
+  point['y'] = 0;
+  //Cartesian Grids
+  grids['type' ] = radial;  //true = normal, radial, spiral (TODO: diagonal)
+  grids['show' ] =   true;
+  grids['text' ] =      0;  //FF06;
+  grids['bound'] =   true;  //false = keep / true = delete positions that fall outside of artbox boundry  
+  grids['order'] = normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
+  grids['start'] =  point; 
+  grids['end'  ] =  point; 
+  grids['dx'   ] =    160; 
+  grids['dy'   ] =    160;
+  //Radial/Spiral Grids
+  grids['r' ] =  800; 
+  grids['a' ] =    0;
+  grids['dr'] =  100;
+  grids['da'] =   30;
+  grids['cx'] =    0;
+  grids['cy'] =    0; 
+  grids['sr'] =    1;  //Spirals
+  grids['sa'] =    4;  //Spirals
+  //console.log(grids);  //DEBUG
   return grids;
 }//----------------------------------------------------------------------------
 
 //Defaults for paths-----------------------------------------------------------
 function defaultPaths() {
-  let paths = Object.create(null);
-  
-  paths = {
-    type:    arc,  //arc, quad, cube, line, all, TODO: random 
-    all:   false,
-    arc:    gold,  //true, false or color
-    cube:  false,  //true, false or color
-    quad:  false,  //true, false or color
-    line:  false,  //true, false or color
-  };
-  
-  return paths;
+  let out = Object.create(null);  
+  out['type'] =   arc;  //arc, quad, cube, line, all, TODO: random 
+  out['all' ] = false;
+  out['arc' ] =  gold;  //true, false or color
+  out['cube'] = false;  //true, false or color
+  out['quad'] = false;  //true, false or color
+  out['line'] = false;  //true, false or color
+  return out;
 }//----------------------------------------------------------------------------
 
-//Default properties of shape types--------------------------------------------
-function defaultShapes() {
-  let shapes = Object.create(null);  //Configuration for shape types
-  let p      = defaultPositions();
-  let s      = defaultSizes();
-  let t      = defaultStrokes();
+//Default shape object template that all shape types share---------------------
+function defaultShapeTemplate() {
+  let out = Object.create(null);
+  out['count'   ] =      0;
+  out['max'     ] =     10;
+  out['fill'    ] = random;
+  out['filter'  ] = random;
+  out['size'    ] = defaultShapeSizeTemplate();
+  out['stroke'  ] = defaultShapeStrokeTemplate();
+  out['position'] = defaultShapePositionTemplate();
+  return out;  
+}//----------------------------------------------------------------------------
 
-  shapes = {    //TODO: each shape should have config for min max etc.
-    //Boxes
-    blob:      { count: 0,  max:10,  fill:random,  filter:random,  size:s.blob,       position:p.blob,       stroke:t.blob,      }, 
-    claw:      { count: 1,  max:10,  fill:random,  filter:random,  size:s.claw,       position:p.claw,       stroke:t.claw,      }, 
-    cloud:     { count: 1,  max:10,  fill:random,  filter:random,  size:s.cloud,      position:p.cloud,      stroke:t.cloud,     }, 
-    square:    { count: 1,  max:20,  fill:random,  filter:random,  size:s.square,     position:p.square,     stroke:t.square,    }, 
-    ellipse:   { count: 0,  max:20,  fill:random,  filter:random,  size:s.ellipse,    position:p.ellipse,    stroke:t.ellipse,   }, 
-    mountain:  { count: 0,  max:10,  fill:random,  filter:random,  size:s.mountain,   position:p.mountain,   stroke:t.mountain,  }, 
-    rectangle: { count: 0,  max:20,  fill:random,  filter:random,  size:s.rectangle,  position:p.rectangle,  stroke:t.rectangle, }, 
-    //Radials                                                                                                                    // 
-    circle:    { count: 5,  max:20,  fill:random,  filter:random,  size:s.circle,     position:p.circle,     stroke:t.circle,    }, 
-    flower:    { count: 1,  max:10,  fill:random,  filter:'glow',  size:s.flower,     position:p.flower,     stroke:t.flower,    }, 
-    hexagon:   { count: 0,  max:20,  fill:random,  filter:random,  size:s.hexagon,    position:p.hexagon,    stroke:t.hexagon,   }, 
-    octagon:   { count: 0,  max:20,  fill:random,  filter:random,  size:s.octagon,    position:p.octagon,    stroke:t.octagon,   }, 
-    oddagon:   { count: 1,  max:20,  fill:random,  filter:random,  size:s.oddagon,    position:p.oddagon,    stroke:t.oddagon,   }, 
-    polygon:   { count: 0,  max:20,  fill:random,  filter:random,  size:s.polygon,    position:p.polygon,    stroke:t.polygon,   }, 
-    dexagon:   { count: 0,  max:20,  fill:random,  filter:random,  size:s.dexagon,    position:p.dexagon,    stroke:t.dexagon,   }, 
-    randogon:  { count: 0,  max:20,  fill:random,  filter:random,  size:s.randogon,   position:p.randogon,   stroke:t.randogon,  }, 
-    pentagon:  { count: 0,  max:20,  fill:random,  filter:random,  size:s.pentagon,   position:p.pentagon,   stroke:t.pentagon,  }, 
-    triangle:  { count: 1,  max:20,  fill:random,  filter:'glow',  size:s.triangle,   position:p.triangle,   stroke:t.triangle,  }, 
-  };
+//Default properties of each shape types---------------------------------------
+function defaultShapes() {
+  let shapes      = Object.create(null);
+  let fill        = defaultShapeFill();
+  let size        = defaultShapeSize();
+  let count       = defaultShapeCount();
+  let filter      = defaultShapeFilter();
+  let stroke      = defaultShapeStroke();
+  let position    = defaultShapePosition();
+
+  //Create defaults for each shape type
+  shapeTypes.forEach(type => {
+    shapes[type] = defaultShapeTemplate(); 
+    shapes[type].count    =    count[type];
+    shapes[type].size     =     size[type];
+    shapes[type].fill     =     fill[type];
+    shapes[type].stroke   =   stroke[type];
+    shapes[type].filter   =   filter[type];
+    shapes[type].position = position[type];
+  });
   
+  //console.log(shapes);  //DEBUG  
   return shapes;
 }//----------------------------------------------------------------------------
 
 //Number of colors per gradient------------------------------------------------
 function defaultGradients() {
-  let gradients = Object.create(null);
-
-  gradients = {
-    min:         2,
-    max:         9,
-    default:     3,
-    selected:    5,
-    orientation: 'both', //TODO: horiz, vertical, both, aligned, random
-  };
-
-  return gradients;
+  let out = Object.create(null);
+  out[min      ] = 2;
+  out[max      ] = 9;
+  out['default'] = 3;
+  out[selected ] = 5;
+  out[type     ] = both; //TODO: horiz, vertical, both, aligned, random
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default color palette properties---------------------------------------------
 function defaultColors() {
-  let colors = Object.create(null);
-
-  colors = {
-    min:         3,
-    max:       256,
-    default:    10,
-    selected:  100,
-  };
-
-  return colors;
+  let out = Object.create(null);
+  out[min      ] =    3;
+  out[max      ] =  256;
+  out['default'] =   10;
+  out[selected ] =  100;
+  return out;
 }//----------------------------------------------------------------------------
 
-//Default position of shape types----------------------------------------------
-function defaultPositions() {
-  let position = Object.create(null);
-
-  position = { 
-    //Boxes      type:random / grid   0 maxx & maxy = width/height  
-    blob:      { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    claw:      { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    cloud:     { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    square:    { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    ellipse:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    mountain:  { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    rectangle: { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    //Radials                                                     //
-    circle:    { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    flower:    { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    hexagon:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    octagon:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    oddagon:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    polygon:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    dexagon:   { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    randogon:  { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    pentagon:  { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-    triangle:  { type:random,  minx:1,  maxx:0,  miny:1,  maxy:0, },
-  };
-  
-  return position;
+//Default template for a shape's position object-------------------------------
+function defaultShapePositionTemplate() {
+  let out  = Object.create(null);
+  out[type] = random; //random / fixed / grid / incremental / decremental (based on min & max)
+  out[cx  ] =      0;
+  out[cy  ] =      0;
+  out[minx] =     60;
+  out[maxx] =    600;
+  out[miny] =     40;
+  out[maxy] =    400;
+  return out;
 }//----------------------------------------------------------------------------
 
-//Default size of shape types--------------------------------------------------
-function defaultSizes() {
-  let sizes     = Object.create(null);
+//Default position of each shape types-----------------------------------------
+function defaultShapePosition() {
+  let out = Object.create(null);
   
-  sizes = { 
-    //Boxes      type:random / fixed / incremental / decremental (based on min & max)
-    blob:      { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    claw:      { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    cloud:     { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    square:    { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    ellipse:   { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    mountain:  { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    rectangle: { type:random,  w:0,  h:0,  minw:60,  maxw:600,  minh:40,  maxh:400, },
-    //Radials                                                  //
-    circle:    { type:random,  r:0,        minr:60,  maxr:600, },
-    flower:    { type:random,  r:0,        minr:60,  maxr:600, },
-    hexagon:   { type:random,  r:0,        minr:60,  maxr:600, },
-    octagon:   { type:random,  r:0,        minr:60,  maxr:600, },
-    oddagon:   { type:random,  r:0,        minr:60,  maxr:600, },
-    polygon:   { type:random,  r:0,        minr:60,  maxr:600, },
-    dexagon:   { type:random,  r:0,        minr:60,  maxr:600, },
-    randogon:  { type:random,  r:0,        minr:60,  maxr:600, },
-    pentagon:  { type:random,  r:0,        minr:60,  maxr:600, },
-    triangle:  { type:random,  r:0,        minr:60,  maxr:600, },
-  };
+  //Create a default position object for each shape type
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = defaultShapePositionTemplate(); 
+  });
 
-  return sizes;
+  //Shape specific tweaks go here
+  //Properties: type, cx, cy, minx, maxx, miny, maxy
+  out[square].cx   = 500;
+  out[square].cy   = 500;
+  
+  return out;
+}//----------------------------------------------------------------------------
+
+//Default template for a shape's size object-----------------------------------
+function defaultShapeSizeTemplate() {
+  let out  = Object.create(null);
+  out[type] = random; //random / fixed / incremental / decremental (based on min & max)
+  out['w' ] =     60;
+  out['h' ] =     40;
+  out[minw] =     60;
+  out[maxw] =    600;
+  out[minh] =     40;
+  out[maxh] =    400;
+  out['r' ] =     30;
+  out[minr] =     30;
+  out[maxr] =    600;
+  return out;
+}//----------------------------------------------------------------------------
+
+//Default sizes of each shape type---------------------------------------------
+function defaultShapeSize() {
+  let out = Object.create(null);
+
+  //Create a default size object for each shape type
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = defaultShapeSizeTemplate(); 
+  });
+
+  //Shape specific tweaks go here
+  //Properties: type, w, h, r, minw, maxw, minh, maxh, minr, maxr
+  out[square].w    = 250;
+  out[flower].maxr = 250;
+  
+  return out;
+}//----------------------------------------------------------------------------
+
+//Default template for a shape's stroke object---------------------------------
+function defaultShapeStrokeTemplate() {
+  let out = Object.create(null);
+  out['swidth'] = random;
+  out['scolor'] =     '';
+  out[opacity ] =    0.5;
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default stroke of shape types------------------------------------------------
-function defaultStrokes() {
-  let strokes = Object.create(null);
+function defaultShapeStroke() {
+  let out = Object.create(null);
 
-  strokes = { 
-    //Boxes
-    blob:      { swidth:    10,  scolor:'#FFCC9966',  opacity:0.1, },
-    claw:      { swidth:    10,  scolor:'#99CCFF66',  opacity:1.0, },
-    cloud:     { swidth:random,  scolor:'#FFFFFF33',  opacity:1.0, },
-    square:    { swidth:     1,  scolor:'#00000099',  opacity:0.5, },
-    ellipse:   { swidth:     0,  scolor:'#CC666666',  opacity:1.0, },
-    mountain:  { swidth:    10,  scolor:'#6600CC66',  opacity:1.0, },
-    rectangle: { swidth:     0,  scolor:'#FF663333',  opacity:1.0, },
-    //Radials                                                        //
-    circle:    { swidth:random,  scolor:'#99CC9999',  opacity:0.1, },
-    flower:    { swidth:     0,  scolor:'#99999966',  opacity:1.0, },
-    hexagon:   { swidth:     6,  scolor:'#3399CC66',  opacity:1.0, },
-    octagon:   { swidth:     8,  scolor:'#6666FF66',  opacity:1.0, },
-    oddagon:   { swidth:random,  scolor:'#33993366',  opacity:1.0, },
-    polygon:   { swidth:    10,  scolor:'#3333CC66',  opacity:1.0, },
-    dexagon:   { swidth:    10,  scolor:'#CC333366',  opacity:1.0, },
-    randogon:  { swidth:random,  scolor:'#CCCC0066',  opacity:1.0, },
-    pentagon:  { swidth:     5,  scolor:'#FFFFFF66',  opacity:1.0, },
-    triangle:  { swidth:random,  scolor:'#00000033',  opacity:1.0, },
-  };
+  //Create a default stroke object for each shape type
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = defaultShapeStrokeTemplate(); 
+  });
 
-  return strokes;
+  //Stroke Width
+  out[square   ].swidth  =   1;
+  out[rectangle].swidth  =   0;
+  out[flower   ].swidth  =   0;
+  //Stroke Color
+  out[blob     ].scolor  = '#FFCC9966';
+  out[claw     ].scolor  = '#99CCFF66';
+  out[cloud    ].scolor  = '#FFFFFF33';
+  out[square   ].scolor  = '#00000099';
+  out[ellipse  ].scolor  = '#CC666666';
+  out[mountain ].scolor  = '#6600CC66';
+  out[rectangle].scolor  = '#FF663333';  
+  out[circle   ].scolor  = '#99CC9999';
+  out[flower   ].scolor  = '#99999966';
+  out[hexagon  ].scolor  = '#3399CC66';
+  out[octagon  ].scolor  = '#6666FF66';
+  out[oddagon  ].scolor  = '#33993366';
+  out[polygon  ].scolor  = '#3333CC66';
+  out[dexagon  ].scolor  = '#CC333366';
+  out[randogon ].scolor  = '#CCCC0066';
+  out[pentagon ].scolor  = '#FFFFFF66';
+  out[triangle ].scolor  = '#00000033';
+  //Stroke Opacity
+  out[circle   ].opacity = 0.1;
+
+  return out;
+}//----------------------------------------------------------------------------
+
+//Default fill for each of the shape types-------------------------------------
+function defaultShapeFill() {
+  let out = Object.create(null);
+  out[blob     ] = random;
+  out[claw     ] = random;
+  out[cloud    ] = random;
+  out[square   ] = solid;
+  out[ellipse  ] = random;
+  out[mountain ] = random;
+  out[rectangle] = random;
+  out[circle   ] = random;
+  out[flower   ] = random;
+  out[hexagon  ] = random;
+  out[octagon  ] = random;
+  out[oddagon  ] = random;
+  out[polygon  ] = random;
+  out[dexagon  ] = random;
+  out[randogon ] = random;
+  out[pentagon ] = random;
+  out[triangle ] = random;  
+  return out;
+}//----------------------------------------------------------------------------
+
+//Default filter for each of the shape types-----------------------------------
+function defaultShapeFilter() {
+  let out = Object.create(null);
+  out[blob     ] = random;
+  out[claw     ] = random;
+  out[cloud    ] = random;
+  out[square   ] = random;
+  out[ellipse  ] = random;
+  out[mountain ] = random;
+  out[rectangle] = random;
+  out[circle   ] = random;
+  out[flower   ] = glow;
+  out[hexagon  ] = random;
+  out[octagon  ] = random;
+  out[oddagon  ] = random;
+  out[polygon  ] = random;
+  out[dexagon  ] = random;
+  out[randogon ] = random;
+  out[pentagon ] = random;
+  out[triangle ] = glow;  
+  //console.log(out);  //DEBUG
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default properties of objects------------------------------------------------
 function defaultObjects() {
-  let objects = Object.create(null);
-  
-  objects = { //Used only when shape properties are undefined or set to 'default'
-    min:        1,
-    max:      250,
-    maxshape:  50,
-    default:    5,     //NOT IN USE
-    selected:  10,     //NOT IN USE
-    swidth:     4,     //Stroke width defualt
-    scolor:    lime,   //Stroke color default
-    acolor:    white,  //Anchor color default
-    pcolor:    black,  //Point  color default
-    ccolor:    black,  //Center color default
-    fill:      color,  //true, false or color
-  };
-
-  return objects;
+  let out = Object.create(null);
+  //Used only when shape properties are undefined or set to 'default'
+  out['min'     ] =      1;
+  out['max'     ] =    250;
+  out['maxshape'] =     50;
+  out['default' ] =      5;  //NOT IN USE
+  out['selected'] =     10;  //NOT IN USE
+  out['swidth'  ] =      4;  //Stroke width defualt
+  out['scolor'  ] =   lime;  //Stroke color default
+  out['acolor'  ] =  white;  //Anchor color default
+  out['pcolor'  ] =  black;  //Point  color default
+  out['ccolor'  ] =  black;  //Center color default
+  out['fill'    ] =  color;  //true, false or color
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default properties of variants-----------------------------------------------
 function defaultVariants() {
-  let variants = Object.create(null);
-  
-  variants = {  //TODO: For doings transforms on various shapes
-    min:             1,
-    max:            10,
-    default:         0,
-    selected:   random,
-  };
-
-  return variants;
+  let out = Object.create(null);
+  //TODO: For doings transforms on various shapes
+  out[min      ] =      1;
+  out[max      ] =     10;
+  out['default'] =      0;
+  out[selected ] = random;
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default animation duration---------------------------------------------------
 function defaultDuration() {
-  let duration = Object.create(null);
-  
-  duration = {  //TODO: Animations
-    min:           100,
-    max:         36000,
-    default:         0,
-    selected:   random,
-  };
- 
-  return duration;
+  let out = Object.create(null);  
+  out[min      ] =    100;
+  out[max      ] =  36000;
+  out['default'] =      0;
+  out[selected ] = random;
+  return out;
 }//----------------------------------------------------------------------------
 
 //Default options for calling shape generator functions------------------------
 function defaultOptions() {
-  let options = Object.create(null);
-
-  options = { 
-    oid:     777, 
-    shape:   'unknown', 
-    filters: '', 
-    fill:    '' 
-  };
-
-  return options;
+  let out = Object.create(null);
+  out['oid'    ] = 777; 
+  out['shape'  ] = 'unknown'; 
+  out['filters'] = ''; 
+  out['fill'   ] = '';
+  return out;
 }//----------------------------------------------------------------------------
 
 //Creates the default config object--------------------------------------------
 function svgDefaults() { 
-  let conf      = Object.create(null);  //Returns this object  
-  let grids     = defaultGrids();
-  let paths     = defaultPaths();
-  let canvas    = defaultCanvas();
-  let colors    = defaultColors();
-  let shapes    = defaultShapes();
-  let enabled   = defaultEnabled();
-  let filters   = defaultFilters();
-  let objects   = defaultObjects();
-  let variants  = defaultVariants();
-  let duration  = defaultDuration();
-  let gradients = defaultGradients();
- 
-  conf = {  //Export
-        paths:paths,
-        grids:grids,
-       canvas:canvas,
-       colors:colors,
-       shapes:shapes,
-      enabled:enabled,
-      filters:filters,
-      objects:objects,
-     variants:variants, //TODO
-     duration:duration, //TODO
-    gradients:gradients,
-  }; //console.log(conf); //DEBUG
-
-  return conf;
+  let out = Object.create(null);
+  out[    'grids'] = defaultGrids();    
+  out[    'paths'] = defaultPaths();    
+  out[   'canvas'] = defaultCanvas();   
+  out[   'colors'] = defaultColors();   
+  out[   'shapes'] = defaultShapes();   
+  out[  'enabled'] = defaultEnabled();  
+  out[  'filters'] = defaultFilters();  
+  out[  'objects'] = defaultObjects();  
+  out[ 'variants'] = defaultVariants(); 
+  out[ 'duration'] = defaultDuration(); 
+  out['gradients'] = defaultGradients();
+  return out;
 }//----------------------------------------------------------------------------
 
 //Handy unix time stamp-------------------------------------------------------- 
@@ -486,122 +530,122 @@ function svgFilters() {
 
   //DISPLACEMENT---------------------------------------------------------------
   if (svgconf.filters.displacement) {
-    let displacement = '';
-    displacement += '<filter id="displacement">\r\n';
-    displacement += `  <feTurbulence baseFrequency="0.0${seed25}" seed="${seed1000}" result="turbulence" />\r\n`;
-    displacement += `  <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />\r\n`;
-    displacement += '</filter>\r\n';
-    output       += displacement;
+    let out = '';
+    out += '<filter id="displacement">\r\n';
+    out += `  <feTurbulence baseFrequency="0.0${seed25}" seed="${seed1000}" result="turbulence" />\r\n`;
+    out += `  <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
   }
   
   //GAUSSIAN BLUR--------------------------------------------------------------
   if (svgconf.filters.gaussianblur) {
-    let gaussianblur = '';
+    let out = '';
     x  = randomInt(5, 99);
     y  = randomInt(5, 99);
     x -= randomInt(1, x); //reduce likelihood of large x
     y -= randomInt(1, y); //reduce likelihood of large y
-    gaussianblur += '<filter id="gaussianblur">\r\n';
-    gaussianblur += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-    gaussianblur += '</filter>\r\n';
-    output       += gaussianblur;
+    out += '<filter id="gaussianblur">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
   }
 
   //GLOW-----------------------------------------------------------------------
   if (svgconf.filters.glow) {
-    let glow = '';
+    let out = '';
     c = randomInt(1, colors);
     d = randomInt(2, 30);
-    glow += '<filter id="glow">\r\n'
-    glow += `  <feDropShadow in="FillPaint" dx="0" dy="0" stdDeviation="${d}" flood-color="var(--c${c})" />\r\n`;
-    glow += '</filter>\r\n';
-    output += glow;
+    out += '<filter id="glow">\r\n'
+    out += `  <feDropShadow in="FillPaint" dx="0" dy="0" stdDeviation="${d}" flood-color="var(--c${c})" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
   }
 
   //POINTLIGHTING--------------------------------------------------------------
   if (svgconf.filters.pointlighting) {
-    let pointlighting = '';
+    let out = '';
     x = randomInt(width  * 0.1, width  * 0.9);
     y = randomInt(height * 0.1, height * 0.9);
     c = randomInt(1, colors);
     z = seed1000;
-  
-    pointlighting += '<filter id="pointlighting">\r\n';
-    pointlighting += `  <feDiffuseLighting in="SourceGraphic" result="light" lighting-color="var(--c${c})">\r\n`;
-    pointlighting += `    <fePointLight x="${x}" y="${y}" z="${z}" />\r\n`;
-    pointlighting += '  </feDiffuseLighting>\r\n';
-    pointlighting += '  <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" />\r\n';
-    pointlighting += '</filter>\r\n';
+    out += '<filter id="pointlighting">\r\n';
+    out += `  <feDiffuseLighting in="SourceGraphic" result="light" lighting-color="var(--c${c})">\r\n`;
+    out += `    <fePointLight x="${x}" y="${y}" z="${z}" />\r\n`;
+    out += '  </feDiffuseLighting>\r\n';
+    out += '  <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" />\r\n';
+    out += '</filter>\r\n';
+    output += out;
   }
 
   //TILE-----------------------------------------------------------------------
   if (svgconf.filters.tile) {
-    let tile = '';
+    let out = '';
     x = randomInt(width  * 0.5, width  * 0.75);
     y = randomInt(height * 0.5, height * 0.75);
     w = randomInt(1, x);
     h = randomInt(1, y);
-    tile += `<filter id="tile" x="0" y="0" width="100%" height="100%">\r\n`;
-    tile += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
-    tile += '  <feTile />\r\n';
-    tile += '</filter>\r\n';
-    output += tile;
+    out += `<filter id="tile" x="0" y="0" width="100%" height="100%">\r\n`;
+    out += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
+    out += '  <feTile />\r\n';
+    out += '</filter>\r\n';
+    output += out;
   }
 
   //DANCE----------------------------------------------------------------------
   if (svgconf.filters.dance) {
-    let dance = '';
-    dance += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    dance += '  <feMorphology operator="dilate" radius="8 8" in="SourceAlpha" result="morphology"/>\r\n';
-    dance += '  <feFlood flood-color="#000000" flood-opacity="0.5" result="flood"/>\r\n';
-    dance += '  <feComposite in="flood" in2="morphology" operator="in" result="composite"/>\r\n';
-    dance += '  <feComposite in="composite" in2="SourceAlpha" operator="out" result="composite1"/>\r\n';
-    dance += '  <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="1" seed="0" stitchTiles="stitch" result="turbulence"/>\r\n';
-    dance += '  <feDisplacementMap in="composite1" in2="turbulence" scale="17" xChannelSelector="A" yChannelSelector="A" result="displacementMap"/>\r\n';
-    dance += '  <feMerge result="merge">\r\n';
-    dance += '    <feMergeNode in="SourceGraphic" result="mergeNode"/>\r\n';
-    dance += '    <feMergeNode in="displacementMap" result="mergeNode1"/>\r\n';
-    dance += '  </feMerge>\r\n';
-    dance += '</filter>\r\n';
-    output += dance;
+    let out = '';
+    out += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feMorphology operator="dilate" radius="8 8" in="SourceAlpha" result="morphology"/>\r\n';
+    out += '  <feFlood flood-color="#000000" flood-opacity="0.5" result="flood"/>\r\n';
+    out += '  <feComposite in="flood" in2="morphology" operator="in" result="composite"/>\r\n';
+    out += '  <feComposite in="composite" in2="SourceAlpha" operator="out" result="composite1"/>\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="1" seed="0" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feDisplacementMap in="composite1" in2="turbulence" scale="17" xChannelSelector="A" yChannelSelector="A" result="displacementMap"/>\r\n';
+    out += '  <feMerge result="merge">\r\n';
+    out += '    <feMergeNode in="SourceGraphic" result="mergeNode"/>\r\n';
+    out += '    <feMergeNode in="displacementMap" result="mergeNode1"/>\r\n';
+    out += '  </feMerge>\r\n';
+    out += '</filter>\r\n';
+    output += out;
   }
 
   //WATERCOLOR-----------------------------------------------------------------
   if (svgconf.filters.watercolor) {
-    let water = '';
-    water += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    water += '  <feTurbulence type="fractalNoise" baseFrequency="0.09 0.09" numOctaves="7" seed="1" stitchTiles="stitch" result="turbulence"/>\r\n';
-    water += '  <feDiffuseLighting surfaceScale="0.5" diffuseConstant="3.2" lighting-color="#ffffff" in="turbulence" result="diffuseLighting">\r\n';
-    water += '    <feDistantLight azimuth="250" elevation="16"/>\r\n';
-    water += '  </feDiffuseLighting>\r\n';
-    water += '  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.004" numOctaves="2" seed="3" stitchTiles="noStitch" result="turbulence1"/>\r\n';
-    water += '  <feColorMatrix type="saturate" values="3" in="turbulence1" result="colormatrix"/>\r\n';
-    water += '  <feColorMatrix type="matrix" values=\r\n';
-    water += '    "2 0   0 0 0\r\n';
-    water += '     0 1.5 0 0 0\r\n';
-    water += '     0 0   2 0 0\r\n';
-    water += '     0 0   0 2 0" in="colormatrix" result="colormatrix1"/>\r\n';
-    water += '  <feBlend mode="multiply" in="diffuseLighting" in2="colormatrix1" result="blend"/>\r\n';
-    water += '  <feComposite in="blend" in2="SourceAlpha" operator="in" result="composite1"/>\r\n';
-    water += '</filter>\r\n';
-    output += water;
+    let out = '';
+    out += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.09 0.09" numOctaves="7" seed="1" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feDiffuseLighting surfaceScale="0.5" diffuseConstant="3.2" lighting-color="#ffffff" in="turbulence" result="diffuseLighting">\r\n';
+    out += '    <feDistantLight azimuth="250" elevation="16"/>\r\n';
+    out += '  </feDiffuseLighting>\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.004" numOctaves="2" seed="3" stitchTiles="noStitch" result="turbulence1"/>\r\n';
+    out += '  <feColorMatrix type="saturate" values="3" in="turbulence1" result="colormatrix"/>\r\n';
+    out += '  <feColorMatrix type="matrix" values=\r\n';
+    out += '    "2 0   0 0 0\r\n';
+    out += '     0 1.5 0 0 0\r\n';
+    out += '     0 0   2 0 0\r\n';
+    out += '     0 0   0 2 0" in="colormatrix" result="colormatrix1"/>\r\n';
+    out += '  <feBlend mode="multiply" in="diffuseLighting" in2="colormatrix1" result="blend"/>\r\n';
+    out += '  <feComposite in="blend" in2="SourceAlpha" operator="in" result="composite1"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
   }  
 
   //CHAOTIC--------------------------------------------------------------------
   if (svgconf.filters.chaotic) {
-    let chaos = '';  
-    chaos += '<filter id="chaotic" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    chaos += '  <feTurbulence type="turbulence" baseFrequency="0.015 0.015" numOctaves="3" seed="8" stitchTiles="stitch" result="turbulence"/>\r\n';
-    chaos += '  <feMorphology operator="dilate" radius="35 35" in="turbulence" result="morphology"/>\r\n';
-    chaos += '  <feColorMatrix type="matrix" values=\r\n';
-    chaos += '    "1 0 0 0 0\r\n';
-    chaos += '     0 1 0 0 0\r\n';
-    chaos += '     0 0 1 0 0\r\n';
-    chaos += '     0 0 0 10 0" in="morphology" result="colormatrix"/>\r\n';
-    chaos += '  <feColorMatrix type="saturate" values="10" in="colormatrix" result="colormatrix1"/>\r\n';
-    chaos += '  <feComposite in="colormatrix1" in2="SourceAlpha" operator="in" result="composite"/>\r\n';
-    chaos += '</filter>\r\n';
-    output += chaos;
+    let out = '';  
+    out += '<filter id="chaotic" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feTurbulence type="turbulence" baseFrequency="0.015 0.015" numOctaves="3" seed="8" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feMorphology operator="dilate" radius="35 35" in="turbulence" result="morphology"/>\r\n';
+    out += '  <feColorMatrix type="matrix" values=\r\n';
+    out += '    "1 0 0 0 0\r\n';
+    out += '     0 1 0 0 0\r\n';
+    out += '     0 0 1 0 0\r\n';
+    out += '     0 0 0 10 0" in="morphology" result="colormatrix"/>\r\n';
+    out += '  <feColorMatrix type="saturate" values="10" in="colormatrix" result="colormatrix1"/>\r\n';
+    out += '  <feComposite in="colormatrix1" in2="SourceAlpha" operator="in" result="composite"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
   }
 
   return output;
@@ -1309,7 +1353,7 @@ function parseConf() {
   let objects  = Object.create(null);
   let filters  = Object.create(null);
   let d        = Object.create(null);
-  d       = svgDefaults();
+  d       = svgDefaults(); console.log(d);
   grids   = d.grids;
   paths   = d.paths;
   canvas  = d.canvas;
@@ -1756,57 +1800,126 @@ const initializeSVGen = svgOnce(function() {
 //-----------------------------------------------------------------------------
 
 //Initialize the global variables and generate---------------------------------
-let svgid       = '123456789';
+let svgid         = '123456789';
 //Syntax sugars reduce typing
-let normal      = 'normal';  
-let random      = 'random';  
-let radial      = 'radial';  
-let diagonal    = 'diagonal';
-let shrink      = 'shrink';  
-let fixed       = 'fixed';   
-let solid       = 'solid';   
-let black       = 'black';   
-let white       = 'white';   
-let FFF3        = '#FFF3';   
-let FFF6        = '#FFF6';   
-let FFF9        = '#FFF9';   
-let FFFC        = '#FFFC';   
-let FF03        = '#FF03';   
-let FF06        = '#FF06';   
-let FF09        = '#FF09';   
-let FF0C        = '#FF0C';   
-let color       = '#333F';  //Default BG color
-let gold        = 'gold';     
-let lime        = 'lime';     
-let pink        = 'hotpink';  
-let grid        = 'grid';     
-let none        = 'none';     
-let glow        = 'glow';     
-let grow        = 'grow';     
-let quad        = 'quad';     
-let cube        = 'cube';     
-let line        = 'line';     
-let arc         = 'arc';      
-let red         = 'red';     
-//Real global variables 
-let svgFiles    = {}; //Final rendered file output
-let idStack     = []; //Keeps track of previous render 
-let elements    = []; //Keeps track of each element data and rendered outputs
-let total       = 0;
-let lastIndex   = 0;
-let anchorall   = '';
-let svgconf     = parseConf();
-let opt         = defaultOptions();
-let filters     = Object.keys(svgconf.filters);
-let scount      = Object.keys(svgconf.shapes).length; //Number of enabled shapes
-let fcount      = filters.length;                     //Number of enabled filters
-let width       = svgconf.width;
-let height      = svgconf.height;
-let colors      = svgconf.colors;
-let pcolor      = svgconf.enabled.points;  //Point  color
-let center      = svgconf.enabled.centers; //Center color
-let acolor      = svgconf.enabled.anchors; //Anchor color
-let gcolor      = svgconf.enabled.grids;   //Grid   color
+let selected      = 'selected';
+let diagonal      = 'diagonal';
+let opacity       = 'opacity';
+let system        = 'system';
+let normal        = 'normal';  
+let random        = 'random';  
+let radial        = 'radial';  
+let shrink        = 'shrink';  
+let fixed         = 'fixed';   
+let solid         = 'solid';
+let both          = 'both';     
+let grid          = 'grid';     
+let none          = 'none';     
+let grow          = 'grow';
+let type          = 'type';
+let minw          = 'minw';
+let maxw          = 'maxw';
+let minh          = 'minh';
+let maxh          = 'maxh';
+let minx          = 'minx';
+let maxx          = 'maxx';
+let miny          = 'miny';
+let maxy          = 'maxy';
+let minr          = 'minr';
+let maxr          = 'maxr';
+let min           = 'min';
+let max           = 'max';
+let cx            = 'cx';
+let cy            = 'cy';
+//Path related syntax sugars
+let quad          = 'quad';     
+let cube          = 'cube';     
+let line          = 'line';     
+let arc           = 'arc';      
+//Filter related syntax sugars
+let glow          = 'glow';
+let tile          = 'tile';
+let dance         = 'dance';
+let chaotic       = 'chaotic';
+let watercolor    = 'watercolor';
+let motionblurX   = 'motionblurX';
+let motionblurY   = 'motionblurY';
+let displacement  = 'displacement';
+let gaussianblur  = 'gaussianblur';
+let pointlighting = 'pointlighting';
+//Color related syntax sugars  
+let color         = '#333F';  //Default BG color
+let black         = 'black';   
+let white         = 'white';   
+let FFF3          = '#FFF3';   
+let FFF6          = '#FFF6';   
+let FFF9          = '#FFF9';   
+let FFFC          = '#FFFC';   
+let FF03          = '#FF03';   
+let FF06          = '#FF06';   
+let FF09          = '#FF09';   
+let FF0C          = '#FF0C';   
+let gold          = 'gold';     
+let lime          = 'lime';     
+let pink          = 'hotpink';
+let red           = 'red';     
+//Shape types syntax sugar allows modifications in only one spot
+let shapeTypes    = Array(null);
+let blob          = 'blob';
+let claw          = 'claw';
+let cloud         = 'cloud';
+let square        = 'square';
+let ellipse       = 'ellipse';
+let mountain      = 'mountain';
+let rectangle     = 'rectangle';
+let circle        = 'circle';
+let flower        = 'flower';
+let hexagon       = 'hexagon';
+let octagon       = 'octagon';
+let oddagon       = 'oddagon';
+let polygon       = 'polygon';
+let dexagon       = 'dexagon';
+let randogon      = 'randogon';
+let pentagon      = 'pentagon';
+let triangle      = 'triangle';
+shapeTypes        = [
+  blob      ,
+  claw      ,
+  cloud     ,
+  square    ,
+  ellipse   ,
+  mountain  ,
+  rectangle ,
+  circle    ,
+  flower    ,
+  hexagon   ,
+  octagon   ,
+  oddagon   ,
+  polygon   ,
+  dexagon   ,
+  randogon  ,
+  pentagon  ,
+  triangle  ,    
+];
+//Actual global variables 
+let svgFiles      = {}; //Final rendered file output
+let idStack       = []; //Keeps track of previous render 
+let elements      = []; //Keeps track of each element data and rendered outputs
+let total         = 0;
+let lastIndex     = 0;
+let anchorall     = '';
+let svgconf       = parseConf();
+let opt           = defaultOptions();
+let filters       = Object.keys(svgconf.filters);
+let scount        = Object.keys(svgconf.shapes).length; //Number of enabled shapes
+let fcount        = filters.length;                     //Number of enabled filters
+let width         = svgconf.width;
+let height        = svgconf.height;
+let colors        = svgconf.colors;
+let pcolor        = svgconf.enabled.points;  //Point  color
+let center        = svgconf.enabled.centers; //Center color
+let acolor        = svgconf.enabled.anchors; //Anchor color
+let gcolor        = svgconf.enabled.grids;   //Grid   color
 //console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load
