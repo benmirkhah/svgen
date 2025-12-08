@@ -1,4 +1,4 @@
-let version   = '0.024'; //Commits + 1
+let version   = '0.025'; //Commits + 1
 
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
@@ -67,8 +67,8 @@ function defaultFilters() {
   out[dance        ] = true;
   out[chaotic      ] = false;
   out[watercolor   ] = false;
-  out[motionblurX  ] = false;
-  out[motionblurY  ] = false;
+  out[motionblurx  ] = true;
+  out[motionblury  ] = true;
   out[displacement ] = false;
   out[gaussianblur ] = true;
   out[pointlighting] = true;
@@ -316,10 +316,10 @@ function defaultShapeFilter() {
   out[blob     ] = random;
   out[claw     ] = random;
   out[cloud    ] = random;
-  out[square   ] = random;
+  out[square   ] = motionblurx;
   out[ellipse  ] = random;
   out[mountain ] = random;
-  out[rectangle] = random;
+  out[rectangle] = motionblury;
   out[circle   ] = random;
   out[flower   ] = glow;
   out[hexagon  ] = random;
@@ -547,6 +547,28 @@ function svgFilters() {
     y -= randomInt(1, y); //reduce likelihood of large y
     out += '<filter id="gaussianblur">\r\n';
     out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //MOTION BLUR X--------------------------------------------------------------
+  if (svgconf.filters.motionblurx) {
+    let out = '';
+    x  = randomInt(5, 200);
+    x -= randomInt(1,   x); //reduce likelihood of large x
+    out += '<filter id="motionblurx">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} 0" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //MOTION BLUR Y--------------------------------------------------------------
+  if (svgconf.filters.motionblury) {
+    let out = '';
+    y  = randomInt(5, 200);
+    y -= randomInt(1,   y); //reduce likelihood of large y
+    out += '<filter id="motionblury">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="0 ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
     out += '</filter>\r\n';
     output += out;
   }
@@ -1840,8 +1862,8 @@ let tile          = 'tile';
 let dance         = 'dance';
 let chaotic       = 'chaotic';
 let watercolor    = 'watercolor';
-let motionblurX   = 'motionblurX';
-let motionblurY   = 'motionblurY';
+let motionblurx   = 'motionblurx';
+let motionblury   = 'motionblury';
 let displacement  = 'displacement';
 let gaussianblur  = 'gaussianblur';
 let pointlighting = 'pointlighting';
