@@ -1,9 +1,9 @@
-let version   = '0.026'; //Commits + 1
+let version   = '0.027'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
 
-More shapes: BG Corners, Stars, Blobs, Ellipses, Mountains, Pollen
+More shapes: BG Corner, Star, Flame, Blob, Ellipse, Mountain, Pollen
 
 Back button: Allowing saving previous renders
 
@@ -42,23 +42,34 @@ function defaultCanvas() {
 //Default number of shape types per instance-----------------------------------
 function defaultShapeCount() {
   let out = Object.create(null);
-  out[blob     ] = 0;
-  out[claw     ] = 0;
+ 
+  //Create a default count object for each shape type
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = 0; 
+  });
+
+//out[blob     ] = 0;
+//out[claw     ] = 0;
+//out[star     ] = 0;
+//out[flame    ] = 0;
   out[cloud    ] = 1;
+//out[pollen   ] = 0;
   out[square   ] = 1;
-  out[ellipse  ] = 0;
-  out[mountain ] = 0;
+//out[ellipse  ] = 0;
+//out[mountain ] = 0;
   out[rectangle] = 1;
   out[circle   ] = 5;
   out[flower   ] = 1;
   out[hexagon  ] = 1;
-  out[octagon  ] = 0;
+//out[octagon  ] = 0;
   out[oddagon  ] = 1;
-  out[polygon  ] = 0;
+//out[polygon  ] = 0;
   out[dexagon  ] = 1;
-  out[randogon ] = 0;
-  out[pentagon ] = 0;
-  out[triangle ] = 2;  
+//out[randogon ] = 0;
+//out[pentagon ] = 0;
+  out[triangle ] = 3;
+
   return out;
 }//----------------------------------------------------------------------------
 
@@ -265,7 +276,7 @@ function defaultShapeStrokeTemplate() {
   let out = Object.create(null);
   out['swidth'] = random;
   out['scolor'] =     '';
-  out[opacity ] =    0.5;
+  out[opacity ] =   0.33;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -277,30 +288,14 @@ function defaultShapeStroke() {
   shapeTypes.forEach(type => { 
     out[type] = Object.create(null);
     out[type] = defaultShapeStrokeTemplate(); 
+    out[type].scolor = randomColor();
   });
 
   //Stroke Width
   out[square   ].swidth  =   1;
   out[rectangle].swidth  =   0;
   out[flower   ].swidth  =   0;
-  //Stroke Color
-  out[blob     ].scolor  = '#FFCC9966';
-  out[claw     ].scolor  = '#99CCFF66';
-  out[cloud    ].scolor  = '#FFFFFF33';
-  out[square   ].scolor  = '#00000099';
-  out[ellipse  ].scolor  = '#CC666666';
-  out[mountain ].scolor  = '#6600CC66';
-  out[rectangle].scolor  = '#FF663333';  
-  out[circle   ].scolor  = '#99CC9999';
-  out[flower   ].scolor  = '#99999966';
-  out[hexagon  ].scolor  = '#3399CC66';
-  out[octagon  ].scolor  = '#6666FF66';
-  out[oddagon  ].scolor  = '#33993366';
-  out[polygon  ].scolor  = '#3333CC66';
-  out[dexagon  ].scolor  = '#CC333366';
-  out[randogon ].scolor  = '#CCCC0066';
-  out[pentagon ].scolor  = '#FFFFFF66';
-  out[triangle ].scolor  = '#00000033';
+
   //Stroke Opacity
   out[circle   ].opacity = 0.1;
 
@@ -344,7 +339,7 @@ function defaultShapeFilter() {
   out[flower   ] = glow;
   out[hexagon  ] = random;
   out[octagon  ] = random;
-  out[oddagon  ] = random;
+  out[oddagon  ] = dance;
   out[polygon  ] = random;
   out[dexagon  ] = random;
   out[randogon ] = random;
@@ -420,10 +415,28 @@ function svgDefaults() {
   return out;
 }//----------------------------------------------------------------------------
 
+/******************************************************************************
+************* Below are all the miscellaneous helper functions ****************
+******************************************************************************/
+
 //Handy unix time stamp-------------------------------------------------------- 
 function epoch(n = 8) { //last 8 hex digits by default
   let epoch = Date.now(); 
   return epoch.toString(16).substring(n);
+}//----------------------------------------------------------------------------
+
+//Generates a random #RRGGBBAA color-------------------------------------------
+function randomColor() {
+  let r = randomInt(0, 256);
+  let g = randomInt(0, 256);
+  let b = randomInt(0, 256);
+  let a = randomInt(0, 256);
+  let c = '#'+
+    r.toString(16).padStart(2, '0')+
+    g.toString(16).padStart(2, '0')+
+    b.toString(16).padStart(2, '0')+
+    a.toString(16).padStart(2, '0');
+  return c  
 }//----------------------------------------------------------------------------
 
 //Needs to be a builtin JS function, grumble-----------------------------------
@@ -538,6 +551,10 @@ function randomize(ar) {
   return ar;
 }//----------------------------------------------------------------------------
 
+/******************************************************************************
+*********************** Below are all the SVG filters *************************
+******************************************************************************/
+
 //Depending on config adds enabled filters-------------------------------------
 function svgFilters() {
   let output = '';
@@ -574,7 +591,7 @@ function svgFilters() {
   //MOTION BLUR X--------------------------------------------------------------
   if (svgconf.filters.motionblurx) {
     let out = '';
-    x  = randomInt(5, 200);
+    x  = randomInt(5, 400);
     x -= randomInt(1,   x); //reduce likelihood of large x
     out += '<filter id="motionblurx">\r\n';
     out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} 0" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
@@ -585,7 +602,7 @@ function svgFilters() {
   //MOTION BLUR Y--------------------------------------------------------------
   if (svgconf.filters.motionblury) {
     let out = '';
-    y  = randomInt(5, 200);
+    y  = randomInt(5, 300);
     y -= randomInt(1,   y); //reduce likelihood of large y
     out += '<filter id="motionblury">\r\n';
     out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="0 ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
@@ -693,7 +710,9 @@ function svgFilters() {
   return output;
 }//----------------------------------------------------------------------------
 
-/*********** Where all the functions that generate points are kept ***********/
+/******************************************************************************
+************* Below are all the functions that generate points ****************
+******************************************************************************/
 
 //Generates 4 semi-random points to make shapes with---------------------------
 function svg4Points(xmax = width, ymax = height) {
@@ -810,7 +829,7 @@ function svgRadialGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, bound="?" ) {
   cy = cy ? cy: roundInt(height/2,1);
   b  = bound;
   b  = (b="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
-  let points = [ { z:'ignore-zero', x:cx , y:cy, r:r, a:a } ]; //index 0 is the center mark 
+  let points = [ { z:'ignore-zero', cx:cx , cy:cy, r:r, a:a } ]; //index 0 is the center mark 
   let rings  = Math.trunc(r   / dr); //Number of rings
   let jewels = Math.trunc(360 / da); //Jewels per ring
   let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
@@ -988,7 +1007,7 @@ function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
   return points;
 }//----------------------------------------------------------------------------
 
-//Top Left to Bottom Right-----------------------------------------------------
+//Vertical Top Left to Bottom Right--------------------------------------------
 function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
   let pos    = Object.create(null);
   let points = ['ignore-zero'];
@@ -1012,7 +1031,7 @@ function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
   return points;
 }//----------------------------------------------------------------------------
 
-//Reverse Bottom Right to Top Left---------------------------------------------
+//Reverse Vertical Bottom Right to Top Left------------------------------------
 function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
   let points = svgGridOrderVertical(dx,dy,rows,cols);
   points.shift();  //Gets rid of 'ignore-zero'
@@ -1024,7 +1043,9 @@ function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
 function svgGridOrderSnake(dx=160, dy=160, rows=10, cols=6){
 }//----------------------------------------------------------------------------
 
-/*********** Where all the functions that generate shapes are kept ***********/
+/******************************************************************************
+************* Below are all the functions that generate shapes ****************
+******************************************************************************/
 
 //Generates Bear Claws---------------------------------------------------------
 function svgBearClaw(oid = 'no-order-id', options = opt) {
@@ -1384,6 +1405,10 @@ function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
   return output;
 }//----------------------------------------------------------------------------
 
+/******************************************************************************
+************* Below are all the functions that generate the SVG ***************
+******************************************************************************/
+
 //Decipher what needs to be exact and what needs randomization-----------------
 function parseConf() {
   let order    = Array();
@@ -1486,24 +1511,13 @@ function parseConf() {
 
 //Generates random colors as CSS variables------------------------------------- 
 function svgColors(pal = [ '#00000000' ]) {
-  let r,g,b,a = 0;
-  let c       = '';
   let extra   = '';
   let output  = '  --c0:  #00000000; \r\n';
 
   for (let i=1; i <= colors; i++) {
-    r = randomInt(0, 256);
-    g = randomInt(0, 256);
-    b = randomInt(0, 256);
-    a = randomInt(0, 256);
-    c = '#'+
-      r.toString(16).padStart(2, '0')+
-      g.toString(16).padStart(2, '0')+
-      b.toString(16).padStart(2, '0')+
-      a.toString(16).padStart(2, '0');
-    pal[i]  = c;
-    extra = ((i < 10)) ? ' ' : '';
-    output += '  --c' + i + ': '+extra+ c + ((i % 5) ? ';' : ';\r\n');
+    pal[i] = randomColor();
+    extra  = ((i < 10)) ? ' ' : '';
+    output += '  --c' + i + ': '+extra+ pal[i] + ((i % 5) ? ';' : ';\r\n');
   }
 
   output += '  --c-count: '+colors+';\r\n';
@@ -1642,6 +1656,8 @@ function svgContent() {
     fill   = '';
     data   = '';
     luck   = randomInt(1,100);
+    thick  = randomInt(1,250);  //Random stroke thickness
+    thick  = thick - randomInt(1,thick); //decrease odds of large values
     fill   = 'var(--c'+oid+')';
     shape  = svgconf.order[oid];
     elements[oid] = { z:oid, render:render, data:data }; //Insert blank data
@@ -1659,7 +1675,7 @@ function svgContent() {
     } else fill = '';
 
     swidth = svgconf.shapes[shape].stroke.swidth; //Random = half none / half stroke 
-    swidth = (swidth == 'random') ? ((luck % 2) ? randomInt(1,100) : 0) : swidth;
+    swidth = (swidth == 'random') ? ((luck % 2) ? thick : 0) : swidth;
 
     if (swidth) {
       //stroke += ' stroke-dasharray="3 3 1 3"';  //DEBUG WHY NOT WORKING
@@ -1676,13 +1692,17 @@ function svgContent() {
     options.stroke = stroke;
     options.filter = filter;
     options.fill   = fill;
-    options.events = ' onclick="this.style.opacity = 0.5" ' 
+    options.events = ' onclick="this.style.fill = randomColor()" '; 
     //console.log(options);  //DEBUG
 
     switch(shape) {      
     //case 'blob'      : render += svgBlob(oid,options);       break;
+    //case 'claw'      : render += svgBearClaw(oid,options);   break;
+    //case 'star'      : render += svgStar(oid,options);       break;
+    //case 'flame'     : render += svgFlame(oid,options);      break;
+    //case 'corner'    : render += svgCorner(oid,options);     break;
+    //case 'pollen'    : render += svgPollen(oid,options);     break;
     //case 'ellipse'   : render += svgellipse(oid,options);    break;
-    //case 'claw'      : render += svgBearClaw(oid,options);   break;      
       case 'cloud'     : render += svgCloud(oid,options);      break;
       case 'circle'    : render += svgCircle(oid,options);     break;
       case 'flower'    : render += svgFlower(oid,options);     break;
@@ -1920,7 +1940,13 @@ let dexagon       = 'dexagon';
 let randogon      = 'randogon';
 let pentagon      = 'pentagon';
 let triangle      = 'triangle';
+//let star          = 'star';
+//let flame         = 'flame';
+//let pollen        = 'pollen';
 shapeTypes        = [
+//  star      ,
+//  flame     ,
+//  pollen    ,
   blob      ,
   claw      ,
   cloud     ,
