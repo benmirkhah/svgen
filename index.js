@@ -1,4 +1,4 @@
-let version   = '0.023'; //Commits + 1
+let version   = '0.024'; //Commits + 1
 
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
@@ -1353,7 +1353,7 @@ function parseConf() {
   let objects  = Object.create(null);
   let filters  = Object.create(null);
   let d        = Object.create(null);
-  d       = svgDefaults(); console.log(d);
+  d       = svgDefaults();
   grids   = d.grids;
   paths   = d.paths;
   canvas  = d.canvas;
@@ -1425,22 +1425,20 @@ function parseConf() {
   if (d.enabled.center  === true) d.enabled.center  = d.objects.ccolor;
   if (d.enabled.anchors === true) d.enabled.anchors = d.objects.acolor;
 
-  parsed = {
-    width:     w,
-    height:    h,
-    colors:    c,
-    variants:  v,
-    duration:  u,
-    gradients: g,
-    grids:     grids,
-    paths:     paths,
-    shapes:    shapes,
-    filters:   filters,
-    objects:   objects,
-    enabled:   enabled,
-    order:     ['zero', ...randomize(order)],
-  }
-
+  parsed['width'    ] = w;
+  parsed['height'   ] = h;
+  parsed['colors'   ] = c;
+  parsed['variants' ] = v;
+  parsed['duration' ] = u;
+  parsed['gradients'] = g;
+  parsed['grids'    ] = grids;
+  parsed['paths'    ] = paths;
+  parsed['shapes'   ] = shapes;
+  parsed['filters'  ] = filters;
+  parsed['objects'  ] = objects;
+  parsed['enabled'  ] = enabled;
+  parsed['order'    ] = ['zero', ...randomize(order)];
+  
   return parsed;
 }//----------------------------------------------------------------------------
 
