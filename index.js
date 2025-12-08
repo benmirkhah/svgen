@@ -1,5 +1,25 @@
-let version   = '0.025'; //Commits + 1
+let version   = '0.026'; //Commits + 1
+/******************************************************************************
+COMMING SOON / TODO LIST
+------------------------
 
+More shapes: BG Corners, Stars, Blobs, Ellipses, Mountains, Pollen
+
+Back button: Allowing saving previous renders
+
+Config UI: Allowing more user interactivity
+
+Grids: Snap to grid and fixed position shapes
+
+More filters: Ideally one filter per shape
+
+Events: OnClick info popup, on hover, etc.
+
+Variants: Transforms of a shape
+
+Animation: The final hurdle when everything else is done
+
+******************************************************************************/
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
   let w = Object.create(null);  //Width
@@ -24,21 +44,21 @@ function defaultShapeCount() {
   let out = Object.create(null);
   out[blob     ] = 0;
   out[claw     ] = 0;
-  out[cloud    ] = 0;
+  out[cloud    ] = 1;
   out[square   ] = 1;
   out[ellipse  ] = 0;
   out[mountain ] = 0;
-  out[rectangle] = 0;
+  out[rectangle] = 1;
   out[circle   ] = 5;
   out[flower   ] = 1;
-  out[hexagon  ] = 0;
+  out[hexagon  ] = 1;
   out[octagon  ] = 0;
   out[oddagon  ] = 1;
   out[polygon  ] = 0;
-  out[dexagon  ] = 0;
+  out[dexagon  ] = 1;
   out[randogon ] = 0;
   out[pentagon ] = 0;
-  out[triangle ] = 1;  
+  out[triangle ] = 2;  
   return out;
 }//----------------------------------------------------------------------------
 
@@ -179,8 +199,8 @@ function defaultColors() {
 function defaultShapePositionTemplate() {
   let out  = Object.create(null);
   out[type] = random; //random / fixed / grid / incremental / decremental (based on min & max)
-  out[cx  ] =      0;
-  out[cy  ] =      0;
+  out['cx'] =      0;
+  out['cy'] =      0;
   out[minx] =     60;
   out[maxx] =    600;
   out[miny] =     40;
@@ -1849,8 +1869,6 @@ let minr          = 'minr';
 let maxr          = 'maxr';
 let min           = 'min';
 let max           = 'max';
-let cx            = 'cx';
-let cy            = 'cy';
 //Path related syntax sugars
 let quad          = 'quad';     
 let cube          = 'cube';     
