@@ -1,4 +1,4 @@
-let version   = '0.027'; //Commits + 1
+let version   = '0.028'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -13,28 +13,30 @@ Grids: Snap to grid and fixed position shapes
 
 More filters: Ideally one filter per shape
 
-Events: OnClick info popup, on hover, etc.
+More events: Configurable OnClick, hover, etc.
 
 Variants: Transforms of a shape
 
 Animation: The final hurdle when everything else is done
 
+*******************************************************************************
+******* Below are the functions that create the default config object *********
 ******************************************************************************/
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
   let w = Object.create(null);  //Width
   let h = Object.create(null);  //Height
   let c = Object.create(null);  //Canvas
-  w['min'     ] =  100;
-  w['max'     ] = 3000;
-  w['default' ] =  640;
-  w['selected'] = 1920;
-  h['min'     ] =  100;
-  h['max'     ] = 3000;
-  h['default' ] =  480;
-  h['selected'] =  957;
-  c['width'   ] =    w;
-  c['height'  ] =    h;
+  w[min     ] =  100;
+  w[max     ] = 3000;
+  w[system  ] =  640;
+  w[selected] = 1920;
+  h[min     ] =  100;
+  h[max     ] = 3000;
+  h[system  ] =  480;
+  h[selected] =  957;
+  c['width' ] =    w;
+  c['height'] =    h;
   //console.log(c);  //DEBUG
   return c;
 }//----------------------------------------------------------------------------
@@ -114,7 +116,7 @@ function defaultGrids() {
   point['y'] = 0;
   //Cartesian Grids
   grids['type' ] = radial;  //true = normal, radial, spiral (TODO: diagonal)
-  grids['show' ] =   true;
+  grids['show' ] =      1;
   grids['text' ] =      0;  //FF06;
   grids['bound'] =   true;  //false = keep / true = delete positions that fall outside of artbox boundry  
   grids['order'] = normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
@@ -122,7 +124,7 @@ function defaultGrids() {
   grids['end'  ] =  point; 
   grids['dx'   ] =    160; 
   grids['dy'   ] =    160;
-  //Radial/Spiral Grids
+  //Radial/Spiral Grids (order types: normal, backward, outward, inward)
   grids['r' ] =  800; 
   grids['a' ] =    0;
   grids['dr'] =  100;
@@ -130,7 +132,7 @@ function defaultGrids() {
   grids['cx'] =    0;
   grids['cy'] =    0; 
   grids['sr'] =    1;  //Spirals
-  grids['sa'] =    4;  //Spirals
+  grids['sa'] =    2;  //Spirals
   //console.log(grids);  //DEBUG
   return grids;
 }//----------------------------------------------------------------------------
@@ -188,21 +190,21 @@ function defaultShapes() {
 //Number of colors per gradient------------------------------------------------
 function defaultGradients() {
   let out = Object.create(null);
-  out[min      ] = 2;
-  out[max      ] = 9;
-  out['default'] = 3;
-  out[selected ] = 5;
-  out[type     ] = both; //TODO: horiz, vertical, both, aligned, random
+  out[min     ] = 2;
+  out[max     ] = 9;
+  out[system  ] = 3;
+  out[selected] = 5;
+  out[type    ] = both; //TODO: horiz, vertical, both, aligned, random
   return out;
 }//----------------------------------------------------------------------------
 
 //Default color palette properties---------------------------------------------
 function defaultColors() {
   let out = Object.create(null);
-  out[min      ] =    3;
-  out[max      ] =  256;
-  out['default'] =   10;
-  out[selected ] =  100;
+  out[min     ] =    3;
+  out[max     ] =  256;
+  out[system  ] =   10;
+  out[selected] =  100;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -352,17 +354,19 @@ function defaultShapeFilter() {
 //Default properties of objects------------------------------------------------
 function defaultObjects() {
   let out = Object.create(null);
-  //Used only when shape properties are undefined or set to 'default'
+  //Used only when shape properties are undefined or set to 'system'
   out['min'     ] =      1;
   out['max'     ] =    250;
   out['maxshape'] =     50;
-  out['default' ] =      5;  //NOT IN USE
+  out['system'  ] =      5;  //NOT IN USE
   out['selected'] =     10;  //NOT IN USE
   out['swidth'  ] =      4;  //Stroke width defualt
   out['scolor'  ] =   lime;  //Stroke color default
   out['acolor'  ] =  white;  //Anchor color default
   out['pcolor'  ] =  black;  //Point  color default
   out['ccolor'  ] =  black;  //Center color default
+  out['gcolor'  ] =  black;  //Grid   color default
+  out['tcolor'  ] =  black;  //Text   color default
   out['fill'    ] =  color;  //true, false or color
   return out;
 }//----------------------------------------------------------------------------
@@ -371,20 +375,20 @@ function defaultObjects() {
 function defaultVariants() {
   let out = Object.create(null);
   //TODO: For doings transforms on various shapes
-  out[min      ] =      1;
-  out[max      ] =     10;
-  out['default'] =      0;
-  out[selected ] = random;
+  out[min     ] =      1;
+  out[max     ] =     10;
+  out[system  ] =      0;
+  out[selected] = random;
   return out;
 }//----------------------------------------------------------------------------
 
 //Default animation duration---------------------------------------------------
 function defaultDuration() {
   let out = Object.create(null);  
-  out[min      ] =    100;
-  out[max      ] =  36000;
-  out['default'] =      0;
-  out[selected ] = random;
+  out[min     ] =    100;
+  out[max     ] =  36000;
+  out[system  ] =      0;
+  out[selected] = random;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -426,16 +430,16 @@ function epoch(n = 8) { //last 8 hex digits by default
 }//----------------------------------------------------------------------------
 
 //Generates a random #RRGGBBAA color-------------------------------------------
-function randomColor() {
-  let r = randomInt(0, 256);
-  let g = randomInt(0, 256);
-  let b = randomInt(0, 256);
-  let a = randomInt(0, 256);
+function randomColor(alpha=true, rs=0, gs=0, bs=0, as=0, re=256, ge=256, be=256, ae=256) {
+  let r = randomInt(rs, re);
+  let g = randomInt(gs, ge);
+  let b = randomInt(bs, be);
+  let a = randomInt(as, ae);
   let c = '#'+
     r.toString(16).padStart(2, '0')+
     g.toString(16).padStart(2, '0')+
     b.toString(16).padStart(2, '0')+
-    a.toString(16).padStart(2, '0');
+    (alpha ? a.toString(16).padStart(2, '0') : '');
   return c  
 }//----------------------------------------------------------------------------
 
@@ -1275,18 +1279,6 @@ function svgCloud(oid = 'no-order-id', options = opt) {
   let quadStroke = '>';
   let lineStroke = '>';
 
-  // if (svgconf.shapes.cloud.stroke) {
-  //   stroke    += ` stroke-width="${svgconf.shapes.cloud.swidth}" `;
-  //   svgconf.paths.arc  = (svgconf.paths.arc  === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.arc ;
-  //   svgconf.paths.cube = (svgconf.paths.cube === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.cube;
-  //   svgconf.paths.quad = (svgconf.paths.quad === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.quad;
-  //   svgconf.paths.line = (svgconf.paths.line === true) ? svgconf.shapes.cloud.stroke : svgconf.paths.line;
-  //   arcStroke  = stroke+` stroke="${svgconf.paths.arc }">`;
-  //   cubeStroke = stroke+` stroke="${svgconf.paths.cube}">`; 
-  //   quadStroke = stroke+` stroke="${svgconf.paths.quad}">`;
-  //   lineStroke = stroke+` stroke="${svgconf.paths.line}">`;
-  // } 
-
   cube   += '  Z" '+cubeStroke+close;
   arc    += '  Z" '+arcStroke +close; 
   quad   += '  Z" '+quadStroke+close;
@@ -1435,12 +1427,12 @@ function parseConf() {
   let f = 0; //Total number of enabled filters
   let t = 0; //Total number of objects = shapes * variations of each shape
 
-  if (isNaN(w)) w = (w == random) ? roundX(canvas.width.min,  canvas.width.max  ) : canvas.width.default;
-  if (isNaN(h)) h = (h == random) ? roundY(canvas.height.min, canvas.height.max ) : canvas.height.default;
-  if (isNaN(c)) c = (c == random) ? randomInt(d.colors.min,      d.colors.max   ) : d.colors.default;
-  if (isNaN(u)) u = (u == random) ? randomInt(d.duration.min,    d.duration.max ) : d.duration.default;
-  if (isNaN(v)) v = (v == random) ? randomInt(d.variants.min,    d.variants.max ) : d.variants.default;
-  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) : d.gradients.default;
+  if (isNaN(w)) w = (w == random) ? roundX(canvas.width.min,  canvas.width.max  ) : canvas.width.system;
+  if (isNaN(h)) h = (h == random) ? roundY(canvas.height.min, canvas.height.max ) : canvas.height.system;
+  if (isNaN(c)) c = (c == random) ? randomInt(d.colors.min,      d.colors.max   ) : d.colors.system;
+  if (isNaN(u)) u = (u == random) ? randomInt(d.duration.min,    d.duration.max ) : d.duration.system;
+  if (isNaN(v)) v = (v == random) ? randomInt(d.variants.min,    d.variants.max ) : d.variants.system;
+  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) : d.gradients.system;
 
   if (d.enabled.filters) {  //Only if filters are enabled
     Object.keys(d.filters).forEach(filter => { //Only keep the enabled filters, discared others
@@ -1453,7 +1445,7 @@ function parseConf() {
   
   Object.keys(d.shapes).forEach(shape => { //Go through each shape type
     if (isNaN(d.shapes[shape].count)) {    //Assign requested random/default values
-      d.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(d.objects.min, shapes[shape].max) : d.objects.default;
+      d.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(d.objects.min, shapes[shape].max) : d.objects.system;
     }
 
     if (d.shapes[shape].count) { //Only keep the enabled shapes, discard others
@@ -1479,10 +1471,10 @@ function parseConf() {
     } else { shapes[shape].filter = false; } //No filter if filters are disabled globally
   
     if (shapes[shape].fill) { //Determine what kind of fill to use per shape
-      if (shapes[shape].fill ===  true    ) shapes[shape].fill = 'solid'; //true means solid
-      if (shapes[shape].fill === 'solid'  ) shapes[shape].fill = 'var(--c'+randomInt(1, total)+')';
-      if (shapes[shape].fill === 'default') shapes[shape].fill = objects.fill;
-      if (shapes[shape].fill === 'none'   ) shapes[shape].fill = false;
+      if (shapes[shape].fill === true  ) shapes[shape].fill = solid; //true means solid
+      if (shapes[shape].fill === solid ) shapes[shape].fill = 'var(--c'+randomInt(1, total)+')';
+      if (shapes[shape].fill === system) shapes[shape].fill = objects.fill;
+      if (shapes[shape].fill === none  ) shapes[shape].fill = false;
       //All else means it's either set to random or a preselected #color
     }  
   });
@@ -1725,7 +1717,7 @@ function svgContent() {
 
 function svgShowGrid() {
   let output  = '';
-  if (svgconf.enabled.grids && svgconf.grids.show) {
+  if (svgconf.enabled.grids) {
     let points = Array();
     //points = svgCartesianGrid();
     //points = svgRadialGrid();
@@ -1734,8 +1726,10 @@ function svgShowGrid() {
     for (let i=1; i<points.length; i++) {
       let x = points[i].x;
       let y = points[i].y;
-      output += svgXMark ( x, y, 4, svgconf.enabled.grids, 'grid', i);
-      output += svgDrawPoint(x,y,(5+i),'#9999');
+      output += svgconf.grids.show ? svgXMark ( x, y, 4, svgconf.enabled.grids, 'grid', i) : '';
+      //output += svgDrawPoint(x,y,(randomInt(points.length, 2*points.length)-i),randomColor());
+      //output += svgDrawPoint(x,y,roundInt((i+10)/2,1),randomColor());
+      output += svgDrawPoint(x,y,6,randomColor(true,90,90,90,50));
     }
   }
   return output;
@@ -1759,7 +1753,7 @@ function svgTag() {
   output     += svgStyle(svgid);
   output     += svgDefs();
   output     += svgContent();
-  //output     += svgShowGrid();
+  output     += svgShowGrid();
   output     += close;
 
   idStack.unshift('svg-'+svgid); //Newest id on top
@@ -1921,17 +1915,21 @@ let gold          = 'gold';
 let lime          = 'lime';     
 let pink          = 'hotpink';
 let red           = 'red';     
-//Shape types syntax sugar allows modifications in only one spot
+//Shape types syntax sugar allows modifications in one spot
 let shapeTypes    = Array(null);
 let blob          = 'blob';
 let claw          = 'claw';
 let cloud         = 'cloud';
+let flame         = 'flame';
 let square        = 'square';
 let ellipse       = 'ellipse';
 let mountain      = 'mountain';
 let rectangle     = 'rectangle';
+//Radial shapes below, boxy shapes above
+let star          = 'star';
 let circle        = 'circle';
 let flower        = 'flower';
+let pollen        = 'pollen';
 let hexagon       = 'hexagon';
 let octagon       = 'octagon';
 let oddagon       = 'oddagon';
@@ -1940,22 +1938,21 @@ let dexagon       = 'dexagon';
 let randogon      = 'randogon';
 let pentagon      = 'pentagon';
 let triangle      = 'triangle';
-//let star          = 'star';
-//let flame         = 'flame';
-//let pollen        = 'pollen';
 shapeTypes        = [
-//  star      ,
-//  flame     ,
-//  pollen    ,
+//Boxy shapes  
   blob      ,
   claw      ,
   cloud     ,
+  flame     ,
   square    ,
   ellipse   ,
   mountain  ,
   rectangle ,
+  star      ,
+//Radial shapes  
   circle    ,
   flower    ,
+  pollen    ,
   hexagon   ,
   octagon   ,
   oddagon   ,
