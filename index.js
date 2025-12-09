@@ -1,4 +1,4 @@
-let version   = '0.031'; //Commits + 1
+let version   = '0.032'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -15,7 +15,7 @@ More filters: Ideally one filter per shape
 
 More events: Configurable OnClick, hover, etc.
 
-Variants: Transforms of a shape
+Variants: Slightly different replicas of a shape
 
 Animation: The final hurdle when everything else is done
 
@@ -1518,7 +1518,7 @@ function svgCloud(oid = 'no-order-id', options = opt) {
 //Generates flowers------------------------------------------------------------
 function svgFlower(oid = 'no-order-id', options = opt) {
   let sid       = svgid+'-'+oid;
-  let pcount    = randomInt(5,8);
+  let pcount    = randomInt(5,16);
   let points    = svgRadialPoints(pcount); //console.log(points); //DEBUG
   let open      = '  <path ';
   let close     = '  </path>\r\n';
