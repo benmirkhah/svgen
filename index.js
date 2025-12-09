@@ -1,4 +1,4 @@
-let version   = '0.028'; //Commits + 1
+let version   = '0.029'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -55,21 +55,22 @@ function defaultShapeCount() {
 //out[claw     ] = 0;
 //out[star     ] = 0;
 //out[flame    ] = 0;
-  out[cloud    ] = 1;
 //out[pollen   ] = 0;
-  out[square   ] = 1;
 //out[ellipse  ] = 0;
 //out[mountain ] = 0;
+//out[octagon  ] = 0;
+//out[polygon  ] = 0;
+//out[randogon ] = 0;
+//out[pentagon ] = 0;
+  out[star     ] = 1;
+  out[cloud    ] = 1;
+  out[square   ] = 1;
   out[rectangle] = 1;
   out[circle   ] = 5;
   out[flower   ] = 1;
   out[hexagon  ] = 1;
-//out[octagon  ] = 0;
   out[oddagon  ] = 1;
-//out[polygon  ] = 0;
   out[dexagon  ] = 1;
-//out[randogon ] = 0;
-//out[pentagon ] = 0;
   out[triangle ] = 3;
 
   return out;
@@ -294,9 +295,10 @@ function defaultShapeStroke() {
   });
 
   //Stroke Width
-  out[square   ].swidth  =   1;
-  out[rectangle].swidth  =   0;
-  out[flower   ].swidth  =   0;
+  out[star     ].swidth  =    0;
+  out[square   ].swidth  =    1;
+  out[rectangle].swidth  =    0;
+  out[flower   ].swidth  =    0;
 
   //Stroke Opacity
   out[circle   ].opacity = 0.1;
@@ -307,47 +309,32 @@ function defaultShapeStroke() {
 //Default fill for each of the shape types-------------------------------------
 function defaultShapeFill() {
   let out = Object.create(null);
-  out[blob     ] = random;
-  out[claw     ] = random;
-  out[cloud    ] = random;
-  out[square   ] = solid;
-  out[ellipse  ] = random;
-  out[mountain ] = random;
-  out[rectangle] = random;
-  out[circle   ] = random;
-  out[flower   ] = random;
-  out[hexagon  ] = random;
-  out[octagon  ] = random;
-  out[oddagon  ] = random;
-  out[polygon  ] = random;
-  out[dexagon  ] = random;
-  out[randogon ] = random;
-  out[pentagon ] = random;
-  out[triangle ] = random;  
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = random;
+  });
+
+  //Exceptions to the rule of random
+  out[square] = solid;
+
   return out;
 }//----------------------------------------------------------------------------
 
 //Default filter for each of the shape types-----------------------------------
 function defaultShapeFilter() {
   let out = Object.create(null);
-  out[blob     ] = random;
-  out[claw     ] = random;
-  out[cloud    ] = random;
+  shapeTypes.forEach(type => { 
+    out[type] = Object.create(null);
+    out[type] = random;
+  });
+
+  //Exceptions to the rule of random
+  out[star     ] = dance;
   out[square   ] = motionblurx;
-  out[ellipse  ] = random;
-  out[mountain ] = random;
   out[rectangle] = motionblury;
-  out[circle   ] = random;
   out[flower   ] = glow;
-  out[hexagon  ] = random;
-  out[octagon  ] = random;
   out[oddagon  ] = dance;
-  out[polygon  ] = random;
-  out[dexagon  ] = random;
-  out[randogon ] = random;
-  out[pentagon ] = random;
-  out[triangle ] = glow;  
-  //console.log(out);  //DEBUG
+  out[triangle ] = glow;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -780,7 +767,7 @@ function svg8Points(xmax = width, ymax = height) {
 
 //Generates n number of uniform radial point to make shapes with---------------
 function svgRadialPoints(n = 12, cx = roundX(100,width-100), cy = roundY(100,height-100), r = roundY(100,height/3)) {
-  let points = [ { x:cx , y:cy, r:r } ];  //index 0 is the center mark 
+  let points = [ { x:cx , y:cy, r:r, n:n } ];  //index 0 is the center mark 
   let nudge  = (2 * Math.PI)/n; //360 degrees is (2 * Pi) in radians
   let radian = 0; //angle in radian
   let angle  = 0; //angle in degrees
@@ -1397,6 +1384,51 @@ function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
   return output;
 }//----------------------------------------------------------------------------
 
+//Generates Stars, 5 or 11 points by default-----------------------------------
+function svgStar(oid = 'no-order-id', options = opt, pcount=0) {
+  let oo      = randomInt(2,9);
+  pcount      = pcount ? pcount : ((oo % 2) ? 11 : 5); //Only odd
+  let sid     = svgid+'-'+oid;
+  let points  = svgRadialPoints(pcount);
+  let cx      = points[0].x;
+  let cy      = points[0].y;
+  let open    = '  <path ';
+  let close   = '  </path>\r\n';
+  let render  = '';
+  let output  = '';
+  let anchors = '';
+  let events  = options.events;
+  let stroke  = options.stroke;
+  let filter  = options.filter;
+  let fill    = options.fill;
+  let cname   = star; //options.name
+  let data    = { type:star };
+  let ring    = [...points];
+  ring.shift(); //get rid of [0]
+  ring.pop();   //get red of [last]
+  points.pop(); //get red of [last]
+  ring = [...points, ...ring]; 
+
+  render  += open+'id="'+sid+'" ';
+  render  += 'class="'+cname+' p'+pcount+'" ';
+  render  += fill+stroke+filter+events+' d="M '+ring[1].x+','+ring[1].y+'\r\n';
+  anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair(cx, cy, 5, center, 'center mark') : '';
+
+  for (i=1; i<(pcount-1)*2; i+=2) {
+    render  += '  L '+ring[i  ].x+','+ring[i  ].y+' '+ring[i+2].x+','+ring[i+2].y+'\r\n';
+    anchors += (svgconf.enabled.points) ? '  '+svgDrawPoint(ring[i].x, ring[i].y, 3, pcolor, 'point' ) : '';
+  }
+
+  anchors     = svgconf.enabled.points ? '<g class="'+cname+' anchors">\r\n'+anchors+'\r\n</g>\r\n' : anchors;
+  render     += '  Z">' +'\r\n'+close+'\r\n';  
+  anchorall  += anchors;
+  output     += render+anchors;
+  data[star] = { pcount:pcount, points: points }
+  elements[oid].data = data;
+
+  return output;
+}//----------------------------------------------------------------------------
+
 /******************************************************************************
 ************* Below are all the functions that generate the SVG ***************
 ******************************************************************************/
@@ -1678,13 +1710,13 @@ function svgContent() {
       stroke += (svgconf.shapes[shape].stroke.opacity != 1) ? ' stroke-opacity="'+svgconf.shapes[shape].stroke.opacity+'" ' : ' ';
     } else stroke = '';
   
-    let options    = Object.create(null);    
-    options.oid    = oid;
-    options.name   = shape;
-    options.stroke = stroke;
-    options.filter = filter;
-    options.fill   = fill;
-    options.events = ' onclick="this.style.fill = randomColor()" '; 
+    let options       = Object.create(null);
+    options['oid'   ] = oid;
+    options['name'  ] = shape;
+    options['stroke'] = stroke;
+    options['filter'] = filter;
+    options['fill'  ] = fill;
+    options['events'] = ' onclick="this.style.fill = randomColor()" '; 
     //console.log(options);  //DEBUG
 
     switch(shape) {      
@@ -1695,6 +1727,7 @@ function svgContent() {
     //case 'corner'    : render += svgCorner(oid,options);     break;
     //case 'pollen'    : render += svgPollen(oid,options);     break;
     //case 'ellipse'   : render += svgellipse(oid,options);    break;
+      case 'star'      : render += svgStar(oid,options);       break;
       case 'cloud'     : render += svgCloud(oid,options);      break;
       case 'circle'    : render += svgCircle(oid,options);     break;
       case 'flower'    : render += svgFlower(oid,options);     break;
@@ -1753,7 +1786,7 @@ function svgTag() {
   output     += svgStyle(svgid);
   output     += svgDefs();
   output     += svgContent();
-  output     += svgShowGrid();
+  //output     += svgShowGrid();
   output     += close;
 
   idStack.unshift('svg-'+svgid); //Newest id on top
@@ -1921,6 +1954,7 @@ let blob          = 'blob';
 let claw          = 'claw';
 let cloud         = 'cloud';
 let flame         = 'flame';
+let corner        = 'corner';
 let square        = 'square';
 let ellipse       = 'ellipse';
 let mountain      = 'mountain';
@@ -1938,18 +1972,20 @@ let dexagon       = 'dexagon';
 let randogon      = 'randogon';
 let pentagon      = 'pentagon';
 let triangle      = 'triangle';
+//Make the array used for iterating shapes
 shapeTypes        = [
 //Boxy shapes  
   blob      ,
   claw      ,
   cloud     ,
   flame     ,
+  corner    ,
   square    ,
   ellipse   ,
   mountain  ,
   rectangle ,
-  star      ,
 //Radial shapes  
+  star      ,
   circle    ,
   flower    ,
   pollen    ,
