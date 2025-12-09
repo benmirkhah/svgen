@@ -1,4 +1,4 @@
-let version   = '0.030'; //Commits + 1
+let version   = '0.031'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -52,13 +52,13 @@ function defaultShapeCount() {
 //out[octagon  ].count = 0;
 //out[polygon  ].count = 0;
 //out[randogon ].count = 0;
-//out[pentagon ].count = 0;
 //out[blob     ].count = 0;
   out[star     ].count = 1;
+  out[pentagon ].count = 1;
   out[cloud    ].count = 1;
-  out[square   ].count = 2;
+  out[square   ].count = 4;
   out[rectangle].count = 1;
-  out[circle   ].count = 8;
+  out[circle   ].count = 5;
   out[flower   ].count = 1;
   out[hexagon  ].count = 1;
   out[oddagon  ].count = 1;
@@ -193,7 +193,7 @@ function defaultShapeFill() {
   let out = blankShapes();
 
   //Exceptions to the rule of random
-  out[square].fill = random;
+  //out[square].fill = randomColor(true,100,200,10,50,10,50,100,200);
 
   return out;
 }//----------------------------------------------------------------------------
@@ -220,6 +220,7 @@ function defaultShapeFilter() {
   let out = blankShapes();
 
   //Exceptions to the rule of random
+  //out[square   ].filter = '';
   out[star     ].filter = dance;
   out[rectangle].filter = oblivion;
   out[flower   ].filter = glow;
@@ -233,18 +234,24 @@ function defaultShapeSize() {
   let out = blankShapes();
 
   //Properties: type, w, h, r, minw, maxw, minh, maxh, minr, maxr, dw, dh, dr
-  out[rectangle].size.minw = 1200;
-  out[rectangle].size.minh = 800;
+  out[rectangle].size.minw = 400;
+  out[rectangle].size.minh = 300;
   out[rectangle].size.maxw = 0;
   out[rectangle].size.maxh = 0;
 
+  //out[square ].size.type = exponential;
+  out[square   ].size.minh = 100;
+  out[square   ].size.maxh = 500;
+  out[square   ].size.h    = 30;
+  out[square   ].size.dh   = 10;
+  out[square   ].size.sh   = 1.075;
+
+  //Radial shapes
   out[flower   ].size.maxr = 250;
-  
+    
   out[star     ].size.minr =  20;
   out[star     ].size.maxr = 200;
-  
-
-  
+    
   return out;
 }//----------------------------------------------------------------------------
 
@@ -253,13 +260,22 @@ function defaultShapePosition() {
   let out = blankShapes();
   
   //Properties: type, cx, cy, minx, maxx, miny, maxy, dx, dy, sx, sy
-  out.circle.position.type = random;
-  out.circle.position.cx   = 500;
-  out.circle.position.cy   = 500;
-  out.circle.position.dx   = 100;
-  out.circle.position.dy   = -25;
-  out.circle.position.sx   = 1.125;
-  out.circle.position.sy   = -1.125;
+  // out[square].position.type = exponential;
+  // out[square].position.cx   = 40;
+  // out[square].position.cy   = 500;
+  // out[square].position.dx   = 9;
+  // out[square].position.dy   = 20;
+  // out[square].position.sx   = 1.125;
+  // out[square].position.sy   = -1.0695;
+  
+  //Radial shapes
+  out[circle].position.type = random;
+  out[circle].position.cx   = 500;
+  out[circle].position.cy   = 500;
+  out[circle].position.dx   = 100;
+  out[circle].position.dy   = -25;
+  out[circle].position.sx   = 1.125;
+  out[circle].position.sy   = -1.125;
   
   return out;
 }//----------------------------------------------------------------------------
@@ -269,7 +285,14 @@ function defaultShapeRotation() {
   let out = blankShapes();
 
   //Properties: type, degs, mina, maxa, da, sa  
-  out.square.rotation.type = incremental;
+  out[square  ].rotation.type = exponential;
+  out[square  ].rotation.type = random;
+  out[square  ].rotation.sa   = -1.090;
+
+  //Radial shapes
+  out[star    ].rotation.type = random;
+  out[pentagon].rotation.type = random;
+  out[triangle].rotation.type = random;
 
   return out;
 }//----------------------------------------------------------------------------
@@ -279,7 +302,7 @@ function defaultShapeScale() {
   let out = blankShapes();
 
   //Properties: type, degs, mina, maxa, da, sa  
-  out.square.scale.type = incremental;
+  out[square].scale.type = incremental;
 
   return out;
 }//----------------------------------------------------------------------------
@@ -289,7 +312,7 @@ function defaultShapeSkew() {
   let out = blankShapes();
   
   //Properties: type, degs, mina, maxa, da, sa  
-  out.square.skew.type = incremental;
+  out[square].skew.type = incremental;
 
   return out;
 }//----------------------------------------------------------------------------
@@ -327,10 +350,10 @@ function defaultShapes() {
     shapes[type].stroke   =   stroke[type].stroke;
     shapes[type].filter   =   filter[type].filter;
     shapes[type].position = position[type].position;
-    shapes[type].rotation = rotation[type].roration;
+    shapes[type].rotation = rotation[type].rotation;
   });
   
-  //console.log(shapes);  //DEBUG  
+  //console.log(rotation);  //DEBUG  
   return shapes;
 }//----------------------------------------------------------------------------
 
@@ -351,6 +374,7 @@ function defaultShapeTemplate() {
   out['stroke'   ] = defaultShapeStrokeTemplate();
   out['position' ] = defaultShapePositionTemplate();
   out['rotation' ] = defaultShapeRotationTemplate();
+  //console.log(out);  //DEBUG
   return out;  
 }//----------------------------------------------------------------------------
 
@@ -504,7 +528,7 @@ function epoch(n = 8) { //last 8 hex digits by default
 }//----------------------------------------------------------------------------
 
 //Generates a random #RRGGBBAA color-------------------------------------------
-function randomColor(alpha=true, rs=0, gs=0, bs=0, as=0, re=256, ge=256, be=256, ae=256) {
+function randomColor(alpha=true, rs=0, re=256, gs=0, ge=255, bs=0, be=255, as=0, ae=255) {
   let r = randomInt(rs, re);
   let g = randomInt(gs, ge);
   let b = randomInt(bs, be);
@@ -716,6 +740,24 @@ function determinePosition(oid, shape) {
   }
 
   return out;
+}//----------------------------------------------------------------------------
+
+//Figure out an object position based on its shape configuration---------------
+function determineRotation(oid, shape) {
+  let out = Object.create(null);
+  let rot = svgconf.shapes[shape].rotation;
+  
+  switch (rot.type) {
+    case none:        out.degs = 0;                                             break;
+    case random:      out.degs = randomInt(rot.mina, rot.maxa);                 break;
+    case fixed:       out.degs = rot.deg;                                       break;
+    case incremental: out.degs = rot.degs + (oid * rot.da);                     break;
+    case decremental: out.degs = rot.degs - (oid * rot.da);                     break;
+    case exponential: out.degs = rot.degs + (rot.degs * Math.pow(rot.sa,oid));  break;
+    default:          out.degs = 0;
+  }
+
+  return out.degs;
 }//----------------------------------------------------------------------------
 
 /******************************************************************************
@@ -1283,23 +1325,24 @@ function svgBearClaw(oid = 'no-order-id', options = opt) {
 
 //Generates squares & rectangles based on config-------------------------------
 function svgRect (oid = 'no-order-id', square = false, options = opt) {
-  let sid     = svgid+'-'+oid;  
-  let open    = '<rect   ';
-  let close   = '</rect>\r\n';
-  let output  = '';
-  let render  = '';
-  let anchors = '';  
-  let h       = options.size.h;
-  let w       = square ?  h : options.size.w; //make squares when requested
-  let cx      = options.position.cx;
-  let cy      = options.position.cy;
-  let x       = roundInt(cx - (w/2), 1);
-  let y       = roundInt(cy - (h/2), 1);
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
-  let cname   = ' cx'+cx+' cy'+cy;
+  let sid       = svgid+'-'+oid;  
+  let open      = '<rect   ';
+  let close     = '</rect>\r\n';
+  let output    = '';
+  let render    = '';
+  let anchors   = '';  
+  let h         = options.size.h;
+  let w         = square ?  h : options.size.w; //make squares when requested
+  let cx        = options.position.cx;
+  let cy        = options.position.cy;
+  let x         = roundInt(cx - (w/2), 1);
+  let y         = roundInt(cy - (h/2), 1);
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
+  let cname     = ' cx'+cx+' cy'+cy;
 
   anchors += center ? svgCrossHair(cx, cy, 5, center, 'center mark', oid) : '';
 
@@ -1322,6 +1365,7 @@ function svgRect (oid = 'no-order-id', square = false, options = opt) {
   render += stroke;
   render += filter;
   render += events;
+  render += transform;
   render += 'class="'+( square ? 'square' : 'rectangle' )+cname+'" >';
   render += close;
   output += render+anchors;
@@ -1331,18 +1375,19 @@ function svgRect (oid = 'no-order-id', square = false, options = opt) {
 
 //Generates a circle based on config-------------------------------------------
 function svgCircle (oid = 'no-order-id', options = opt) {
-  let sid     = svgid+'-'+oid;
-  let open    = '<circle id="circ-'+sid+'" ';
-  let close   = '</circle>\r\n';
-  let output  = '';
-  let render  = '';
-  let r       = options.size.r;
-  let x       = options.position.cx;
-  let y       = options.position.cy;
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
+  let sid       = svgid+'-'+oid;
+  let open      = '<circle id="circ-'+sid+'" ';
+  let close     = '</circle>\r\n';
+  let output    = '';
+  let render    = '';
+  let r         = options.size.r;
+  let x         = options.position.cx;
+  let y         = options.position.cy;
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
 
   render += open;
   render += ` r="${r}" `;
@@ -1351,6 +1396,7 @@ function svgCircle (oid = 'no-order-id', options = opt) {
   render += fill;
   render += stroke;
   render += filter;
+  render += transform;
   render += events+'">';
   render += close;  
   render += svgconf.enabled.centers ? svgCrossHair(x, y, 5, center, 'center mark', oid) : '';
@@ -1361,38 +1407,39 @@ function svgCircle (oid = 'no-order-id', options = opt) {
 
 //Generates clouds-------------------------------------------------------------
 function svgCloud(oid = 'no-order-id', options = opt) {
-  let sid     = svgid+'-'+oid;
-  let pcount  = 2 * randomInt(2,5);
-  let points  = svgPoints(width, height, pcount); //console.log(points); //DEBUG
-  let open    = '<path   ';
-  let close   = '\r\n</path>\r\n';
-  let output  = '';
-  let render  = '';
-  let anchors = '';
-  let line    = '';
-  let cube    = '';
-  let quad    = '';
-  let arc     = '';
-  let x,y     = 0;
-  let u,v     = 0;
-  let dx,dy   = 0;
-  let qx,qy   = 0;
-  let cx      = 0;
-  let cy      = 0;
-  let mx      = moveX(360, 720);
-  let my      = moveY(180, 360); //console.log( mx + ' : ' + my ); //DEBUG
-  let startx  = mx+points[1].x;
-  let starty  = my+points[1].y;
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
+  let sid       = svgid+'-'+oid;
+  let pcount    = 2 * randomInt(2,5);
+  let points    = svgPoints(width, height, pcount); //console.log(points); //DEBUG
+  let open      = '<path   ';
+  let close     = '\r\n</path>\r\n';
+  let output    = '';
+  let render    = '';
+  let anchors   = '';
+  let line      = '';
+  let cube      = '';
+  let quad      = '';
+  let arc       = '';
+  let x,y       = 0;
+  let u,v       = 0;
+  let dx,dy     = 0;
+  let qx,qy     = 0;
+  let cx        = 0;
+  let cy        = 0;
+  let mx        = moveX(360, 720);
+  let my        = moveY(180, 360); //console.log( mx + ' : ' + my ); //DEBUG
+  let startx    = mx+points[1].x;
+  let starty    = my+points[1].y;
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
 
   fill = fill + stroke + filter+' d="\r\n  M '+startx+' '+ starty+' \r\n';
-  arc  = open +'id="cloud-'+sid+'-a" class="cloud arc"  '+ events+fill;
-  cube = open +'id="cloud-'+sid+'-c" class="cloud cube" '+ events+fill;
-  quad = open +'id="cloud-'+sid+'-q" class="cloud quad" '+ events+fill;
-  line = open +'id="cloud-'+sid+'-l" class="cloud line" '+ events+fill;
+  arc  = open +'id="cloud-'+sid+'-a" class="cloud arc"  '+ events+transform+fill;
+  cube = open +'id="cloud-'+sid+'-c" class="cloud cube" '+ events+transform+fill;
+  quad = open +'id="cloud-'+sid+'-q" class="cloud quad" '+ events+transform+fill;
+  line = open +'id="cloud-'+sid+'-l" class="cloud line" '+ events+transform+fill;
   
   for (i=1; i<=pcount; i++) {
     x = mx+points[i].x;
@@ -1441,7 +1488,7 @@ function svgCloud(oid = 'no-order-id', options = opt) {
 
   cx = roundInt(cx/pcount);
   cy = roundInt(cy/pcount);
-  if (svgconf.enabled.centers) anchors += svgCrossHair(cx, cy, 5, center, 'center mark');
+  if (svgconf.enabled.centers) anchors += svgCrossHair(cx, cy, 5, center, 'center mark', oid);
 
   let arcStroke  = '>';
   let cubeStroke = '>';
@@ -1470,27 +1517,28 @@ function svgCloud(oid = 'no-order-id', options = opt) {
 
 //Generates flowers------------------------------------------------------------
 function svgFlower(oid = 'no-order-id', options = opt) {
-  let sid     = svgid+'-'+oid;
-  let pcount  = randomInt(5,8);
-  let points  = svgRadialPoints(pcount); //console.log(points); //DEBUG
-  let open    = '  <path ';
-  let close   = '  </path>\r\n';
-  let render  = '';
-  let output  = '';
-  let anchors = '';
-  let path    = '';
-  let x,y     = 0;
-  let u,v     = 0;
-  let dx,dy   = 0;
-  let ax,ay   = 0;
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
-  let startx  = points[0].x;
-  let starty  = points[0].y;
+  let sid       = svgid+'-'+oid;
+  let pcount    = randomInt(5,8);
+  let points    = svgRadialPoints(pcount); //console.log(points); //DEBUG
+  let open      = '  <path ';
+  let close     = '  </path>\r\n';
+  let render    = '';
+  let output    = '';
+  let anchors   = '';
+  let path      = '';
+  let x,y       = 0;
+  let u,v       = 0;
+  let dx,dy     = 0;
+  let ax,ay     = 0;
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
+  let startx    = points[0].x;
+  let starty    = points[0].y;
 
-  render = '<g id="flower-'+sid+'" class="flower" '+ fill+filter+'>\r\n';
+  render = '<g id="flower-'+sid+'" class="flower" '+ fill+filter+transform+'>\r\n';
   let d  = stroke + events +'  d="\r\n    M '+ startx+' '+starty+' \r\n';
   
   for (i=1; i<=pcount; i++) {
@@ -1518,7 +1566,7 @@ function svgFlower(oid = 'no-order-id', options = opt) {
 
     if (svgconf.enabled.anchors) output += svgDrawPoint(     ax,     ay, 4, svgconf.paths.arc, 'point anchor arc ');
     if (svgconf.enabled.points ) output += svgDrawPoint(      x,      y, 3, pcolor, 'point');
-    if (svgconf.enabled.centers) output += svgCrossHair( startx, starty, 5, center, 'center mark'); 
+    if (svgconf.enabled.centers) output += svgCrossHair( startx, starty, 5, center, 'center mark', oid); 
   }
 
   output += render+'</g>\r\n';
@@ -1528,28 +1576,29 @@ function svgFlower(oid = 'no-order-id', options = opt) {
 
 //Generates Polygons, Hexagon by default---------------------------------------
 function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
-  let sid     = svgid+'-'+oid;
-  let points  = svgRadialPoints(pcount); //console.log(points); //DEBUG
-  let open    = '  <polygon ';
-  let close   = '  </polygon>\r\n';
-  let render  = '';
-  let output  = '';
-  let anchors = '';
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
-  let startx  = points[0].x;
-  let starty  = points[0].y;
-  let polyn   = options.name;
-  let cname   = polyn;
-  let data    = { type:polyn };
+  let sid       = svgid+'-'+oid;
+  let points    = svgRadialPoints(pcount); //console.log(points); //DEBUG
+  let open      = '  <polygon ';
+  let close     = '  </polygon>\r\n';
+  let render    = '';
+  let output    = '';
+  let anchors   = '';
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
+  let startx    = points[0].x;
+  let starty    = points[0].y;
+  let polyn     = options.name;
+  let cname     = polyn;
+  let data      = { type:polyn };
   
   cname   += ((polyn == 'oddagon') || (polyn == 'randogon')) ? ' poly'+pcount : '';
   render  += open+'id="'+polyn+'-'+sid+'-'+i+'" ';
   render  += 'class="'+cname+'"';
-  render  += fill+stroke+filter+events+' points="';
-  anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair( startx, starty, 5, center, 'center mark') : '';
+  render  += fill+stroke+filter+transform+events+' points="';
+  anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair( startx, starty, 5, center, 'center mark', oid) : '';
 
   for (i=1; i<=pcount; i++) {
     render  += points[i].x+','+points[i].y+' ';     
@@ -1568,31 +1617,32 @@ function svgPolygon(oid = 'no-order-id', pcount=6, options = opt) {
 
 //Generates Stars, 5 or 11 points by default-----------------------------------
 function svgStar(oid = 'no-order-id', options = opt, pcount=0) {
-  let oo      = randomInt(2,9);
-  pcount      = pcount ? pcount : ((oo % 2) ? 11 : 5); //Only odd
-  let sid     = svgid+'-'+oid;
-  let points  = svgRadialPoints(pcount);
-  let cx      = points[0].x;
-  let cy      = points[0].y;
-  let open    = '  <path ';
-  let close   = '  </path>\r\n';
-  let render  = '';
-  let output  = '';
-  let anchors = '';
-  let events  = options.events;
-  let stroke  = options.stroke;
-  let filter  = options.filter;
-  let fill    = options.fill;
-  let cname   = star; //options.name
-  let data    = { type:star };
-  let ring    = [...points];
+  let oo        = randomInt(2,9);
+  pcount        = pcount ? pcount : ((oo % 2) ? 11 : 5); //Only odd
+  let sid       = svgid+'-'+oid;
+  let points    = svgRadialPoints(pcount);
+  let cx        = points[0].x;
+  let cy        = points[0].y;
+  let open      = '  <path ';
+  let close     = '  </path>\r\n';
+  let render    = '';
+  let output    = '';
+  let anchors   = '';
+  let transform = options.transform;
+  let events    = options.events;
+  let stroke    = options.stroke;
+  let filter    = options.filter;
+  let fill      = options.fill;
+  let cname     = star; //options.name
+  let data      = { type:star };
+  let ring      = [...points];
   ring.shift(); //get rid of [0]
   ring.pop();   //get red of [last]
   points.pop(); //get red of [last]
   ring = [...points, ...ring]; 
 
   render  += open+'id="'+sid+'" ';
-  render  += 'class="'+cname+' p'+pcount+'" ';
+  render  += 'class="'+cname+' p'+pcount+'" '+transform;
   render  += fill+stroke+filter+events+' d="M '+ring[1].x+','+ring[1].y+'\r\n';
   anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair(cx, cy, 5, center, 'center mark') : '';
 
@@ -1745,7 +1795,7 @@ function svgVars(svgid) {
 //Adds the <style> element-----------------------------------------------------
 function svgStyle(svgid) {
   let open    = '<style>\r\n';
-  let content = 'text { font-size:0.65em; }\r\n'+svgVars(svgid);
+  let content = '* { transform-box: fill-box; } text { font-size:0.65em; }\r\n'+svgVars(svgid);
   let close   = '</style>\r\n';
   let output  = open + content + close;
   return output;
@@ -1895,14 +1945,24 @@ function svgContent() {
     } else stroke = '';
 
     let options         = Object.create(null);
-    options['oid'     ] = oid;
-    options['name'    ] = shape;
-    options['stroke'  ] = stroke;
-    options['filter'  ] = filter;
-    options['fill'    ] = fill;
-    options['size'    ] = determineSize(oid, shape);
-    options['position'] = determinePosition(oid, shape);
-    options['events'  ] = ' onclick="this.style.fill = randomColor()" '; 
+    options['oid'      ] = oid;
+    options['name'     ] = shape;
+    options['stroke'   ] = stroke;
+    options['filter'   ] = filter;
+    options['fill'     ] = fill;
+    options['size'     ] = determineSize(oid, shape);
+    options['position' ] = determinePosition(oid, shape);
+    options['events'   ] = ' onclick="this.style.fill = randomColor()" '; 
+
+    let transform = '';
+    let rotation  = determineRotation(oid, shape);
+    //transform    += rotation ? ' transform-origin="'+options.position.cx+' '+options.position.cy+'" ' : '';
+    transform    += rotation ? ' transform-origin="center center" ' : '';
+    transform    += rotation ? ' transform="rotate('+rotation+')" ' : '';
+
+
+
+    options['transform'] = transform;
     //console.log(options);  //DEBUG
 
     switch(shape) {      
