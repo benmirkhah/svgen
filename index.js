@@ -1,19 +1,21 @@
-let version   = '0.032'; //Commits + 1
+let version   = '0.033'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
 
-More shapes: BG Corner, Flame, Blob, Ellipse, Mountain, Pollen
+More shapes: Flame, Blob, Ellipse, Mountain, Pollen, Letters, Numbers, Waves
 
 Back button: Allowing saving previous renders
 
-Config UI: Allowing more user interactivity
+Config UI: Allowing non technical user interaction
 
-Grids: Snap to grid and fixed position shapes
+Grids: Snap to grid
 
 More filters: Ideally one filter per shape
 
-More events: Configurable OnClick, hover, etc.
+Events: Configurable OnClick, RightClick, hover, etc. to run actions
+
+Actions: Change Color, Size, Position, Rotation upon events.
 
 Variants: Slightly different replicas of a shape
 
@@ -44,26 +46,27 @@ function defaultCanvas() {
 //Default number of shape types per instance-----------------------------------
 function defaultShapeCount() {
   let out = blankShapes();
-//out[claw     ].count = 0;
-//out[flame    ].count = 0;
-//out[pollen   ].count = 0;
-//out[ellipse  ].count = 0;
-//out[mountain ].count = 0;
-//out[octagon  ].count = 0;
-//out[polygon  ].count = 0;
-//out[randogon ].count = 0;
-//out[blob     ].count = 0;
-  out[star     ].count = 1;
-  out[pentagon ].count = 1;
+//out[blob     ].count = 1;
+//out[claw     ].count = 1;
+//out[flame    ].count = 1;
+//out[pollen   ].count = 1;
+//out[ellipse  ].count = 1;
+//out[mountain ].count = 1;
+//out[octagon  ].count = 1;
+//out[polygon  ].count = 1;
+//out[randogon ].count = 1;
+//out[star     ].count = 1;
+//out[flower   ].count = 1;
+//out[triangle ].count = 1;
+//out[square   ].count = 1;
+//out[oddagon  ].count = 1;
+//out[hexagon  ].count = 1;
+//out[dexagon  ].count = 1;
+  out[corner   ].count = 4;
   out[cloud    ].count = 1;
-  out[square   ].count = 4;
-  out[rectangle].count = 1;
-  out[circle   ].count = 5;
-  out[flower   ].count = 1;
-  out[hexagon  ].count = 1;
-  out[oddagon  ].count = 1;
-  out[dexagon  ].count = 1;
-  out[triangle ].count = 3;
+  out[rectangle].count = 3;
+  out[circle   ].count = 8;
+  out[pentagon ].count = 4;
 
   return out;
 }//----------------------------------------------------------------------------
@@ -90,13 +93,13 @@ function defaultEnabled() {
 function defaultFilters() {
   let out = Object.create(null);
   out[glow         ] = true;
-  out[tile         ] = false;
+  out[tile         ] = true;
   out[dance        ] = true;
   out[chaotic      ] = false;
   out[watercolor   ] = false;
   out[motionblurx  ] = true;
   out[motionblury  ] = true;
-  out[displacement ] = false;
+  out[displacement ] = true;
   out[gaussianblur ] = true;
   out[pointlighting] = true;
   return out;
@@ -193,6 +196,7 @@ function defaultShapeFill() {
   let out = blankShapes();
 
   //Exceptions to the rule of random
+  //out[corner].fill = ''; //randomColor(true,100,200,10,50,10,50,100,200);
   //out[square].fill = randomColor(true,100,200,10,50,10,50,100,200);
 
   return out;
@@ -201,14 +205,14 @@ function defaultShapeFill() {
 //Default stroke of shape types------------------------------------------------
 function defaultShapeStroke() {
   let out = blankShapes();
-
   //Stroke Width
   out[star     ].stroke.swidth  =    0;
   out[square   ].stroke.swidth  =    1;
   out[rectangle].stroke.swidth  =    0;
   out[flower   ].stroke.swidth  =    0;
-
+  out[corner   ].stroke.swidth  =    0;  
   //Stroke Opacity
+  out[corner   ].stroke.opacity =    1;
   out[circle   ].stroke.opacity = 0.15;
   out[square   ].stroke.opacity = 0.65;
 
@@ -220,12 +224,13 @@ function defaultShapeFilter() {
   let out = blankShapes();
 
   //Exceptions to the rule of random
-  //out[square   ].filter = '';
-  out[star     ].filter = dance;
+//out[square   ].filter = '';
+  out[star     ].filter =    dance;
+  out[flower   ].filter =     glow;
+  out[oddagon  ].filter =    dance;
+  out[triangle ].filter =     glow;
   out[rectangle].filter = oblivion;
-  out[flower   ].filter = glow;
-  out[oddagon  ].filter = dance;
-  out[triangle ].filter = glow;
+  out[corner   ].filter = ''; //oblivion;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -364,16 +369,18 @@ function defaultShapes() {
 //Default shape object template that all shape types share---------------------
 function defaultShapeTemplate() {
   let out = Object.create(null);
-  out['count'    ] =      0;
-  out['max'      ] =     10;
-  out['fill'     ] = random;
-  out['filter'   ] = random;
-  out['size'     ] = defaultShapeSizeTemplate();
-  out['skew'     ] = defaultShapeSkewTemplate();
-  out['scale'    ] = defaultShapeScaleTemplate();
-  out['stroke'   ] = defaultShapeStrokeTemplate();
-  out['position' ] = defaultShapePositionTemplate();
-  out['rotation' ] = defaultShapeRotationTemplate();
+  out['count'   ] =      0;
+  out['max'     ] =     10;
+  out['points'  ] =      1;  
+  out['type'    ] = normal; 
+  out['fill'    ] = random;
+  out['filter'  ] = random;
+  out['size'    ] = defaultShapeSizeTemplate();
+  out['skew'    ] = defaultShapeSkewTemplate();
+  out['scale'   ] = defaultShapeScaleTemplate();
+  out['stroke'  ] = defaultShapeStrokeTemplate();
+  out['position'] = defaultShapePositionTemplate();
+  out['rotation'] = defaultShapeRotationTemplate();
   //console.log(out);  //DEBUG
   return out;  
 }//----------------------------------------------------------------------------
@@ -381,7 +388,7 @@ function defaultShapeTemplate() {
 //Default template for a shape's size object-----------------------------------
 function defaultShapeSizeTemplate() {
   let out  = Object.create(null);
-  out[type] = random;  //random, fixed, incremental, decremental, exponential
+  out[type] = random;  //random, fixed, incremental, exponential
   out['w' ] =     80;
   out['h' ] =     60;
   out[minw] =     40;
@@ -391,52 +398,56 @@ function defaultShapeSizeTemplate() {
   out['r' ] =     50;
   out[minr] =     30;
   out[maxr] =      0;  //0 = canvas width/2
-  out['dw'] =     20;  //Deltas for incremental & decremental
+  out['dw'] =     20;  //Deltas for incremental
   out['dh'] =     20;
   out['dr'] =     20;
   out['sw'] =  1.125;  //Scalers for exponential
   out['sh'] =  1.125;
   out['sr'] =  1.125;
+  out['oe'] =      1;  //Once every number
   return out;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's stroke object---------------------------------
 function defaultShapeStrokeTemplate() {
   let out = Object.create(null);
-  out['swidth'] = random;
   out['scolor'] = randomColor(false);
-  out[opacity ] =   0.25;
-  out['dw'    ] =      5;
   out['dc'    ] = '11000011'; //#RRGGBBAA delta
+  out['swidth'] = random;
+  out[opacity ] =   0.25;
+  out['dw'    ] =      5; //Delta
+  out['oe'    ] =      2; //Once every
   return out;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's position object-------------------------------
 function defaultShapePositionTemplate() {
   let out  = Object.create(null);
-  out[type] = random;  //random, fixed, ongrid, incremental, decremental, exponential
+  out[type] = random;  //random, fixed, ongrid, incremental, exponential
   out['cx'] = middle;
   out['cy'] = middle;
   out[minx] =      0;
   out[maxx] =      0;  //0 = canvas width
   out[miny] =      0;
   out[maxy] =      0;  //0 = canvas height
-  out['dx'] =     80;  //Deltas incremental, decremental
+  out['dx'] =     80;  //Deltas
   out['dy'] =     60;
-  out['sx'] =  1.125;  //Scalers for exponential
+  out['sx'] =  1.125;  //Scalers
   out['sy'] =  1.125;
+  out['oe'] =      2;  //Once every
   return out;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's rotation object-------------------------------
 function defaultShapeRotationTemplate() {
   let out  = Object.create(null);
-  out[type] = 'none';  //random, fixed, incremental, decremental, exponential
+  out[type] = 'none';  //random, fixed, incremental, exponential
   out[degs] =      5;  
   out[mina] =   -360;
   out[maxa] =    360;
   out['da'] =      5;  //Delta
   out['sa'] =    1.1;  //Scaler
+  out['oe'] =      2;  //Once every
   return out;
 }//----------------------------------------------------------------------------
 
@@ -449,18 +460,20 @@ function defaultShapeScaleTemplate() {
   out[max   ] =    100;
   out['da'  ] =      5;  //Delta
   out['sa'  ] =    1.1;  //Scaler
+  out['oe'  ] =      2;  //Once every 
   return out;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's skew object----------------------------------
 function defaultShapeSkewTemplate() {
   let out  = Object.create(null);
-  out[type] = 'none';  //random, fixed, incremental, decremental, exponential
+  out[type] = 'none';  //random, fixed, incremental, exponential
   out[degs] =      5;  
   out[min ] =      0;
   out[max ] =    100;
   out['da'] =      5;  //Delta
   out['sa'] =    1.1;  //Scaler
+  out['oe'] =      2;  //Once every
   return out;
 }//----------------------------------------------------------------------------
 
@@ -686,11 +699,6 @@ function determineSize(oid=1, shape=square) {
       out.h = size.h + (oid * size.dh);
       out.r = size.r + (oid * size.dr);
       break;
-    case decremental:
-      out.w = size.w - (oid * size.dw);
-      out.h = size.h - (oid * size.dh);
-      out.r = size.r - (oid * size.dr);
-      break;      
     case exponential:
       out.w = size.w + (size.w * Math.pow(size.sw,oid));
       out.h = size.h + (size.h * Math.pow(size.sh,oid));
@@ -722,14 +730,14 @@ function determinePosition(oid, shape) {
     case ongrid:
       //TODO
       break;
+      // case onceevery: 
+      //   out.cx = pos.cx + (oid * pos.dx);
+      //   out.cy = pos.cy + (oid * pos.dy);
+      //   break;
     case incremental: 
       out.cx = pos.cx + (oid * pos.dx);
       out.cy = pos.cy + (oid * pos.dy);
-      break;
-    case decremental:
-      out.cx = pos.cx - (oid * pos.dx);
-      out.cy = pos.cy - (oid * pos.dy);
-      break;      
+      break;   
     case exponential:
       out.cx = pos.cx + (((oid-1) * (pos.dx * Math.pow(pos.sx,oid)))/oid);
       out.cy = pos.cy + (((oid-1) * (pos.dy * Math.pow(pos.sy,oid)))/oid);
@@ -746,13 +754,13 @@ function determinePosition(oid, shape) {
 function determineRotation(oid, shape) {
   let out = Object.create(null);
   let rot = svgconf.shapes[shape].rotation;
-  
+
   switch (rot.type) {
     case none:        out.degs = 0;                                             break;
     case random:      out.degs = randomInt(rot.mina, rot.maxa);                 break;
     case fixed:       out.degs = rot.deg;                                       break;
+    //case onceevery:   out.degs = rot.degs + (rot.oe % oid) ? 0 : oid * rot.da;  break;                    break;
     case incremental: out.degs = rot.degs + (oid * rot.da);                     break;
-    case decremental: out.degs = rot.degs - (oid * rot.da);                     break;
     case exponential: out.degs = rot.degs + (rot.degs * Math.pow(rot.sa,oid));  break;
     default:          out.degs = 0;
   }
@@ -772,7 +780,21 @@ function svgFilters() {
   let scale    = randomInt(2,   99);
   let seed25   = randomInt(1,   25);
   let seed1000 = randomInt(100, 1000);
-  let x,y,z,c,d,w,h = 0;
+  let x,y,z,c,d,w,h,r;
+
+  //OBLIVION BLUR--------------------------------------------------------------
+  x = randomInt(width  * 0.5, width  * 0.75);
+  y = randomInt(height * 0.5, height * 0.75);
+  w = randomInt(1, x);
+  h = randomInt(1, y);    
+  r = randomInt(100, 200);
+  r = r+' '+r;
+  //r = r%2 ? '0 '+r : r+' 0';
+  output += '<filter id="oblivion">\r\n';
+  output += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
+  output += '  <feTile />\r\n';
+  output += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${r}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+  output += '</filter>\r\n';
 
   //DISPLACEMENT---------------------------------------------------------------
   if (svgconf.filters.displacement) {
@@ -815,24 +837,6 @@ function svgFilters() {
     y -= randomInt(1,   y); //reduce likelihood of large y
     out += '<filter id="motionblury">\r\n';
     out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="0 ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //OBLIVION BLUR--------------------------------------------------------------
-  //if (svgconf.filters.oblivion) {
-  if (svgconf.shapes.rectangle.count) { //ONLY USE ON RECTAGLES FOR NOW
-    let out = '';
-    x = randomInt(width  * 0.5, width  * 0.75);
-    y = randomInt(height * 0.5, height * 0.75);
-    w = randomInt(1, x);
-    h = randomInt(1, y);    
-    r = randomInt(50, 100);
-    r = r%2 ? '0 '+r : r+' 0';
-    out += '<filter id="oblivion">\r\n';
-    out += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
-    out += '  <feTile />\r\n';
-    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${r}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
     out += '</filter>\r\n';
     output += out;
   }
@@ -1661,6 +1665,64 @@ function svgStar(oid = 'no-order-id', options = opt, pcount=0) {
   return output;
 }//----------------------------------------------------------------------------
 
+//Generates Corner Backgrounds-------------------------------------------------
+function svgCorner(oid = 'no-order-id', options = opt) {
+  let sid       = svgid+'-'+oid;
+  let open      = '  <path ';
+  let close     = '  </path>\r\n';
+  let render    = '';
+  let output    = '';
+  let anchors   = '';
+  let transform = ''; //options.transform;
+  let events    = ''; //options.events;
+  let stroke    = ''; //options.stroke;
+  let filter    = options.filter;
+  let data      = { type: 'corner' };
+  let cname     = 'corner';
+  let cx,cy; //Center points
+  let xm; //X multiplier
+  let ym; //Y multiplier
+  let sp; //Starting point
+  let bp; //Bottom bpoin
+  let tp; //Top point
+  let corners = [zero, tlc, trc, blc, brc];
+  let type = corners[oid+4%4]; //blc, brc, tlc, trc
+  let fill = ' fill="url(#corner-'+type+')" '; //options.fill;
+
+  switch (type) {
+    case tlc: sp=TLC;   tp=TRC;   bp=BLC;   xm= 1;   ym= 1;   break;
+    case trc: sp=TRC;   tp=TLC;   bp=BRC;   xm=-1;   ym= 1;   break;
+    case blc: sp=BLC;   tp=TLC;   bp=BRC;   xm= 1;   ym=-1;   break;
+    case brc: sp=BRC;   tp=TRC;   bp=BLC;   xm=-1;   ym=-1;   break;
+    //default:  sp=TLC;   tp=TRC;   bp=BLC;   xm= 1;   ym= 1;
+  }
+
+  cx = sp.x + (xm * roundInt(WIDTH  * 0.33,1));
+  cy = sp.y + (ym * roundInt(HEIGHT * 0.33,1));
+  qx = sp.x + (xm * roundInt(WIDTH  * 0.66,1));
+  qy = sp.y + (ym * roundInt(HEIGHT * 0.84,1));
+
+  render  += open+'id="'+sid+'" ';
+  render  += 'class="'+cname+' '+type+'" '+transform;
+  render  += fill+stroke+filter+events+' d="M '+sp.x+','+sp.y+'\r\n'; 
+  render  += '  L '+sp.x+','+sp.y+' '+   tp.x+','+   tp.y+'\r\n';
+  render  += '  Q '+  qx+','+  qy+' '+bp.x+','+bp.y+'\r\n';
+  render  += '  L '+bp.x+','+bp.y+' '+sp.x+','+sp.y+'\r\n';
+  render  += '  Z">' +'\r\n'+close+'\r\n';  
+  
+  anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair(cx, cy, 5, center, 'center mark', oid) : '';
+  //anchors += (svgconf.enabled.anchors) ? '  '+svgCrossHair(qx, qy, 5, center, 'center mark', 'Q'+oid) : '';
+  anchorall  += anchors;
+  output     += render+anchors;
+  //data[type] = { '' }
+  //elements[oid].data = data;
+
+  return output;
+}//----------------------------------------------------------------------------
+
+
+
+
 /******************************************************************************
 ************* Below are all the functions that generate the SVG ***************
 ******************************************************************************/
@@ -1762,8 +1824,8 @@ function parseConf() {
   parsed['filters'  ] = filters;
   parsed['objects'  ] = objects;
   parsed['enabled'  ] = enabled;
-  parsed['order'    ] = ['zero', ...randomize(order)];
-//parsed['order'    ] = ['zero', ...order];
+//parsed['order'    ] = ['zero', ...randomize(order)];
+  parsed['order'    ] = ['zero', ...order];
   
   return parsed;
 }//----------------------------------------------------------------------------
@@ -1819,9 +1881,47 @@ function svgGrad(gid, gtype = 'L') {
   return open + g + close;
 }//----------------------------------------------------------------------------
 
+//Generates Corner Radial Gradients--------------------------------------------
+function svgCornerGrad(type = tlc) {
+  let g  = '';
+  let c1 = '';
+  let c2 = '';
+  let c3 = '';
+  let sp = {}; //Starting point
+  let corners = [tlc, trc, blc, brc];
+  
+  for (let i=0; i<4; i++) {
+    type = corners[i];
+
+    switch (type) {
+      case tlc: sp=TLC; break;
+      case trc: sp=TRC; break;
+      case blc: sp=BLC; break;
+      case brc: sp=BRC; break;
+      default:  sp=TLC; type=tlc;
+    }
+
+    c1 = randomColor(true,99,225,32,128,99,225,99,199);
+    c2 = randomColor(true,64,193,64,193,64,225,32, 96);
+    c3 = randomColor(true,32,128,32,128,32,128, 0, 64);
+    g += `  <radialGradient id="corner-${type}" gradientUnits="userSpaceOnUse" cx="${sp.x}" cy="${sp.y}" r="${HEIGHT}">\r\n`;
+    g += '    <stop offset="0.00" stop-opacity="0.50" stop-color="'+c1+'"/>\r\n';
+    g += '    <stop offset="0.25" stop-opacity="0.33" stop-color="'+c1+'"/>\r\n';
+    g += '    <stop offset="0.75" stop-opacity="0.15" stop-color="'+c2+'"/>\r\n';
+    g += '    <stop offset="1.00" stop-opacity="0.0"  stop-color="'+c3+'"/>\r\n';
+    g += '  </radialGradient>\r\n';
+  }
+
+  return g;
+}//----------------------------------------------------------------------------
+
 //Adds Linear & Radial gradients-----------------------------------------------
 function svgGradients(type = 'L') {
   let output = '';
+  if (corner in svgconf.shapes) {
+    output += svgCornerGrad(svgconf.shapes.corner.type);
+  }
+
   if (svgconf.enabled.gradients) {
     for (let i=1; i <= total; i++) {
       output += svgGrad(svgid+'-'+i, ((i % 2) ? 'L' : 'R'));
@@ -1975,6 +2075,7 @@ function svgContent() {
     //case 'ellipse'   : render += svgellipse(oid,options);    break;
       case 'star'      : render += svgStar(oid,options);       break;
       case 'cloud'     : render += svgCloud(oid,options);      break;
+      case 'corner'    : render += svgCorner(oid,options);     break;
       case 'circle'    : render += svgCircle(oid,options);     break;
       case 'flower'    : render += svgFlower(oid,options);     break;
       case 'square'    : render += svgRect(oid,true ,options); break;
@@ -2144,6 +2245,7 @@ let anchorall       = '';
 const decremental   = 'decremental';
 const incremental   = 'incremental';
 const exponential   = 'exponential';
+const onceevery     = 'onceevery';
 const selected      = 'selected';
 const diagonal      = 'diagonal';
 const opacity       = 'opacity';
@@ -2160,6 +2262,7 @@ const both          = 'both';
 const grid          = 'grid';
 const none          = 'none';
 const type          = 'type';
+const zero          = 'zero';
 const degs          = 'degs';  //Degrees
 const mina          = 'mina';  //Angle
 const maxa          = 'maxa';  //Angle
@@ -2177,6 +2280,10 @@ const miny          = 'miny';  //Position
 const maxy          = 'maxy';  //Position
 const min           = 'min';   //Value
 const max           = 'max';   //Value
+const tlc           = 'tlc';   //Top Left Corner
+const trc           = 'trc';   //Top Right Corner
+const blc           = 'blc';   //Bottom Left Corner
+const brc           = 'brc';   //Bottom Right Corner
 //Path related syntax sugars
 const arc           = 'arc';
 const quad          = 'quad';
@@ -2235,11 +2342,11 @@ const pentagon      = 'pentagon';
 const triangle      = 'triangle';
 //Array used for iterating shapes
 const shapeTypes    = new Array(
+  corner    ,
   blob      ,  //Boxy shapes  
   claw      ,
   cloud     ,
   flame     ,
-  corner    ,
   square    ,
   ellipse   ,
   mountain  ,
@@ -2265,11 +2372,19 @@ const scount   = Object.keys(svgconf.shapes).length; //Number of enabled shapes
 const fcount   = filters.length;                     //Number of enabled filters
 const width    = svgconf.width;
 const height   = svgconf.height;
+const WIDTH    = svgconf.width;
+const HEIGHT   = svgconf.height;
 const colors   = svgconf.colors;
 const pcolor   = svgconf.enabled.points;  //Point  color
 const center   = svgconf.enabled.centers; //Center color
 const acolor   = svgconf.enabled.anchors; //Anchor color
 const gcolor   = svgconf.enabled.grids;   //Grid   color
+const MIDX     = roundInt(WIDTH/2,1);
+const MIDY     = roundInt(HEIGHT/2,1);
+const TLC      = { x:0     , y:0      };
+const TRC      = { x:WIDTH , y:0      };
+const BLC      = { x:0     , y:HEIGHT };
+const BRC      = { x:WIDTH , y:HEIGHT };
 //console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load
