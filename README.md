@@ -2,7 +2,7 @@
 
 <b>Generates SVG files with parametric semi-random elements defined in configuration.</b>
 
-I love SVG files, specially for page backgrounds, <a href="https://github.benmirkhah.com/svgen/">see it in action</a>.
+I love SVG files, specially for page backgrounds, so I made a tool to generate them, <a href="https://github.benmirkhah.com/svgen/">see it in action</a>!
 
 This is a work in progress, so far it includes random colors, gradients and filters, parametric size, position and rotation, and most importantly...
 
@@ -12,14 +12,15 @@ Random shapes:
 - Fluffy Clouds
 - Circles
 - Squares 
-- Triangle
-- Pentagon (defense headquarters)
-- Hexagon  (6 sides)
+- Nautili (nautiluses are NOT A LIE) 
+- Triangles
+- Pentagons (defense headquarters)
+- Hexagons (6 sides)
 - Octagons (8 sides)
 - Oddagons (random odd numbered sides) 
 - Dexagons (10 sides)
-- Randogon (random numbers of sides)
+- Randogons (random numbers of sides)
   
-More shapes are planned to be added including blobs, flames, etc.
+More shapes are planned to be added including blobs, flames, hearts, etc.
 
-No UI yet (coming soon) but the granular config object allows fine adjustment of all parameters used in generating the shapes. 
+No UI yet (coming soon) but the granular config object allows fine adjustment of all parameters used in generating each shape. 
