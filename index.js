@@ -1,27 +1,17 @@
-let version = '0.037'; //Commits + 1
+let version = '0.038'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
-Palette options for color generation (muted, pastel, complementary, monotone etc.)
-
-Back button: Allowing saving previous renders
-
-Config UI: Allowing non technical user interaction
-
-More shapes: Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
-
+Back button:  Allowing saving previous renders
+Config UI:    Allowing non technical user interaction
+More shapes:  Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
 More filters: Ideally one filter per shape
-
-Events: Configurable OnClick, RightClick, hover, etc. to run actions
-
-Actions: Change Color, Size, Position, Rotation upon events.
-
-Variants: Slightly different replicas of a shape
-
-Animation: The final hurdle when everything else is done
-
+Events:       Configurable OnClick, RightClick, hover, etc. to run actions
+Actions:      Change Color, Size, Position, Rotation upon events.
+Variants:     Slightly different replicas of a shape
+Animation:    Final hurdle when everything else is done
 *******************************************************************************
 ******* Below are the functions that create the default config object *********
 ******************************************************************************/
@@ -74,6 +64,7 @@ function defaultShapes() {
 //shapes[randogon ].count          =           1;
 //shapes[pentagon ].count          =           2;
 //shapes[star     ].count          =           1;
+//shapes[umbrella ].count          =           1;
   //---------------------------------------------
   //Adjust each shape according to your need here
   //Corner---------------------------------------
@@ -190,6 +181,8 @@ function defaultShapes() {
   //Triangle-------------------------------------
   shapes[triangle ].filter         =        glow;
   shapes[triangle ].rotation.kind  =      random;
+  //Umbrella-------------------------------------
+  shapes[umbrella ].rotation.kind  =      random;
   //---------------------------------------------
   //console.log(shapes);                  //DEBUG  
   return shapes;
@@ -226,7 +219,6 @@ function defaultFilters() {
   let out = Object.create(null);
   filterTypes.forEach(kind => { out[kind] = true; });
   //Exceptions to being enabled by default
-  out[bnw        ] = false;  //<-- not working right now
   out[pixelate   ] = false;  //<-- not working right now
   out[chaotic    ] = false;
   out[watercolor ] = false;
@@ -478,872 +470,6 @@ function svgDefaults() {
   out[ 'duration'] = defaultDuration(); 
   out['gradients'] = defaultGradients();
   return out;
-}//----------------------------------------------------------------------------
-
-/******************************************************************************
-************* Below are all the miscellaneous helper functions ****************
-******************************************************************************/
-
-//Handy unix time stamp-------------------------------------------------------- 
-function epoch(n = 8) { //last 8 hex digits by default
-  let epoch = Date.now(); 
-  return epoch.toString(16).substring(n);
-}//----------------------------------------------------------------------------
-
-//Needs to be a builtin JS function, grumble-----------------------------------
-function randomInt(min = 0, max = 100) {
-  return Math.floor(min + (Math.random() * (max - min)));
-}//----------------------------------------------------------------------------
-
-//Implements CSS style rounding------------------------------------------------
-function roundInt(num = 10, factor = 10) {
-  return factor * Math.trunc(num/factor);
-}//----------------------------------------------------------------------------
-
-//Sugar syntax wrapper for generating random X cords---------------------------
-function roundX(min = 1, max = width, factor = 10) {
-  return roundInt(randomInt(min, max), factor);
-}//----------------------------------------------------------------------------
-
-//Sugar syntax wrapper for generating random Y cords---------------------------
-function roundY(min = 1, max = height, factor = 10) {
-  return roundInt(randomInt(min, max), factor);
-}//----------------------------------------------------------------------------
-
-//Random -X or +X cords to move objects with-----------------------------------
-function moveX(min = 1, max = width) {
-  let luck  = randomInt();
-  let randX = randomInt(min, max);
-  randX = (luck % 3) ? (randX - luck) : (max - randX - luck) * -1;
-  return roundInt(randX, 5);
-}//----------------------------------------------------------------------------
-
-//Random -Y or +Y cords to move objects with-----------------------------------
-function moveY(min = 1, max = height) {
-  let luck  = randomInt();
-  let randY = randomInt(min, max);
-  randY = (luck % 3) ? (randY - luck) : (max - randY - luck) * -1;
-  return roundInt(randY, 5);
-}//----------------------------------------------------------------------------
-
-//A random X value in a 2 section wide quadrant--------------------------------
-function quadrantX( t = 1, maxw = width) {
-  switch (t) {
-    case 1: return roundX(maxw * 0.20, maxw * 0.40, 5);
-    case 2: return roundX(maxw * 0.60, maxw * 0.80, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//A random Y value in a 2 section tall quadrant--------------------------------
-function quadrantY( t = 1, maxh = height) {
-  switch (t) {
-    case 1: return roundY(maxh * 0.20, maxh * 0.40, 5);
-    case 2: return roundY(maxh * 0.60, maxh * 0.80, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//A random X value in a 3 section wide tridant---------------------------------
-function tridantX( t = 1, maxw = width) {
-  switch (t) {
-    case 1: return roundX(maxw * 0.15, maxw * 0.30, 5);
-    case 2: return roundX(maxw * 0.40, maxw * 0.60, 5);
-    case 3: return roundX(maxw * 0.70, maxw * 0.85, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//A random Y value in a 3 section tall tridant---------------------------------
-function tridantY( t = 1, maxh = height) {
-  switch (t) {
-    case 1: return roundY(maxh * 0.15, maxh * 0.30, 5);
-    case 2: return roundY(maxh * 0.33, maxh * 0.66, 5);
-    case 3: return roundY(maxh * 0.70, maxh * 0.85, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//A random X value in a 4 section wide octadant--------------------------------
-function octadantX( t = 1, maxw = width) {
-  switch (t) {
-    case 1: return roundX(maxw * 0.10, maxw * 0.25, 5);
-    case 2: return roundX(maxw * 0.30, maxw * 0.45, 5);
-    case 3: return roundX(maxw * 0.55, maxw * 0.70, 5);
-    case 4: return roundX(maxw * 0.75, maxw * 0.90, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//A random Y value in a 4 section tall octadant--------------------------------
-function octadantY( t = 1, maxh = height) {
-  switch (t) {
-    case 1: return roundY(maxh * 0.10, maxh * 0.25, 5);
-    case 2: return roundY(maxh * 0.30, maxh * 0.45, 5);
-    case 3: return roundY(maxh * 0.55, maxh * 0.70, 5);
-    case 4: return roundY(maxh * 0.75, maxh * 0.90, 5);
-  }
-  return t;
-}//----------------------------------------------------------------------------
-
-//Shuffle the order array------------------------------------------------------
-function randomize(ar) {
-  let i = ar.length
-  let temp = 0;
-  let j = 0;
-
-  while (--i > 0) {
-    j = Math.floor(Math.random() * (i+1));   
-    temp  = ar[j];
-    ar[j] = ar[i];
-    ar[i] = temp;
-  }
-
-  return ar;
-}//----------------------------------------------------------------------------
-
-//Sets the counter for all shapes to zero--------------------------------------
-function resetCounter(){
-  out = Object.create(null); //Keep count of each shape's renders
-  shapeTypes.forEach(shape => { out[shape] = 0; });
-  return out;
-}//----------------------------------------------------------------------------
-
-//Figure out an object size based on its shape configuration-------------------
-function determineSize(oid=1, shape=square) {
-  let out  = Object.create(null);
-  let size = svgconf.shapes[shape].size;
-  let i    = counter[shape];
-  let oe   = i % size.oe;  //Once every parameter
-
-  switch (size.kind) {
-    case random:
-      let w = 0;
-      let h = 0;
-      let r = 0;    
-      w  = randomInt(size.minw, size.maxw ? size.maxw : width  );
-      h  = randomInt(size.minh, size.maxh ? size.maxh : height );
-      r  = randomInt(size.minr, size.maxr ? size.maxr : width/2);
-      w -= randomInt(1, w-size.minw); //reduce likelihood of large w
-      h -= randomInt(1, h-size.minh); //reduce likelihood of large h
-      r -= randomInt(1, r-size.minr); //reduce likelihood of large r
-      w -= randomInt(1, w-size.minw); //reduce likelihood of large w
-      h -= randomInt(1, h-size.minh); //reduce likelihood of large h
-      r -= randomInt(1, r-size.minr); //reduce likelihood of large r
-      out.w = w;
-      out.h = h;
-      out.r = r;
-      break;
-    case fixed:
-      out.w = size.w;
-      out.h = size.h;
-      out.r = size.r;
-      break;
-    case incremental: 
-      out.w = size.w + (oe ? 0 : roundInt((i * size.dw),1));
-      out.h = size.h + (oe ? 0 : roundInt((i * size.dh),1));
-      out.r = size.r + (oe ? 0 : roundInt((i * size.dr),1));
-      break;
-    case exponential:
-      out.w = size.w + (oe ? 0 : roundInt((size.w * Math.pow(size.sw,i)),1));
-      out.h = size.h + (oe ? 0 : roundInt((size.h * Math.pow(size.sh,i)),1));
-      out.r = size.r + (oe ? 0 : roundInt((size.r * Math.pow(size.sr,i)),1));
-      break;      
-    default:
-      out.w = roundInt( width/4, 1);
-      out.h = roundInt(height/3, 1);
-      out.r = roundInt(height/4, 1);
-  }
-  //console.log('Shape:'+shape+'  i:'+i+'  oe:'+size.oe+'  mod: '+oe);
-  return out;
-}//----------------------------------------------------------------------------
-
-//Figure out an object position based on its shape configuration---------------
-function determinePosition(oid, shape) {
-  let out = Object.create(null);
-  let pos = svgconf.shapes[shape].position;
-  let i   = counter[shape];
-  let oe  = i % pos.oe;  //Once every parameter
-
-  switch (pos.kind) {
-    case random:
-      out.cx = randomInt(pos.minx, pos.maxx ? pos.maxx : width );
-      out.cy = randomInt(pos.miny, pos.maxy ? pos.maxy : height);
-      break;
-    case fixed:
-      out.cx = pos.cx=='middle' ? roundInt( width/2, 1) : pos.cx;
-      out.cy = pos.cy=='middle' ? roundInt(height/2, 1) : pos.cy;
-      break;
-    case ongrid:
-      out.cx = GRID[i].x;
-      out.cy = GRID[i].y;
-      break;
-    case incremental: 
-      out.cx = pos.cx + (oe ? 0 : roundInt((i * pos.dx),1));
-      out.cy = pos.cy + (oe ? 0 : roundInt((i * pos.dy),1));
-      break;   
-    case exponential:
-      out.cx = pos.cx + (oe ? 0 : roundInt((((i-1) * (pos.dx * Math.pow(pos.sx,i)))/i)));
-      out.cy = pos.cy + (oe ? 0 : roundInt((((i-1) * (pos.dy * Math.pow(pos.sy,i)))/i)));
-      break;      
-    default:
-      out.cx = roundInt( width/2, 1);
-      out.cy = roundInt(height/2, 1);
-  }
-  return out;
-}//----------------------------------------------------------------------------
-
-//Figure out an object position based on its shape configuration---------------
-function determineRotation(oid, shape) {
-  let out = Object.create(null);
-  let rot = svgconf.shapes[shape].rotation;
-
-  switch (rot.kind) {
-    case none:        out.degs = 0;                             break;
-    case random:      out.degs = randomInt(rot.mina, rot.maxa); break;
-    case fixed:       out.degs = rot.deg;                       break;
-    //case onceevery:   out.degs = rot.degs + (rot.oe % oid) ? 0 : oid * rot.da;  break;                    break;
-    case incremental: out.degs = rot.degs + roundInt((oid * rot.da)                   ,1);  break;
-    case exponential: out.degs = rot.degs + roundInt((rot.degs * Math.pow(rot.sa,oid)),1);  break;
-    default:          out.degs = 0;
-  }
-  return out.degs;
-}//----------------------------------------------------------------------------
-
-//Generates a random #RRGGBBAA color-------------------------------------------
-function cornerColor(alpha=true, rs=0, re=256, gs=0, ge=256, bs=0, be=256, as=0, ae=256) {
-  let r = randomInt(rs, re);
-  let g = randomInt(gs, ge);
-  let b = randomInt(bs, be);
-  let a = randomInt(as, ae);
-  let c = '#'+
-    r.toString(16).padStart(2, '0')+
-    g.toString(16).padStart(2, '0')+
-    b.toString(16).padStart(2, '0')+
-    (alpha ? a.toString(16).padStart(2, '0') : '');
-  return c  
-}//----------------------------------------------------------------------------
-
-//Generates a random #RRGGBBAA color-------------------------------------------
-function randomColor(kind=random) { 
-  //Random mid color by default
-  let rrr =  0 ;
-  let ggg =  0 ;
-  let bbb =  0 ;
-  let aaa =  randomInt(64,192) ;
-  let hex = '#';
-
-  switch (kind) {
-    case reds:
-      rrr = randomInt(96,256);
-      ggg = randomInt(0,96);
-      bbb = randomInt(0,96);
-      break;
-    case blues:
-      rrr = randomInt(0,96);
-      ggg = randomInt(0,96);
-      bbb = randomInt(96,256);
-      break;
-    case greens:
-      rrr = randomInt(0,96);
-      ggg = randomInt(96,256);
-      bbb = randomInt(0,96);
-      break;
-    case purples:
-      rrr = randomInt(96,256);
-      ggg = randomInt(0,96);
-      bbb = rrr;
-      break;
-    case yellows:
-      rrr = randomInt(96,256);
-      ggg = rrr;
-      bbb = randomInt(0,96);
-      break;
-    case teals:
-      rrr = randomInt(0,96);
-      ggg = randomInt(96,256);
-      bbb = ggg;
-      break;
-    case grays:
-      rrr = randomInt(32,228);
-      ggg = rrr;
-      bbb = rrr;
-      break;
-    case sunset:  
-      rrr = randomInt(96,256);
-      ggg = randomInt(32,128);
-      bbb = randomInt(96,256);
-      aaa = randomInt(32,128);
-      break;
-    case brights:
-      rrr = randomInt(128,256);
-      ggg = randomInt(128,256);
-      bbb = randomInt(128,256);
-      aaa = randomInt(128,256);
-      break;
-    case darks:
-      rrr = randomInt(0,128);
-      ggg = randomInt(0,128);
-      bbb = randomInt(0,128);
-      aaa = randomInt(0,128);
-      break;
-    case mids:
-      rrr = randomInt(64,160);
-      ggg = randomInt(64,160);
-      bbb = randomInt(64,160);
-      aaa = randomInt(64,160);
-      break;
-    default:
-      rrr = randomInt(0,256);
-      ggg = randomInt(0,256);
-      bbb = randomInt(0,256);
-      aaa = randomInt(0,256);
-  }
-
-  aaa = (kind==opaque) ?              255  : aaa;
-  aaa = (kind==clear ) ?               32  : aaa;
-  aaa = (kind==tint  ) ? randomInt(32,160) : aaa;
-
-  hex += rrr.toString(16).padStart(2, '0');
-  hex += ggg.toString(16).padStart(2, '0');
-  hex += bbb.toString(16).padStart(2, '0');
-  hex += aaa.toString(16).padStart(2, '0');
-  return hex;
-}//----------------------------------------------------------------------------
-
-/******************************************************************************
-*********************** Below are all the SVG filters *************************
-******************************************************************************/
-
-//Depending on config adds enabled filters-------------------------------------
-function svgFilters() {
-  let output = '';
-  if (!svgconf.enabled.filters) return output;
-
-  let scale    = randomInt(2,   99);
-  let seed25   = randomInt(1,   25);
-  let seed1000 = randomInt(100, 1000);
-  let x,y,z,c,d,w,h,r;
-
-  //OBLIVION BLUR--------------------------------------------------------------
-  x = randomInt(width  * 0.5, width  * 0.75);
-  y = randomInt(height * 0.5, height * 0.75);
-  w = randomInt(1, x);
-  h = randomInt(1, y);    
-  r = randomInt(300, 500);
-  r = r+' '+r;
-  //r = r%2 ? '0 '+r : r+' 0';
-  output += '<filter id="oblivion">\r\n';
-  output += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
-  output += '  <feTile />\r\n';
-  output += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${r}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-  output += '</filter>\r\n';
-
-  //BNW------------------------------------------------------------------------
-  if (svgconf.filters.mboss) {
-    let out = '';
-    out += '<filter id="bnw" filterUnits="objectBoundingBox">\r\n';
-    out += '  <feColorMatrix id="luminance-value" type="bnw" in="SourceGraphic"/>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //PIXEL8---------------------------------------------------------------------
-  if (svgconf.filters.pixelate) {
-    let out = '';
-    let r = randomInt(5, 101);
-    out += '<filter id="pixelate">\r\n';
-    out += '  <feGaussianBlur operator="pixelate" in="SourceGraphic" radius="'+r+'"/>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }  
-
-  //MBOSS----------------------------------------------------------------------
-  if (svgconf.filters.mboss) {
-    let out = '';
-    out += '<filter id="mboss">\r\n';
-    out += '  <feConvolveMatrix order="4" kernelMatrix="-2 2 1 -1 -1 3 2 1 -1 0 -1 -4 -1 1 0 0"/>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //DISPLACEMENT---------------------------------------------------------------
-  if (svgconf.filters.displacement) {
-    let out = '';
-    out += '<filter id="displacement">\r\n';
-    out += `  <feTurbulence baseFrequency="0.0${seed25}" seed="${seed1000}" result="turbulence" />\r\n`;
-    out += `  <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-  
-  //GAUSSIAN BLUR--------------------------------------------------------------
-  if (svgconf.filters.gaussianblur) {
-    let out = '';
-    x  = randomInt(5, 99);
-    y  = randomInt(5, 99);
-    x -= randomInt(1, x); //reduce likelihood of large x
-    y -= randomInt(1, y); //reduce likelihood of large y
-    out += '<filter id="gaussianblur">\r\n';
-    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //MOTION BLUR X--------------------------------------------------------------
-  if (svgconf.filters.motionblurx) {
-    let out = '';
-    x  = randomInt(5, 400);
-    x -= randomInt(1,   x); //reduce likelihood of large x
-    out += '<filter id="motionblurx">\r\n';
-    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} 0" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //MOTION BLUR Y--------------------------------------------------------------
-  if (svgconf.filters.motionblury) {
-    let out = '';
-    y  = randomInt(5, 300);
-    y -= randomInt(1,   y); //reduce likelihood of large y
-    out += '<filter id="motionblury">\r\n';
-    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="0 ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //GLOW-----------------------------------------------------------------------
-  if (svgconf.filters.glow) {
-    let out = '';
-    c = randomInt(1, colors);
-    d = randomInt(2, 30);
-    out += '<filter id="glow">\r\n'
-    out += `  <feDropShadow in="FillPaint" dx="0" dy="0" stdDeviation="${d}" flood-color="var(--c${c})" />\r\n`;
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //POINTLIGHTING--------------------------------------------------------------
-  if (svgconf.filters.pointlight) {
-    let out = '';
-    x = randomInt(width  * 0.1, width  * 0.9);
-    y = randomInt(height * 0.1, height * 0.9);
-    c = randomInt(1, colors);
-    z = seed1000;
-    out += '<filter id="pointlight">\r\n';
-    out += `  <feDiffuseLighting in="SourceGraphic" result="light" lighting-color="var(--c${c})">\r\n`;
-    out += `    <fePointLight x="${x}" y="${y}" z="${z}" />\r\n`;
-    out += '  </feDiffuseLighting>\r\n';
-    out += '  <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" />\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //TILE-----------------------------------------------------------------------
-  if (svgconf.filters.tile) {
-    let out = '';
-    x = randomInt(width  * 0.5, width  * 0.75);
-    y = randomInt(height * 0.5, height * 0.75);
-    w = randomInt(1, x);
-    h = randomInt(1, y);
-    out += `<filter id="tile" x="0" y="0" width="100%" height="100%">\r\n`;
-    out += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
-    out += '  <feTile />\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //DANCE----------------------------------------------------------------------
-  if (svgconf.filters.dance) {
-    let out = '';
-    out += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    out += '  <feMorphology operator="dilate" radius="8 8" in="SourceAlpha" result="morphology"/>\r\n';
-    out += '  <feFlood flood-color="#000000" flood-opacity="0.5" result="flood"/>\r\n';
-    out += '  <feComposite in="flood" in2="morphology" operator="in" result="composite"/>\r\n';
-    out += '  <feComposite in="composite" in2="SourceAlpha" operator="out" result="composite1"/>\r\n';
-    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="1" seed="0" stitchTiles="stitch" result="turbulence"/>\r\n';
-    out += '  <feDisplacementMap in="composite1" in2="turbulence" scale="17" xChannelSelector="A" yChannelSelector="A" result="displacementMap"/>\r\n';
-    out += '  <feMerge result="merge">\r\n';
-    out += '    <feMergeNode in="SourceGraphic" result="mergeNode"/>\r\n';
-    out += '    <feMergeNode in="displacementMap" result="mergeNode1"/>\r\n';
-    out += '  </feMerge>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  //WATERCOLOR-----------------------------------------------------------------
-  if (svgconf.filters.watercolor) {
-    let out = '';
-    out += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.09 0.09" numOctaves="7" seed="1" stitchTiles="stitch" result="turbulence"/>\r\n';
-    out += '  <feDiffuseLighting surfaceScale="0.5" diffuseConstant="3.2" lighting-color="#ffffff" in="turbulence" result="diffuseLighting">\r\n';
-    out += '    <feDistantLight azimuth="250" elevation="16"/>\r\n';
-    out += '  </feDiffuseLighting>\r\n';
-    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.004" numOctaves="2" seed="3" stitchTiles="noStitch" result="turbulence1"/>\r\n';
-    out += '  <feColorMatrix type="saturate" values="3" in="turbulence1" result="colormatrix"/>\r\n';
-    out += '  <feColorMatrix type="matrix" values=\r\n';
-    out += '    "2 0   0 0 0\r\n';
-    out += '     0 1.5 0 0 0\r\n';
-    out += '     0 0   2 0 0\r\n';
-    out += '     0 0   0 2 0" in="colormatrix" result="colormatrix1"/>\r\n';
-    out += '  <feBlend mode="multiply" in="diffuseLighting" in2="colormatrix1" result="blend"/>\r\n';
-    out += '  <feComposite in="blend" in2="SourceAlpha" operator="in" result="composite1"/>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }  
-
-  //CHAOTIC--------------------------------------------------------------------
-  if (svgconf.filters.chaotic) {
-    let out = '';  
-    out += '<filter id="chaotic" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
-    out += '  <feTurbulence type="turbulence" baseFrequency="0.015 0.015" numOctaves="3" seed="8" stitchTiles="stitch" result="turbulence"/>\r\n';
-    out += '  <feMorphology operator="dilate" radius="35 35" in="turbulence" result="morphology"/>\r\n';
-    out += '  <feColorMatrix type="matrix" values=\r\n';
-    out += '    "1 0 0 0 0\r\n';
-    out += '     0 1 0 0 0\r\n';
-    out += '     0 0 1 0 0\r\n';
-    out += '     0 0 0 10 0" in="morphology" result="colormatrix"/>\r\n';
-    out += '  <feColorMatrix type="saturate" values="10" in="colormatrix" result="colormatrix1"/>\r\n';
-    out += '  <feComposite in="colormatrix1" in2="SourceAlpha" operator="in" result="composite"/>\r\n';
-    out += '</filter>\r\n';
-    output += out;
-  }
-
-  return output;
-}//----------------------------------------------------------------------------
-
-/******************************************************************************
-************* Below are all the functions that generate points ****************
-******************************************************************************/
-
-//Generates 4 semi-random points to make shapes with---------------------------
-function svg4Points(xmax = width, ymax = height) {
-  // Clockwise Quadrants
-  // -----------
-  // | Q1 | Q2 | 
-  // -----------
-  // | Q4 | Q3 | 
-  // -----------
-  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
-  points[1]  = { x: quadrantX(1, xmax), y: quadrantY(1, ymax) }; //Q1
-  points[2]  = { x: quadrantX(2, xmax), y: quadrantY(1, ymax) }; //Q2
-  points[3]  = { x: quadrantX(2, xmax), y: quadrantY(2, ymax) }; //Q3
-  points[4]  = { x: quadrantX(1, xmax), y: quadrantY(2, ymax) }; //Q4
-  points[5]  = { x: points[1].x,        y: points[1].y };  //Q5 is Q1
-  return points;
-}//----------------------------------------------------------------------------
-
-//Generates 6 semi-random points to make shapes with---------------------------
-function svg6WPoints(xmax = width, ymax = height) {
-  // Clockwise Tridants
-  // ----------------
-  // | T1 | T2 | T3 | 
-  // ----------------
-  // | T6 | T5 | T4 | 
-  // ----------------
-
-  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
-  points[1]  = { x: tridantX(1, xmax), y: tridantY(1, ymax) }; //T1
-  points[2]  = { x: tridantX(2, xmax), y: tridantY(1, ymax) }; //T2
-  points[3]  = { x: tridantX(3, xmax), y: tridantY(1, ymax) }; //T3
-  points[4]  = { x: tridantX(3, xmax), y: tridantY(2, ymax) }; //T4
-  points[5]  = { x: tridantX(2, xmax), y: tridantY(2, ymax) }; //T5
-  points[6]  = { x: tridantX(1, xmax), y: tridantY(2, ymax) }; //T6
-  points[7]  = { x: points[1].x,       y: points[1].y }; //T7 is T1
-  return points;
-}//----------------------------------------------------------------------------
-
-//Generates 8 semi-random points to make shapes with---------------------------
-function svg8Points(xmax = width, ymax = height) {
-  // Clockwise Tridants
-  // ----------------
-  // | T1 | T2 | T3 | 
-  // ----------------
-  // | T8 | T9 | T4 | 
-  // ----------------
-  // | T7 | T6 | T5 | 
-  // ----------------
-  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
-  points[1]  = { x: tridantX(1, xmax), y: tridantY(1, ymax) }; //T1
-  points[2]  = { x: tridantX(2, xmax), y: tridantY(1, ymax) }; //T2
-  points[3]  = { x: tridantX(3, xmax), y: tridantY(1, ymax) }; //T3
-  points[4]  = { x: tridantX(3, xmax), y: tridantY(2, ymax) }; //T4
-  points[5]  = { x: tridantX(3, xmax), y: tridantY(3, ymax) }; //T5
-  points[6]  = { x: tridantX(2, xmax), y: tridantY(3, ymax) }; //T6
-  points[7]  = { x: tridantX(1, xmax), y: tridantY(3, ymax) }; //T7
-  points[8]  = { x: tridantX(1, xmax), y: tridantY(2, ymax) }; //T8
-  points[9]  = { x: points[1].x,       y: points[1].y }; //T9 is T1
-  return points;
-}//----------------------------------------------------------------------------
-
-//Generates n number of uniform radial point to make shapes with---------------
-function svgRadialPoints(n = 12, cx = roundX(100,width-100), cy = roundY(100,height-100), r = roundY(100,height/3)) {
-  let points = [ { x:cx , y:cy, r:r, n:n } ];  //index 0 is the center mark 
-  let nudge  = (2 * Math.PI)/n; //360 degrees is (2 * Pi) in radians
-  let radian = 0; //angle in radian
-  let angle  = 0; //angle in degrees
-  let x      = 0;
-  let y      = 0;
-  
-  for (let i=0; i<=n; i++) { 
-    radian = nudge * (i + 0.001); //Fixes rounding error
-    angle  = roundInt(radian*(180/Math.PI),1)
-    x = roundInt(cx + (r * Math.cos(radian)),1);
-    y = roundInt(cy + (r * Math.sin(radian)),1);
-    points[i+1] = { x:x , y:y, a:angle }; //skip index 0
-  } //console.log(points); //DEBUG
-
-  return points;
-}//----------------------------------------------------------------------------
-
-//Sugar wrapper for the various count points generators------------------------
-function svgPoints( xmax = width, ymax = height, count = 4, option = '') {
-  points = [];
-
-  switch (count) {
-    case 6 : points = (option != 'T') ? svg6WPoints(xmax,ymax) : svg6TPoints(xmax,ymax); break;
-    case 8 : points = svg8Points(xmax,ymax); break;
-    default: points = svg4Points(xmax,ymax); break;
-  }
-
-  return points;
-}//----------------------------------------------------------------------------
-
-function svgGridPoints() {
-  let out = []
-  switch (svgconf.grids) {
-    case 'normal'  : out = svgCartesianGrid(); break;
-    case 'radial'  : out = svgRadialGrid(); break;
-    case 'spiral'  : out = svgSpiralGrid(); break;
-    case 'diagonal': out = svgCartesianGrid('diagonal'); break
-    default        : out = svgCartesianGrid();
-  }
-  return out;
-}//----------------------------------------------------------------------------
-
-//Radial R,A grid--------------------------------------------------------------
-function svgRadialGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, bound="?" ) {
-  r  = r  ? r : svgconf.grids.r;
-  a  = a  ? a : svgconf.grids.a;
-  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
-  da = da ? da: svgconf.grids.da; //Angle incremental delta
-  cx = cx ? cx: roundInt(width/2,1);
-  cy = cy ? cy: roundInt(height/2,1);
-  b  = bound;
-  bound = (b="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
-  let points = [ { z:'ignore-zero', cx:cx , cy:cy, r:r, a:a } ]; //index 0 is the center mark 
-  let rings  = Math.trunc(r   / dr); //Number of rings
-  let jewels = Math.trunc(360 / da); //Jewels per ring
-  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
-  let ignore = 0; //Number of ignored points
-  let radius = 0; //Radius of each ring
-  let radian = 0; //Angle in radian
-  let angle  = 0; //Angle in degrees
-  let msg    = '';
-  let num    = 1;
-  let x      = 0;
-  let y      = 0;
-
-  //Radial Clockwise
-  for (let ring=1; ring<=rings; ring++) {
-    for(let jewel=0; jewel<jewels; jewel++) {
-      radius = ring*dr;
-      radian = nudge * (jewel + 0.001); //Fixes rounding error
-      angle  = roundInt(radian*(180/Math.PI),1)
-      x = roundInt(cx + (radius * Math.cos(radian)),1);
-      y = roundInt(cy + (radius * Math.sin(radian)),1);
-      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
-        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
-        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
-        msg += '\r\n';
-        ignore++;        
-      } else {
-        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
-        num++;
-      }
-    }
-  }
-
-  if (bound) console.log(ignore+' points where ignored for being out of bounds');
-  //console.log(points);  //console.log(msg);  //DEBUG
-
-  return points;
-}//----------------------------------------------------------------------------
-
-//Spiral R,A grid--------------------------------------------------------------
-function svgSpiralGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, sr=0, sa=0, bound="?" ) {
-  r  = r  ? r : svgconf.grids.r;
-  a  = a  ? a : svgconf.grids.a;
-  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
-  da = da ? da: svgconf.grids.da; //Angle incremental delta
-  sr = sr ? sr: svgconf.grids.sr; //Spiral radius delta
-  sa = sa ? sa: svgconf.grids.sa; //Spiral angle delta
-  cx = cx ? cx: roundInt(width/2,1);
-  cy = cy ? cy: roundInt(height/2,1);
-  b  = bound;
-  bound  = (b=="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
-  let points = [ { z:'ignore-zero', x:cx , y:cy, r:r, a:a } ]; //index 0 is the center mark 
-  let rings  = Math.trunc(r   / dr); //Number of rings
-  let jewels = Math.trunc(360 / da); //Jewels per ring
-  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
-  let ignore = 0; //Number of ignored points
-  let radius = 0; //Radius of each ring
-  let radian = 0; //Angle in radian
-  let angle  = 0; //Angle in degrees
-  let msg    = '';
-  let num    = 1;
-  let x      = 0;
-  let y      = 0;
-
-  //Spiral Clockwise
-  radius = 0;
-  radian = 0;
-  for (let ring=1; ring<=rings; ring++) {
-    //radius += dr; //roundInt(da/sr,1);
-    for(let jewel=0; jewel<jewels; jewel++) {
-      angle  = roundInt(radian*(180/Math.PI),1);
-      x = roundInt(cx + (radius * Math.cos(radian)),1);
-      y = roundInt(cy + (radius * Math.sin(radian)),1);
-      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
-        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
-        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
-        msg += '\r\n';
-        ignore++;        
-      } else {
-        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
-        num++;
-      }
-      radian += nudge + (sa*(180/Math.PI)); //Fixes rounding error
-      radius += (dr+(jewel*Math.sqrt(sr*jewel)))/jewels;
-    }
-  }
-
-  if (bound) console.log(ignore+' points where ignored for being out of bounds');
-  //console.log(points);  
-  //console.log(msg);  //DEBUG
-
-  return points;
-}//----------------------------------------------------------------------------
-
-//Normal X,Y grid--------------------------------------------------------------
-function svgCartesianGrid(diagnal = false) {  
-  let sx = svgconf.grids.start.x;
-  let sy = svgconf.grids.start.y;
-  let ex = svgconf.grids.end.x ? svgconf.grids.end.x : width;
-  let ey = svgconf.grids.end.y ? svgconf.grids.end.y : height;
-  let dx = svgconf.grids.dx;
-  let dy = svgconf.grids.dy;
-  let points  = ['ignore-zeor'];
-  let xlength = ex - sx;
-  let ylength = ey - sy;
-  let rows = Math.trunc(ylength / dy); //Number of rows
-  let cols = Math.trunc(xlength / dx); //Number of cols
-
-  svgconf.grids.order = 'vertiback';
-  switch (svgconf.grids.order) { 
-    case 'normal':    points = svgGridOrderNormal(dx,dy,rows,cols); break;
-    case 'backward':  points = svgGridOrderBackward(dx,dy,rows,cols); break;
-    case 'vertical':  points = svgGridOrderVertical(dx,dy,rows,cols); break;
-    case 'vertiback': points = svgGridOrderVertiBack(dx,dy,rows,cols); break;
-    // case 'snake':
-    // case 'vsnake':
-    // case 'spiral':
-  }
-
-  return points;
-}//----------------------------------------------------------------------------
-
-//Normal Left to right---------------------------------------------------------
-function svgGridOrderNormal(dx=160, dy=160, rows=10, cols=6) {
-  let pos    = Object.create(null);
-  let table  = ['ignore-row-zero'];
-  let points = ['ignore-zero'];
-  let num    = 1;
-  let x      = dx;
-  let y      = dy;
-
-  for (let r=1; r<rows; r++) {
-    x = dx;
-    table[r]=[];
-
-    for (let c=1; c<cols; c++) {
-      pos = { x:x , y:y }
-      table[r][c] = pos;
-      points[num] = pos;
-      x += dx;
-      num++;
-    }
-    y += dy;
-  } //console.log(table);  //DEBUG
-  
-  return points;
-}//----------------------------------------------------------------------------
-
-//Backward Right to left-------------------------------------------------------
-function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
-  let pos    = Object.create(null);
-  let table  = [];
-  let points = ['ignore-zero'];
-  let num    = 1;
-  let x      = dx;
-  let y      = dy;
-
-  for (let r=1; r<rows; r++) {
-    x = dx;
-    table[r]=[];
-
-    for (let c=1; c<cols; c++) {
-      pos = { x:x , y:y }
-      table[r][cols-c] = pos;
-      x += dx;
-    }
-    y += dy;
-  } //console.log(table);  //DEBUG
-
-  for (let r=1; r<rows; r++) {
-    for (let c=1; c<cols; c++) {
-      points[num] = table[r][c];
-      num++;
-    }
-  } 
-  
-  return points;
-}//----------------------------------------------------------------------------
-
-//Vertical Top Left to Bottom Right--------------------------------------------
-function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
-  let pos    = Object.create(null);
-  let points = ['ignore-zero'];
-  let num    = 1;
-  let r      = 1;
-  let c      = 1;
-  let x      = dx;
-  let y      = dy;
-  
-  for (c=1; c<cols; c++) {
-    y = dy;
-    for (r=1; r<=rows; r++) {
-      pos = { x:x , y:y }
-      points[num] = pos;
-      y += dy;
-      num++;
-    }
-    x += dx;
-  }
-
-  return points;
-}//----------------------------------------------------------------------------
-
-//Reverse Vertical Bottom Right to Top Left------------------------------------
-function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
-  let points = svgGridOrderVertical(dx,dy,rows,cols);
-  points.shift();  //Gets rid of 'ignore-zero'
-  let reversed = ['ignore-zero', ...points.reverse()];  //console.log(reversed); //DEBUG
-  return reversed;
-}//----------------------------------------------------------------------------
-
-//Everyrow switch between L2R/R2L----------------------------------------------
-function svgGridOrderSnake(dx=160, dy=160, rows=10, cols=6){
 }//----------------------------------------------------------------------------
 
 /******************************************************************************
@@ -1887,6 +1013,872 @@ function svgNautilus(oid = 'no-order-id', options = opt) {
 
 
 /******************************************************************************
+************* Below are all the miscellaneous helper functions ****************
+******************************************************************************/
+
+//Handy unix time stamp-------------------------------------------------------- 
+function epoch(n = 8) { //last 8 hex digits by default
+  let epoch = Date.now(); 
+  return epoch.toString(16).substring(n);
+}//----------------------------------------------------------------------------
+
+//Needs to be a builtin JS function, grumble-----------------------------------
+function randomInt(min = 0, max = 100) {
+  return Math.floor(min + (Math.random() * (max - min)));
+}//----------------------------------------------------------------------------
+
+//Implements CSS style rounding------------------------------------------------
+function roundInt(num = 10, factor = 10) {
+  return factor * Math.trunc(num/factor);
+}//----------------------------------------------------------------------------
+
+//Sugar syntax wrapper for generating random X cords---------------------------
+function roundX(min = 1, max = width, factor = 10) {
+  return roundInt(randomInt(min, max), factor);
+}//----------------------------------------------------------------------------
+
+//Sugar syntax wrapper for generating random Y cords---------------------------
+function roundY(min = 1, max = height, factor = 10) {
+  return roundInt(randomInt(min, max), factor);
+}//----------------------------------------------------------------------------
+
+//Random -X or +X cords to move objects with-----------------------------------
+function moveX(min = 1, max = width) {
+  let luck  = randomInt();
+  let randX = randomInt(min, max);
+  randX = (luck % 3) ? (randX - luck) : (max - randX - luck) * -1;
+  return roundInt(randX, 5);
+}//----------------------------------------------------------------------------
+
+//Random -Y or +Y cords to move objects with-----------------------------------
+function moveY(min = 1, max = height) {
+  let luck  = randomInt();
+  let randY = randomInt(min, max);
+  randY = (luck % 3) ? (randY - luck) : (max - randY - luck) * -1;
+  return roundInt(randY, 5);
+}//----------------------------------------------------------------------------
+
+//A random X value in a 2 section wide quadrant--------------------------------
+function quadrantX( t = 1, maxw = width) {
+  switch (t) {
+    case 1: return roundX(maxw * 0.20, maxw * 0.40, 5);
+    case 2: return roundX(maxw * 0.60, maxw * 0.80, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//A random Y value in a 2 section tall quadrant--------------------------------
+function quadrantY( t = 1, maxh = height) {
+  switch (t) {
+    case 1: return roundY(maxh * 0.20, maxh * 0.40, 5);
+    case 2: return roundY(maxh * 0.60, maxh * 0.80, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//A random X value in a 3 section wide tridant---------------------------------
+function tridantX( t = 1, maxw = width) {
+  switch (t) {
+    case 1: return roundX(maxw * 0.15, maxw * 0.30, 5);
+    case 2: return roundX(maxw * 0.40, maxw * 0.60, 5);
+    case 3: return roundX(maxw * 0.70, maxw * 0.85, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//A random Y value in a 3 section tall tridant---------------------------------
+function tridantY( t = 1, maxh = height) {
+  switch (t) {
+    case 1: return roundY(maxh * 0.15, maxh * 0.30, 5);
+    case 2: return roundY(maxh * 0.33, maxh * 0.66, 5);
+    case 3: return roundY(maxh * 0.70, maxh * 0.85, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//A random X value in a 4 section wide octadant--------------------------------
+function octadantX( t = 1, maxw = width) {
+  switch (t) {
+    case 1: return roundX(maxw * 0.10, maxw * 0.25, 5);
+    case 2: return roundX(maxw * 0.30, maxw * 0.45, 5);
+    case 3: return roundX(maxw * 0.55, maxw * 0.70, 5);
+    case 4: return roundX(maxw * 0.75, maxw * 0.90, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//A random Y value in a 4 section tall octadant--------------------------------
+function octadantY( t = 1, maxh = height) {
+  switch (t) {
+    case 1: return roundY(maxh * 0.10, maxh * 0.25, 5);
+    case 2: return roundY(maxh * 0.30, maxh * 0.45, 5);
+    case 3: return roundY(maxh * 0.55, maxh * 0.70, 5);
+    case 4: return roundY(maxh * 0.75, maxh * 0.90, 5);
+  }
+  return t;
+}//----------------------------------------------------------------------------
+
+//Shuffle the order array------------------------------------------------------
+function randomize(ar) {
+  let i = ar.length
+  let temp = 0;
+  let j = 0;
+
+  while (--i > 0) {
+    j = Math.floor(Math.random() * (i+1));   
+    temp  = ar[j];
+    ar[j] = ar[i];
+    ar[i] = temp;
+  }
+
+  return ar;
+}//----------------------------------------------------------------------------
+
+//Sets the counter for all shapes to zero--------------------------------------
+function resetCounter(){
+  out = Object.create(null); //Keep count of each shape's renders
+  shapeTypes.forEach(shape => { out[shape] = 0; });
+  return out;
+}//----------------------------------------------------------------------------
+
+//Figure out an object size based on its shape configuration-------------------
+function determineSize(oid=1, shape=square) {
+  let out  = Object.create(null);
+  let size = svgconf.shapes[shape].size;
+  let i    = counter[shape];
+  let oe   = i % size.oe;  //Once every parameter
+
+  switch (size.kind) {
+    case random:
+      let w = 0;
+      let h = 0;
+      let r = 0;    
+      w  = randomInt(size.minw, size.maxw ? size.maxw : width  );
+      h  = randomInt(size.minh, size.maxh ? size.maxh : height );
+      r  = randomInt(size.minr, size.maxr ? size.maxr : width/2);
+      w -= randomInt(1, w-size.minw); //reduce likelihood of large w
+      h -= randomInt(1, h-size.minh); //reduce likelihood of large h
+      r -= randomInt(1, r-size.minr); //reduce likelihood of large r
+      w -= randomInt(1, w-size.minw); //reduce likelihood of large w
+      h -= randomInt(1, h-size.minh); //reduce likelihood of large h
+      r -= randomInt(1, r-size.minr); //reduce likelihood of large r
+      out.w = w;
+      out.h = h;
+      out.r = r;
+      break;
+    case fixed:
+      out.w = size.w;
+      out.h = size.h;
+      out.r = size.r;
+      break;
+    case incremental: 
+      out.w = size.w + (oe ? 0 : roundInt((i * size.dw),1));
+      out.h = size.h + (oe ? 0 : roundInt((i * size.dh),1));
+      out.r = size.r + (oe ? 0 : roundInt((i * size.dr),1));
+      break;
+    case exponential:
+      out.w = size.w + (oe ? 0 : roundInt((size.w * Math.pow(size.sw,i)),1));
+      out.h = size.h + (oe ? 0 : roundInt((size.h * Math.pow(size.sh,i)),1));
+      out.r = size.r + (oe ? 0 : roundInt((size.r * Math.pow(size.sr,i)),1));
+      break;      
+    default:
+      out.w = roundInt( width/4, 1);
+      out.h = roundInt(height/3, 1);
+      out.r = roundInt(height/4, 1);
+  }
+  //console.log('Shape:'+shape+'  i:'+i+'  oe:'+size.oe+'  mod: '+oe);
+  return out;
+}//----------------------------------------------------------------------------
+
+//Figure out an object position based on its shape configuration---------------
+function determinePosition(oid, shape) {
+  let out = Object.create(null);
+  let pos = svgconf.shapes[shape].position;
+  let i   = counter[shape];
+  let oe  = i % pos.oe;  //Once every parameter
+
+  switch (pos.kind) {
+    case random:
+      out.cx = randomInt(pos.minx, pos.maxx ? pos.maxx : width );
+      out.cy = randomInt(pos.miny, pos.maxy ? pos.maxy : height);
+      break;
+    case fixed:
+      out.cx = pos.cx=='middle' ? roundInt( width/2, 1) : pos.cx;
+      out.cy = pos.cy=='middle' ? roundInt(height/2, 1) : pos.cy;
+      break;
+    case ongrid:
+      out.cx = GRID[i].x;
+      out.cy = GRID[i].y;
+      break;
+    case incremental: 
+      out.cx = pos.cx + (oe ? 0 : roundInt((i * pos.dx),1));
+      out.cy = pos.cy + (oe ? 0 : roundInt((i * pos.dy),1));
+      break;   
+    case exponential:
+      out.cx = pos.cx + (oe ? 0 : roundInt((((i-1) * (pos.dx * Math.pow(pos.sx,i)))/i)));
+      out.cy = pos.cy + (oe ? 0 : roundInt((((i-1) * (pos.dy * Math.pow(pos.sy,i)))/i)));
+      break;      
+    default:
+      out.cx = roundInt( width/2, 1);
+      out.cy = roundInt(height/2, 1);
+  }
+  return out;
+}//----------------------------------------------------------------------------
+
+//Figure out an object position based on its shape configuration---------------
+function determineRotation(oid, shape) {
+  let out = Object.create(null);
+  let rot = svgconf.shapes[shape].rotation;
+
+  switch (rot.kind) {
+    case none:        out.degs = 0;                             break;
+    case random:      out.degs = randomInt(rot.mina, rot.maxa); break;
+    case fixed:       out.degs = rot.deg;                       break;
+    //case onceevery:   out.degs = rot.degs + (rot.oe % oid) ? 0 : oid * rot.da;  break;                    break;
+    case incremental: out.degs = rot.degs + roundInt((oid * rot.da)                   ,1);  break;
+    case exponential: out.degs = rot.degs + roundInt((rot.degs * Math.pow(rot.sa,oid)),1);  break;
+    default:          out.degs = 0;
+  }
+  return out.degs;
+}//----------------------------------------------------------------------------
+
+//Generates a random #RRGGBBAA color-------------------------------------------
+function cornerColor(alpha=true, rs=0, re=256, gs=0, ge=256, bs=0, be=256, as=0, ae=256) {
+  let r = randomInt(rs, re);
+  let g = randomInt(gs, ge);
+  let b = randomInt(bs, be);
+  let a = randomInt(as, ae);
+  let c = '#'+
+    r.toString(16).padStart(2, '0')+
+    g.toString(16).padStart(2, '0')+
+    b.toString(16).padStart(2, '0')+
+    (alpha ? a.toString(16).padStart(2, '0') : '');
+  return c  
+}//----------------------------------------------------------------------------
+
+//Generates a random #RRGGBBAA color-------------------------------------------
+function randomColor(pal=random) { 
+  //Random color palette by default
+  let rrr =  0 ;
+  let ggg =  0 ;
+  let bbb =  0 ;
+  let aaa =  randomInt(64,192) ;
+  let hex = '#';
+
+  switch (pal) {
+    case reds:
+      rrr = randomInt(96,256);
+      ggg = randomInt(0,96);
+      bbb = randomInt(0,96);
+      break;
+    case blues:
+      rrr = randomInt(0,96);
+      ggg = randomInt(0,96);
+      bbb = randomInt(96,256);
+      break;
+    case greens:
+      rrr = randomInt(0,96);
+      ggg = randomInt(96,256);
+      bbb = randomInt(0,96);
+      break;
+    case purples:
+      rrr = randomInt(96,256);
+      ggg = randomInt(0,96);
+      bbb = rrr;
+      break;
+    case yellows:
+      rrr = randomInt(96,256);
+      ggg = rrr;
+      bbb = randomInt(0,96);
+      break;
+    case teals:
+      rrr = randomInt(0,96);
+      ggg = randomInt(96,256);
+      bbb = ggg;
+      break;
+    case grays:
+      rrr = randomInt(32,228);
+      ggg = rrr;
+      bbb = rrr;
+      break;
+    case sunset:  
+      rrr = randomInt(96,256);
+      ggg = randomInt(32,128);
+      bbb = randomInt(96,256);
+      aaa = randomInt(32,128);
+      break;
+    case brights:
+      rrr = randomInt(128,256);
+      ggg = randomInt(128,256);
+      bbb = randomInt(128,256);
+      aaa = randomInt(128,256);
+      break;
+    case darks:
+      rrr = randomInt(0,128);
+      ggg = randomInt(0,128);
+      bbb = randomInt(0,128);
+      aaa = randomInt(0,128);
+      break;
+    case mids:
+      rrr = randomInt(64,160);
+      ggg = randomInt(64,160);
+      bbb = randomInt(64,160);
+      aaa = randomInt(64,160);
+      break;
+    default:
+      rrr = randomInt(0,256);
+      ggg = randomInt(0,256);
+      bbb = randomInt(0,256);
+      aaa = randomInt(0,256);
+  }
+
+  aaa = (pal==opaque) ?              255  : aaa;
+  aaa = (pal==clear ) ?               32  : aaa;
+  aaa = (pal==tint  ) ? randomInt(32,160) : aaa;
+
+  hex += rrr.toString(16).padStart(2, '0');
+  hex += ggg.toString(16).padStart(2, '0');
+  hex += bbb.toString(16).padStart(2, '0');
+  hex += aaa.toString(16).padStart(2, '0');
+  return hex;
+}//----------------------------------------------------------------------------
+
+/******************************************************************************
+*********************** Below are all the SVG filters *************************
+******************************************************************************/
+
+//Depending on config adds enabled filters-------------------------------------
+function svgFilters() {
+  let output = '';
+  if (!svgconf.enabled.filters) return output;
+
+  let scale    = randomInt(2,   99);
+  let seed25   = randomInt(1,   25);
+  let seed1000 = randomInt(100, 1000);
+  let x,y,z,c,d,w,h,r;
+
+  //OBLIVION BLUR--------------------------------------------------------------
+  x = randomInt(width  * 0.5, width  * 0.75);
+  y = randomInt(height * 0.5, height * 0.75);
+  w = randomInt(1, x);
+  h = randomInt(1, y);    
+  r = randomInt(300, 500);
+  r = r+' '+r;
+  //r = r%2 ? '0 '+r : r+' 0';
+  output += '<filter id="oblivion">\r\n';
+  output += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
+  output += '  <feTile />\r\n';
+  output += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${r}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+  output += '</filter>\r\n';
+
+  //BNW------------------------------------------------------------------------
+  if (svgconf.filters.bnw) {
+    let out = '';
+    out += '<filter id="bnw" filterUnits="objectBoundingBox">\r\n';
+    out += '  <feColorMatrix id="lumval" type="luminanceToAlpha" in="SourceGraphic"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //PIXEL8---------------------------------------------------------------------
+  if (svgconf.filters.pixelate) {
+    let out = '';
+    let r = randomInt(5, 101);
+    out += '<filter id="pixelate">\r\n';
+    out += '  <feGaussianBlur operator="pixelate" in="SourceGraphic" radius="'+r+'"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }  
+
+  //MBOSS----------------------------------------------------------------------
+  if (svgconf.filters.mboss) {
+    let out = '';
+    out += '<filter id="mboss">\r\n';
+    out += '  <feConvolveMatrix order="4" kernelMatrix="-2 2 1 -1 -1 3 2 1 -1 0 -1 -4 -1 1 0 0"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //DISPLACEMENT---------------------------------------------------------------
+  if (svgconf.filters.displacement) {
+    let out = '';
+    out += '<filter id="displacement">\r\n';
+    out += `  <feTurbulence baseFrequency="0.0${seed25}" seed="${seed1000}" result="turbulence" />\r\n`;
+    out += `  <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="${scale}" xChannelSelector="R" yChannelSelector="G" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+  
+  //GAUSSIAN BLUR--------------------------------------------------------------
+  if (svgconf.filters.gaussianblur) {
+    let out = '';
+    x  = randomInt(5, 99);
+    y  = randomInt(5, 99);
+    x -= randomInt(1, x); //reduce likelihood of large x
+    y -= randomInt(1, y); //reduce likelihood of large y
+    out += '<filter id="gaussianblur">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //MOTION BLUR X--------------------------------------------------------------
+  if (svgconf.filters.motionblurx) {
+    let out = '';
+    x  = randomInt(5, 400);
+    x -= randomInt(1,   x); //reduce likelihood of large x
+    out += '<filter id="motionblurx">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${x} 0" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //MOTION BLUR Y--------------------------------------------------------------
+  if (svgconf.filters.motionblury) {
+    let out = '';
+    y  = randomInt(5, 300);
+    y -= randomInt(1,   y); //reduce likelihood of large y
+    out += '<filter id="motionblury">\r\n';
+    out += `  <feGaussianBlur in="SourceGraphic" stdDeviation="0 ${y}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //GLOW-----------------------------------------------------------------------
+  if (svgconf.filters.glow) {
+    let out = '';
+    c = randomInt(1, colors);
+    d = randomInt(2, 30);
+    out += '<filter id="glow">\r\n'
+    out += `  <feDropShadow in="FillPaint" dx="0" dy="0" stdDeviation="${d}" flood-color="var(--c${c})" />\r\n`;
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //POINTLIGHTING--------------------------------------------------------------
+  if (svgconf.filters.pointlight) {
+    let out = '';
+    x = randomInt(width  * 0.1, width  * 0.9);
+    y = randomInt(height * 0.1, height * 0.9);
+    c = randomInt(1, colors);
+    z = seed1000;
+    out += '<filter id="pointlight">\r\n';
+    out += `  <feDiffuseLighting in="SourceGraphic" result="light" lighting-color="var(--c${c})">\r\n`;
+    out += `    <fePointLight x="${x}" y="${y}" z="${z}" />\r\n`;
+    out += '  </feDiffuseLighting>\r\n';
+    out += '  <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" />\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //TILE-----------------------------------------------------------------------
+  if (svgconf.filters.tile) {
+    let out = '';
+    x = randomInt(width  * 0.5, width  * 0.75);
+    y = randomInt(height * 0.5, height * 0.75);
+    w = randomInt(1, x);
+    h = randomInt(1, y);
+    out += `<filter id="tile" x="0" y="0" width="100%" height="100%">\r\n`;
+    out += `  <feTile in="SourceGraphic" x="${x}" y="${y}" width="${w}" height="${h}" />\r\n`;
+    out += '  <feTile />\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //DANCE----------------------------------------------------------------------
+  if (svgconf.filters.dance) {
+    let out = '';
+    out += '<filter id="dance" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feMorphology operator="dilate" radius="8 8" in="SourceAlpha" result="morphology"/>\r\n';
+    out += '  <feFlood flood-color="#000000" flood-opacity="0.5" result="flood"/>\r\n';
+    out += '  <feComposite in="flood" in2="morphology" operator="in" result="composite"/>\r\n';
+    out += '  <feComposite in="composite" in2="SourceAlpha" operator="out" result="composite1"/>\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="1" seed="0" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feDisplacementMap in="composite1" in2="turbulence" scale="17" xChannelSelector="A" yChannelSelector="A" result="displacementMap"/>\r\n';
+    out += '  <feMerge result="merge">\r\n';
+    out += '    <feMergeNode in="SourceGraphic" result="mergeNode"/>\r\n';
+    out += '    <feMergeNode in="displacementMap" result="mergeNode1"/>\r\n';
+    out += '  </feMerge>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //WATERCOLOR-----------------------------------------------------------------
+  if (svgconf.filters.watercolor) {
+    let out = '';
+    out += '<filter id="watercolor" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.09 0.09" numOctaves="7" seed="1" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feDiffuseLighting surfaceScale="0.5" diffuseConstant="3.2" lighting-color="#ffffff" in="turbulence" result="diffuseLighting">\r\n';
+    out += '    <feDistantLight azimuth="250" elevation="16"/>\r\n';
+    out += '  </feDiffuseLighting>\r\n';
+    out += '  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.004" numOctaves="2" seed="3" stitchTiles="noStitch" result="turbulence1"/>\r\n';
+    out += '  <feColorMatrix type="saturate" values="3" in="turbulence1" result="colormatrix"/>\r\n';
+    out += '  <feColorMatrix type="matrix" values=\r\n';
+    out += '    "2 0   0 0 0\r\n';
+    out += '     0 1.5 0 0 0\r\n';
+    out += '     0 0   2 0 0\r\n';
+    out += '     0 0   0 2 0" in="colormatrix" result="colormatrix1"/>\r\n';
+    out += '  <feBlend mode="multiply" in="diffuseLighting" in2="colormatrix1" result="blend"/>\r\n';
+    out += '  <feComposite in="blend" in2="SourceAlpha" operator="in" result="composite1"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }  
+
+  //CHAOTIC--------------------------------------------------------------------
+  if (svgconf.filters.chaotic) {
+    let out = '';  
+    out += '<filter id="chaotic" color-interpolation-filters="linearRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">\r\n';
+    out += '  <feTurbulence type="turbulence" baseFrequency="0.015 0.015" numOctaves="3" seed="8" stitchTiles="stitch" result="turbulence"/>\r\n';
+    out += '  <feMorphology operator="dilate" radius="35 35" in="turbulence" result="morphology"/>\r\n';
+    out += '  <feColorMatrix type="matrix" values=\r\n';
+    out += '    "1 0 0 0 0\r\n';
+    out += '     0 1 0 0 0\r\n';
+    out += '     0 0 1 0 0\r\n';
+    out += '     0 0 0 10 0" in="morphology" result="colormatrix"/>\r\n';
+    out += '  <feColorMatrix type="saturate" values="10" in="colormatrix" result="colormatrix1"/>\r\n';
+    out += '  <feComposite in="colormatrix1" in2="SourceAlpha" operator="in" result="composite"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  return output;
+}//----------------------------------------------------------------------------
+
+/******************************************************************************
+************* Below are all the functions that generate points ****************
+******************************************************************************/
+
+//Generates 4 semi-random points to make shapes with---------------------------
+function svg4Points(xmax = width, ymax = height) {
+  // Clockwise Quadrants
+  // -----------
+  // | Q1 | Q2 | 
+  // -----------
+  // | Q4 | Q3 | 
+  // -----------
+  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
+  points[1]  = { x: quadrantX(1, xmax), y: quadrantY(1, ymax) }; //Q1
+  points[2]  = { x: quadrantX(2, xmax), y: quadrantY(1, ymax) }; //Q2
+  points[3]  = { x: quadrantX(2, xmax), y: quadrantY(2, ymax) }; //Q3
+  points[4]  = { x: quadrantX(1, xmax), y: quadrantY(2, ymax) }; //Q4
+  points[5]  = { x: points[1].x,        y: points[1].y };  //Q5 is Q1
+  return points;
+}//----------------------------------------------------------------------------
+
+//Generates 6 semi-random points to make shapes with---------------------------
+function svg6WPoints(xmax = width, ymax = height) {
+  // Clockwise Tridants
+  // ----------------
+  // | T1 | T2 | T3 | 
+  // ----------------
+  // | T6 | T5 | T4 | 
+  // ----------------
+
+  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
+  points[1]  = { x: tridantX(1, xmax), y: tridantY(1, ymax) }; //T1
+  points[2]  = { x: tridantX(2, xmax), y: tridantY(1, ymax) }; //T2
+  points[3]  = { x: tridantX(3, xmax), y: tridantY(1, ymax) }; //T3
+  points[4]  = { x: tridantX(3, xmax), y: tridantY(2, ymax) }; //T4
+  points[5]  = { x: tridantX(2, xmax), y: tridantY(2, ymax) }; //T5
+  points[6]  = { x: tridantX(1, xmax), y: tridantY(2, ymax) }; //T6
+  points[7]  = { x: points[1].x,       y: points[1].y }; //T7 is T1
+  return points;
+}//----------------------------------------------------------------------------
+
+//Generates 8 semi-random points to make shapes with---------------------------
+function svg8Points(xmax = width, ymax = height) {
+  // Clockwise Tridants
+  // ----------------
+  // | T1 | T2 | T3 | 
+  // ----------------
+  // | T8 | T9 | T4 | 
+  // ----------------
+  // | T7 | T6 | T5 | 
+  // ----------------
+  let points = [ { x:0 , y:0 } ];  //index 0 is unused 
+  points[1]  = { x: tridantX(1, xmax), y: tridantY(1, ymax) }; //T1
+  points[2]  = { x: tridantX(2, xmax), y: tridantY(1, ymax) }; //T2
+  points[3]  = { x: tridantX(3, xmax), y: tridantY(1, ymax) }; //T3
+  points[4]  = { x: tridantX(3, xmax), y: tridantY(2, ymax) }; //T4
+  points[5]  = { x: tridantX(3, xmax), y: tridantY(3, ymax) }; //T5
+  points[6]  = { x: tridantX(2, xmax), y: tridantY(3, ymax) }; //T6
+  points[7]  = { x: tridantX(1, xmax), y: tridantY(3, ymax) }; //T7
+  points[8]  = { x: tridantX(1, xmax), y: tridantY(2, ymax) }; //T8
+  points[9]  = { x: points[1].x,       y: points[1].y }; //T9 is T1
+  return points;
+}//----------------------------------------------------------------------------
+
+//Generates n number of uniform radial point to make shapes with---------------
+function svgRadialPoints(n = 12, cx = roundX(100,width-100), cy = roundY(100,height-100), r = roundY(100,height/3)) {
+  let points = [ { x:cx , y:cy, r:r, n:n } ];  //index 0 is the center mark 
+  let nudge  = (2 * Math.PI)/n; //360 degrees is (2 * Pi) in radians
+  let radian = 0; //angle in radian
+  let angle  = 0; //angle in degrees
+  let x      = 0;
+  let y      = 0;
+  
+  for (let i=0; i<=n; i++) { 
+    radian = nudge * (i + 0.001); //Fixes rounding error
+    angle  = roundInt(radian*(180/Math.PI),1)
+    x = roundInt(cx + (r * Math.cos(radian)),1);
+    y = roundInt(cy + (r * Math.sin(radian)),1);
+    points[i+1] = { x:x , y:y, a:angle }; //skip index 0
+  } //console.log(points); //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Sugar wrapper for the various count points generators------------------------
+function svgPoints( xmax = width, ymax = height, count = 4, option = '') {
+  points = [];
+
+  switch (count) {
+    case 6 : points = (option != 'T') ? svg6WPoints(xmax,ymax) : svg6TPoints(xmax,ymax); break;
+    case 8 : points = svg8Points(xmax,ymax); break;
+    default: points = svg4Points(xmax,ymax); break;
+  }
+
+  return points;
+}//----------------------------------------------------------------------------
+
+function svgGridPoints() {
+  let out = []
+  switch (svgconf.grids) {
+    case 'normal'  : out = svgCartesianGrid(); break;
+    case 'radial'  : out = svgRadialGrid(); break;
+    case 'spiral'  : out = svgSpiralGrid(); break;
+    case 'diagonal': out = svgCartesianGrid('diagonal'); break
+    default        : out = svgCartesianGrid();
+  }
+  return out;
+}//----------------------------------------------------------------------------
+
+//Radial R,A grid--------------------------------------------------------------
+function svgRadialGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, bound="?" ) {
+  r  = r  ? r : svgconf.grids.r;
+  a  = a  ? a : svgconf.grids.a;
+  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
+  da = da ? da: svgconf.grids.da; //Angle incremental delta
+  cx = cx ? cx: roundInt(width/2,1);
+  cy = cy ? cy: roundInt(height/2,1);
+  b  = bound;
+  bound = (b="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
+  let points = [ { z:'ignore-zero', cx:cx , cy:cy, r:r, a:a } ]; //index 0 is the center mark 
+  let rings  = Math.trunc(r   / dr); //Number of rings
+  let jewels = Math.trunc(360 / da); //Jewels per ring
+  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
+  let ignore = 0; //Number of ignored points
+  let radius = 0; //Radius of each ring
+  let radian = 0; //Angle in radian
+  let angle  = 0; //Angle in degrees
+  let msg    = '';
+  let num    = 1;
+  let x      = 0;
+  let y      = 0;
+
+  //Radial Clockwise
+  for (let ring=1; ring<=rings; ring++) {
+    for(let jewel=0; jewel<jewels; jewel++) {
+      radius = ring*dr;
+      radian = nudge * (jewel + 0.001); //Fixes rounding error
+      angle  = roundInt(radian*(180/Math.PI),1)
+      x = roundInt(cx + (radius * Math.cos(radian)),1);
+      y = roundInt(cy + (radius * Math.sin(radian)),1);
+      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
+        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
+        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
+        msg += '\r\n';
+        ignore++;        
+      } else {
+        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
+        num++;
+      }
+    }
+  }
+
+  if (bound) console.log(ignore+' points where ignored for being out of bounds');
+  //console.log(points);  //console.log(msg);  //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Spiral R,A grid--------------------------------------------------------------
+function svgSpiralGrid( r=0, a=0, dr=0, da=0, cx=0, cy=0, sr=0, sa=0, bound="?" ) {
+  r  = r  ? r : svgconf.grids.r;
+  a  = a  ? a : svgconf.grids.a;
+  dr = dr ? dr: svgconf.grids.dr; //Radius incremental delta
+  da = da ? da: svgconf.grids.da; //Angle incremental delta
+  sr = sr ? sr: svgconf.grids.sr; //Spiral radius delta
+  sa = sa ? sa: svgconf.grids.sa; //Spiral angle delta
+  cx = cx ? cx: roundInt(width/2,1);
+  cy = cy ? cy: roundInt(height/2,1);
+  b  = bound;
+  bound  = (b=="?") ? svgconf.grids.bound : false; //False for building shapes (not grids)
+  let points = [ { z:'ignore-zero', x:cx , y:cy, r:r, a:a } ]; //index 0 is the center mark 
+  let rings  = Math.trunc(r   / dr); //Number of rings
+  let jewels = Math.trunc(360 / da); //Jewels per ring
+  let nudge  = (2 * Math.PI)/jewels; //360 degrees is (2 * Pi) in radians
+  let ignore = 0; //Number of ignored points
+  let radius = 0; //Radius of each ring
+  let radian = 0; //Angle in radian
+  let angle  = 0; //Angle in degrees
+  let msg    = '';
+  let num    = 1;
+  let x      = 0;
+  let y      = 0;
+
+  //Spiral Clockwise
+  radius = 0;
+  radian = 0;
+  for (let ring=1; ring<=rings; ring++) {
+    //radius += dr; //roundInt(da/sr,1);
+    for(let jewel=0; jewel<jewels; jewel++) {
+      angle  = roundInt(radian*(180/Math.PI),1);
+      x = roundInt(cx + (radius * Math.cos(radian)),1);
+      y = roundInt(cy + (radius * Math.sin(radian)),1);
+      if (bound && ((x<0) || (x>width) || (y<0) || (y>height))) {
+        msg += ((x<0) || (x>width))  ? 'Ignored out of bounds (X: '+x+') ':'Even with a normal    (X: '+x+') ';  
+        msg += ((y<0) || (y>height)) ? 'Ignored out of bounds (Y: '+y+') ':'Even with a normal    (Y: '+y+') '; 
+        msg += '\r\n';
+        ignore++;        
+      } else {
+        points[num] = { x:x , y:y, r:radius, a:(jewel*da) }; //skip index 0
+        num++;
+      }
+      radian += nudge + (sa*(180/Math.PI)); //Fixes rounding error
+      radius += (dr+(jewel*Math.sqrt(sr*jewel)))/jewels;
+    }
+  }
+
+  if (bound) console.log(ignore+' points where ignored for being out of bounds');
+  //console.log(points);  
+  //console.log(msg);  //DEBUG
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Normal X,Y grid--------------------------------------------------------------
+function svgCartesianGrid(diagnal = false) {  
+  let sx = svgconf.grids.start.x;
+  let sy = svgconf.grids.start.y;
+  let ex = svgconf.grids.end.x ? svgconf.grids.end.x : width;
+  let ey = svgconf.grids.end.y ? svgconf.grids.end.y : height;
+  let dx = svgconf.grids.dx;
+  let dy = svgconf.grids.dy;
+  let points  = ['ignore-zeor'];
+  let xlength = ex - sx;
+  let ylength = ey - sy;
+  let rows = Math.trunc(ylength / dy); //Number of rows
+  let cols = Math.trunc(xlength / dx); //Number of cols
+
+  svgconf.grids.order = 'vertiback';
+  switch (svgconf.grids.order) { 
+    case 'normal':    points = svgGridOrderNormal(dx,dy,rows,cols); break;
+    case 'backward':  points = svgGridOrderBackward(dx,dy,rows,cols); break;
+    case 'vertical':  points = svgGridOrderVertical(dx,dy,rows,cols); break;
+    case 'vertiback': points = svgGridOrderVertiBack(dx,dy,rows,cols); break;
+    // case 'snake':
+    // case 'vsnake':
+    // case 'spiral':
+  }
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Normal Left to right---------------------------------------------------------
+function svgGridOrderNormal(dx=160, dy=160, rows=10, cols=6) {
+  let pos    = Object.create(null);
+  let table  = ['ignore-row-zero'];
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let x      = dx;
+  let y      = dy;
+
+  for (let r=1; r<rows; r++) {
+    x = dx;
+    table[r]=[];
+
+    for (let c=1; c<cols; c++) {
+      pos = { x:x , y:y }
+      table[r][c] = pos;
+      points[num] = pos;
+      x += dx;
+      num++;
+    }
+    y += dy;
+  } //console.log(table);  //DEBUG
+  
+  return points;
+}//----------------------------------------------------------------------------
+
+//Backward Right to left-------------------------------------------------------
+function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
+  let pos    = Object.create(null);
+  let table  = [];
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let x      = dx;
+  let y      = dy;
+
+  for (let r=1; r<rows; r++) {
+    x = dx;
+    table[r]=[];
+
+    for (let c=1; c<cols; c++) {
+      pos = { x:x , y:y }
+      table[r][cols-c] = pos;
+      x += dx;
+    }
+    y += dy;
+  } //console.log(table);  //DEBUG
+
+  for (let r=1; r<rows; r++) {
+    for (let c=1; c<cols; c++) {
+      points[num] = table[r][c];
+      num++;
+    }
+  } 
+  
+  return points;
+}//----------------------------------------------------------------------------
+
+//Vertical Top Left to Bottom Right--------------------------------------------
+function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
+  let pos    = Object.create(null);
+  let points = ['ignore-zero'];
+  let num    = 1;
+  let r      = 1;
+  let c      = 1;
+  let x      = dx;
+  let y      = dy;
+  
+  for (c=1; c<cols; c++) {
+    y = dy;
+    for (r=1; r<=rows; r++) {
+      pos = { x:x , y:y }
+      points[num] = pos;
+      y += dy;
+      num++;
+    }
+    x += dx;
+  }
+
+  return points;
+}//----------------------------------------------------------------------------
+
+//Reverse Vertical Bottom Right to Top Left------------------------------------
+function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
+  let points = svgGridOrderVertical(dx,dy,rows,cols);
+  points.shift();  //Gets rid of 'ignore-zero'
+  let reversed = ['ignore-zero', ...points.reverse()];  //console.log(reversed); //DEBUG
+  return reversed;
+}//----------------------------------------------------------------------------
+
+//Everyrow switch between L2R/R2L----------------------------------------------
+function svgGridOrderSnake(dx=160, dy=160, rows=10, cols=6){
+}//----------------------------------------------------------------------------
+
+/******************************************************************************
 ************* Below are all the functions that generate the SVG ***************
 ******************************************************************************/
 
@@ -2299,10 +2291,12 @@ function svgTag() {
 
 //Encodes and sends the file to user-------------------------------------------
 function svgDownload(fid) {
-  if (!fid) return console.log('no file to download');
+  let svg  = document.getElementById('svg-'+svgid);
+  let code = svg ? svg.outerHTML : svgFiles[fid];
+  if (!code) return console.log('No file to download :(');
   if (Object.hasOwn(svgFiles,fid)) {
     let  link = document.createElement('a');
-    link.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgFiles[fid]);
+    link.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(code);
     link.download = fid+'.svg';
     link.style.display = 'none';
     document.body.appendChild(link);
@@ -2420,12 +2414,27 @@ class Point {
   } 
 }//----------------------------------------------------------------------------
 
-//Every shape can have its ouw color-------------------------------------------
+//Any value needing constraints, incremental, exponential or angular functions-
+class val {
+  constructor(name = '') {
+    this.name     =   name;
+    this.min      =      0;
+    this.max      =      0;
+    this.system   =      0;
+    this.selected =      0;
+    this.delta    =      0;
+    this.scaler   =      0;
+    this.angular  =      0;
+    this.kind     = normal;
+  }  
+}//----------------------------------------------------------------------------
+
+//Every shape can have its own color-------------------------------------------
 class Color {
-  constructor(name = '', kind = 'mid') { //Random mid color by default
-    this.name = name;
-    this.kind = kind;
-    this.hex  = randomColor(kind);
+  constructor(name = '', pal = 'mid') { //Random mid color by default
+    this.name    = name;
+    this.palette = pal;
+    this.hex     = randomColor(pal);
   }
 }//----------------------------------------------------------------------------
 
@@ -2595,6 +2604,7 @@ const diagonal      = 'diagonal';
 const monotone      = 'monotone';
 const tritonal      = 'tritonal';
 const opacity       = 'opacity';
+const palette       = 'palette';
 const uniform       = 'uniform';
 const amount        = 'amount';
 const middle        = 'middle';
@@ -2729,6 +2739,7 @@ const nautilus      = 'nautilus';
 const randogon      = 'randogon';
 const pentagon      = 'pentagon';
 const triangle      = 'triangle';
+const umbrella      = 'umbrella';
 //Array used for iterating shapes
 const shapeTypes    = new Array(
   corner    ,  //Bottom most layer
@@ -2757,6 +2768,7 @@ const shapeTypes    = new Array(
   randogon  ,
   pentagon  ,
   triangle  ,
+  umbrella  ,
 );
 //Parse the conguration and run
 let svgconf    = parseConf();
