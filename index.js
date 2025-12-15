@@ -1,6 +1,6 @@
-"use strict";  //Like college teachers!
+let version = '0.037'; //Commits + 1
 
-let version = '0.036'; //Commits + 1
+//"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -55,11 +55,12 @@ function defaultShapes() {
   shapes[corner   ].count          =           4;
   shapes[hexagon  ].count          =           1;
   shapes[flower   ].count          =           1;
-  shapes[oddagon  ].count          =           4;
+  shapes[oddagon  ].count          =           3;
   shapes[rectangle].count          =           3;
   shapes[cloud    ].count          =           1;
   shapes[circle   ].count          =           9;
   shapes[nautilus ].count          =           1;
+  shapes[triangle ].count          =           2;
 //shapes[square   ].count          =         108;
 //shapes[blob     ].count          =           1;
 //shapes[claw     ].count          =           1;
@@ -71,7 +72,6 @@ function defaultShapes() {
 //shapes[polygon  ].count          =           1;
 //shapes[dexagon  ].count          =           1;
 //shapes[randogon ].count          =           1;
-//shapes[triangle ].count          =           1;
 //shapes[pentagon ].count          =           2;
 //shapes[star     ].count          =           1;
   //---------------------------------------------
@@ -156,7 +156,6 @@ function defaultShapes() {
   //Polygon--------------------------------------
   //Dexagon--------------------------------------
   //Nautilus-------------------------------------
-  shapes[nautilus ].filter         =          '';
   shapes[nautilus ].position.kind  =      ongrid;
   shapes[nautilus ].position.kind  =      random;
   shapes[nautilus ].rotation.kind  =      random;
@@ -227,6 +226,8 @@ function defaultFilters() {
   let out = Object.create(null);
   filterTypes.forEach(kind => { out[kind] = true; });
   //Exceptions to being enabled by default
+  out[bnw        ] = false;  //<-- not working right now
+  out[pixelate   ] = false;  //<-- not working right now
   out[chaotic    ] = false;
   out[watercolor ] = false;
   return out;
@@ -837,6 +838,34 @@ function svgFilters() {
   output += '  <feTile />\r\n';
   output += `  <feGaussianBlur in="SourceGraphic" stdDeviation="${r}" edgeMode="duplicate" color-interpolation-filters="sRGB" />\r\n`;
   output += '</filter>\r\n';
+
+  //BNW------------------------------------------------------------------------
+  if (svgconf.filters.mboss) {
+    let out = '';
+    out += '<filter id="bnw" filterUnits="objectBoundingBox">\r\n';
+    out += '  <feColorMatrix id="luminance-value" type="bnw" in="SourceGraphic"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
+
+  //PIXEL8---------------------------------------------------------------------
+  if (svgconf.filters.pixelate) {
+    let out = '';
+    let r = randomInt(5, 101);
+    out += '<filter id="pixelate">\r\n';
+    out += '  <feGaussianBlur operator="pixelate" in="SourceGraphic" radius="'+r+'"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }  
+
+  //MBOSS----------------------------------------------------------------------
+  if (svgconf.filters.mboss) {
+    let out = '';
+    out += '<filter id="mboss">\r\n';
+    out += '  <feConvolveMatrix order="4" kernelMatrix="-2 2 1 -1 -1 3 2 1 -1 0 -1 -4 -1 1 0 0"/>\r\n';
+    out += '</filter>\r\n';
+    output += out;
+  }
 
   //DISPLACEMENT---------------------------------------------------------------
   if (svgconf.filters.displacement) {
@@ -2609,11 +2638,14 @@ const quad          = 'quad';
 const cube          = 'cube';
 const line          = 'line';
 //Filter related syntax sugars
+const bnw           = 'bnw';
 const glow          = 'glow';
 const tile          = 'tile';
 const dance         = 'dance';
+const mboss         = 'mboss';
 const chaotic       = 'chaotic';
 const oblivion      = 'oblivion'; 
+const pixelate      = 'pixelate';
 const watercolor    = 'watercolor';
 const pointlight    = 'pointlight';
 const motionblurx   = 'motionblurx';
@@ -2622,11 +2654,14 @@ const displacement  = 'displacement';
 const gaussianblur  = 'gaussianblur';
 //Array used for iterating filters
 const filterTypes   = new Array(
+  bnw          ,
   glow         ,
   tile         ,
   dance        ,
+  mboss        ,
   chaotic      ,
   oblivion     ,
+  pixelate     ,
   watercolor   ,
   pointlight   ,
   motionblurx  ,
