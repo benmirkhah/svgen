@@ -1,4 +1,6 @@
-# svgen
+![Sample output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/svgenout/svg-2cf493.svg)
+
+# SVGen
 
 <b>Generates SVG files with parametric semi-random elements defined in configuration.</b>
 

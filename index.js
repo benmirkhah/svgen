@@ -1,6 +1,6 @@
-//"use strict";  //Like college teachers!
+"use strict";  //Like college teachers!
 
-let version = '0.035'; //Commits + 1
+let version = '0.036'; //Commits + 1
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -127,7 +127,6 @@ function defaultShapes() {
   shapes[rectangle].size.minh      =         300;
   shapes[rectangle].size.maxw      =           0;
   shapes[rectangle].size.maxh      =           0;
-  shapes[rectangle].stroke.swidth  =           0;
   //Star-----------------------------------------
   shapes[star     ].filter         =       dance;
   shapes[star     ].rotation.kind  =      random;
@@ -146,13 +145,14 @@ function defaultShapes() {
   shapes[circle   ].stroke.opacity =        0.15;
   //Flower---------------------------------------
   shapes[flower   ].filter         =        glow;
-  shapes[flower   ].size.maxr      =         250;
+  shapes[flower   ].size.maxr      =         200;
   shapes[flower   ].stroke.swidth  =           0;
   //Pollen---------------------------------------
   //Hexagon--------------------------------------
   //Octagon--------------------------------------
   //Oddagon--------------------------------------
   shapes[oddagon  ].filter         =       dance;
+  shapes[oddagon  ].rotation.kind  =      random;
   //Polygon--------------------------------------
   //Dexagon--------------------------------------
   //Nautilus-------------------------------------
@@ -206,7 +206,7 @@ function defaultEnabled() {
   out['centers'  ] = false;  //true, false, or color
   out['anchors'  ] = false;  //true, false, or color
   out['position' ] = false;  //true, false, or color
-  out['bgcolor'  ] = color;  //true (currentColor), false, or color
+  out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
   out['filters'  ] = true;
   out['variants' ] = false;  //TODO
   out['gradients'] = true;
