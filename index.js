@@ -1,4 +1,4 @@
-let version = '0.038'; //Commits + 1
+let version = '0.039'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
