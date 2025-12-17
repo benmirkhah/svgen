@@ -1,9 +1,11 @@
-let version = '0.040'; //Commits + 1
+let version = '0.041'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
+Fill options: Fixed (gradient/solid) / Random (gradient/solid) / incremental
+Shape grids:  Allowing each shape to snap to its internal grid system
 Back button:  Allowing saving previous renders
 Config UI:    Allowing non technical user interaction
 More shapes:  Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
@@ -33,17 +35,44 @@ function defaultCanvas() {
   return c;
 }//----------------------------------------------------------------------------
 
+//Default enabled features-----------------------------------------------------
+function defaultEnabled() {
+  let out = Object.create(null);
+  out['text'     ] = FF06;   //true, false, or color
+  out['grids'    ] = false;  //true, false, or color
+  out['stroke'   ] = true;   //true, false, or color
+  out['points'   ] = false;  //true, false, or color
+  out['centers'  ] = false;  //true, false, or color
+  out['anchors'  ] = false;  //true, false, or color
+  out['position' ] = false;  //true, false, or color
+  out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
+  out['filters'  ] = false;
+  out['variants' ] = false;  //TODO
+  out['gradients'] = true;
+  out['animation'] = false;  //TODO
+  return out;
+}//----------------------------------------------------------------------------
+
+//Normal, Radial and Spiral grids defaults-------------------------------------
+function defaultGrids() {
+  let out   = new   Grid;
+  out.kind  =     spiral;
+//out.kind  =     radial;
+//out.cy    =        600;
+//out.show  =      false;
+//out.order = 'vertical';
+  return out;
+}//----------------------------------------------------------------------------
+
 //Default properties of each shape type----------------------------------------
 function defaultShapes() {
   let shapes = Object.create(null);
-  //--------------------------------------------------
-  //Create a default object for every type of shape
+  //Create a default object for every type of shape---
   shapeTypes.forEach(kind => { 
     shapes[kind] = new Shape(kind);
   });
   //Shape Counts--------------------------------------
   shapes[corner   ].count              =            4;
-  shapes[square   ].count              =            4;
   shapes[circle   ].count              =            9;
   shapes[hexagon  ].count              =            1;
   shapes[flower   ].count              =            1;
@@ -52,6 +81,7 @@ function defaultShapes() {
   shapes[cloud    ].count              =            1;
   shapes[nautilus ].count              =            1;
   shapes[triangle ].count              =            2;
+//shapes[square   ].count              =           50;
 //shapes[blob     ].count              =            1;
 //shapes[claw     ].count              =            1;
 //shapes[flame    ].count              =            1;
@@ -66,7 +96,7 @@ function defaultShapes() {
 //shapes[star     ].count              =            1;
 //shapes[umbrella ].count              =            1;
   //--------------------------------------------------
-  //Adjust each shape according to your need here
+  //Adjust each shape according to your needs below---
   //Corner--------------------------------------------
   shapes[corner   ].filter             =           '';
   shapes[corner   ].stroke.swidth      =            0;
@@ -79,27 +109,40 @@ function defaultShapes() {
   //Bullet--------------------------------------------
   //Letter--------------------------------------------
   //Square--------------------------------------------
+  shapes[square   ].fill               =    RC(clear);
   shapes[square   ].position.cx.kind   =       random; //Position
-  shapes[square   ].position.cy.kind   =        fixed;
+  shapes[square   ].position.cx.kind   =       ongrid;
+  shapes[square   ].position.cy.kind   =       ongrid;
   shapes[square   ].position.cx.val    =           20;
-  shapes[square   ].position.cy.val    =          500;
-  shapes[square   ].position.cx.delta  =          100;
-  shapes[square   ].position.cy.delta  =           20;
-  shapes[square   ].position.cx.scaler =        1.075;
+  shapes[square   ].position.cy.val    =           20;
+  shapes[square   ].position.cx.delta  =           76;
+  shapes[square   ].position.cy.delta  =         22.5;
+  shapes[square   ].position.cx.scaler =        1.175;
   shapes[square   ].position.cy.scaler =      -1.0695;
-  shapes[square   ].rotation.a.kind    =       random; //Rotation
-  shapes[square   ].rotation.a.delta   =          -15;
-  shapes[square   ].rotation.a.scaler  =       -1.090;
-  shapes[square   ].rotation.a.rate    =            2;
-  shapes[square   ].scale.kind         =        fixed; //Scale
+  shapes[square   ].rotation.a.kind    =  incremental; //Rotation
+  shapes[square   ].rotation.a.val     =            1;
+  shapes[square   ].rotation.a.delta   =          7.5;
+  shapes[square   ].rotation.a.scaler  =         1.25;
+  shapes[square   ].rotation.a.rate    =            1;
+  shapes[square   ].scale.s.kind       =        fixed; //Scale
   shapes[square   ].size.h.kind        =       random; //Size
+  shapes[square   ].size.h.kind        =  incremental;
+  shapes[square   ].size.h.val         =            1;
   shapes[square   ].size.h.min         =           30;
   shapes[square   ].size.h.max         =          500;
-  shapes[square   ].size.h.val         =           82;
-  shapes[square   ].size.h.delta       =            2;
-  shapes[square   ].size.h.delta       =        1.075;
+  shapes[square   ].size.h.delta       =            3;
+  shapes[square   ].size.h.scaler      =        1.115;
   shapes[square   ].size.h.rate        =            1;
-  shapes[square   ].skew.kind          =  incremental;  
+  shapes[square   ].skew.x.kind        =         none; //Skew X
+  shapes[square   ].skew.x.val         =           -1;
+  shapes[square   ].skew.x.delta       =            1;
+  shapes[square   ].skew.x.scaler      =        1.225;
+  shapes[square   ].skew.x.rate        =            1;
+  shapes[square   ].skew.y.kind        =         none; //Skew Y
+  shapes[square   ].skew.y.val         =           -1;
+  shapes[square   ].skew.y.delta       =            1;
+  shapes[square   ].skew.y.scaler      =        1.025;
+  shapes[square   ].skew.y.rate        =            1;
   shapes[square   ].stroke.swidth      =            2; //Stroke
   shapes[square   ].stroke.opacity     =         0.50;
   //Ellipse-------------------------------------------
@@ -142,8 +185,8 @@ function defaultShapes() {
   //Dexagon-------------------------------------------
   //Nautilus------------------------------------------
   shapes[nautilus ].rotation.a.kind    =       random;
-  shapes[nautilus ].size.r.minr        =          180;
-  shapes[nautilus ].size.r.maxr        =          420;
+  shapes[nautilus ].size.r.min         =          180;
+  shapes[nautilus ].size.r.max         =          420;
   shapes[nautilus ].size.r.val         =          240;
   shapes[nautilus ].size.r.delta       =           60;
   shapes[nautilus ].size.r.scaler      =            1;
@@ -161,8 +204,8 @@ function defaultShapes() {
   shapes[pentagon ].rotation.a.kind    =       random;
   shapes[pentagon ].rotation.a.val     =          -20;
   shapes[pentagon ].rotation.a.delta   =          2.5;
-  shapes[pentagon ].size.kind          =  exponential;
-  shapes[pentagon ].size.kind          =  incremental;
+  shapes[pentagon ].size.r.kind        =  exponential;
+  shapes[pentagon ].size.r.kind        =  incremental;
   shapes[pentagon ].size.r.val         =           10;
   shapes[pentagon ].size.r.delta       =            2;
   shapes[pentagon ].size.r.scaler      =        1.075;
@@ -177,32 +220,6 @@ function defaultShapes() {
   //--------------------------------------------------
   //console.log(shapes);                       //DEBUG  
   return shapes;
-}//----------------------------------------------------------------------------
-
-//Default enabled features-----------------------------------------------------
-function defaultEnabled() {
-  let out = Object.create(null);
-  out['text'     ] = FF06;   //true, false, or color
-  out['grids'    ] = false;  //true, false, or color
-  out['stroke'   ] = true;   //true, false, or color
-  out['points'   ] = false;  //true, false, or color
-  out['centers'  ] = false;  //true, false, or color
-  out['anchors'  ] = false;  //true, false, or color
-  out['position' ] = false;  //true, false, or color
-  out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
-  out['filters'  ] = true;
-  out['variants' ] = false;  //TODO
-  out['gradients'] = true;
-  out['animation'] = false;  //TODO
-  return out;
-}//----------------------------------------------------------------------------
-
-//Normal, Radial and Spiral grids defaults-------------------------------------
-function defaultGrids() {
-  let out = new Grid;
-  //out.kind = radial;
-  //out.kind = spiral;
-  return out;
 }//----------------------------------------------------------------------------
 
 //Default enabled filters------------------------------------------------------
@@ -1090,105 +1107,68 @@ function resetCounter(){
   return out;
 }//----------------------------------------------------------------------------
 
+//Figure out the value of Val objects based on its configuration---------------
+function determineValue(thing, count) {
+  let out  = 0;
+  let i    = count;
+  let rate = i % thing.rate;
+
+  switch (thing.kind) {
+    case random:
+      out  = randomInt(thing.min, thing.max ? thing.max : WIDTH );
+      out -= randomInt(1,  out -  thing.min); //reduce likelihood of large values
+      out -= randomInt(1,  out -  thing.min); //reduce likelihood of large values
+      break;
+    case none:        out = 0; break;
+    case fixed:       out = thing.val; break;
+    case ongrid:      out = svgconf.enabled.grids ? GRID[i] : roundInt( WIDTH/2, 1); break;
+    case incremental: out = thing.val + (rate ? 0 : roundInt((thing.delta *                i ),1)); break;
+    case exponential: out = thing.val + (rate ? 0 : roundInt((thing.val   * (thing.scaler**i)),1)); break;      
+    default:          out = roundInt( WIDTH/2, 1);
+  }
+
+  return out;
+}//----------------------------------------------------------------------------
+
 //Figure out an object size based on its shape configuration-------------------
-function determineSize(oid=1, shape=square) {
+function determineSize(shape=square) {
   let out  = Object.create(null);
   let size = svgconf.shapes[shape].size;
-  let i    = counter[shape];
-  let rw   = i % size.w.rate;
-  let rh   = i % size.h.rate;
-  let rr   = i % size.r.rate;
 
-  //Width----------------------------------------
-  switch (size.w.kind) {
-    case random:
-      let w = 0;
-      w  = randomInt(size.w.min, size.w.max ? size.w.max : WIDTH  );
-      w -= randomInt(1, w-size.w.min); //reduce likelihood of large w
-      w -= randomInt(1, w-size.w.min); //reduce likelihood of large w
-      out.w = w;
-      break;
-    case fixed:       out.w = size.w.val; break;
-    case incremental: out.w = size.w.val + (rw ? 0 : roundInt((i * size.w.delta),1)); break;
-    case exponential: out.w = size.w.val + (rw ? 0 : roundInt((size.w.val * Math.pow(size.w.scaler,i)),1)); break;      
-    default:          out.w = roundInt( WIDTH/4, 1);
-  }
-  //Height---------------------------------------
-  switch (size.h.kind) {
-    case random:
-      let h = 0;
-      h  = randomInt(size.h.min, size.h.max ? size.h.max : HEIGHT );
-      h -= randomInt(1, h-size.h.min); //reduce likelihood of large h
-      h -= randomInt(1, h-size.h.min); //reduce likelihood of large h
-      out.h = h;
-      break;
-    case fixed:       out.h = size.h.val; break;
-    case incremental: out.h = size.h.val + (rh ? 0 : roundInt((i * size.h.delta),1)); break;
-    case exponential: out.h = size.h.val + (rh ? 0 : roundInt((size.h.val * Math.pow(size.h.scaler,i)),1)); break;      
-    default:          out.h = roundInt(HEIGHT/3, 1);
-  }
-  //Radius---------------------------------------
-  switch (size.r.kind) {
-    case random:
-      let r = 0;    
-      r  = randomInt(size.r.min, size.r.max ? size.r.max : WIDTH/2);
-      r -= randomInt(1, r-size.r.min); //reduce likelihood of large r
-      r -= randomInt(1, r-size.r.min); //reduce likelihood of large r
-      out.r = r;
-      break;
-    case fixed:       out.r = size.r.val; break;
-    case incremental: out.r = size.r.val + (rr ? 0 : roundInt((i * size.r.delta),1)); break;
-    case exponential: out.r = size.r.val + (rr ? 0 : roundInt((size.r.val * Math.pow(size.r.scaler,i)),1)); break;      
-    default:          out.r = roundInt(HEIGHT/4, 1);
-  }
-  //console.log('Shape:'+shape+'  i:'+i);
+  out.w    = determineValue(size.w, counter[shape]);
+  out.h    = determineValue(size.h, counter[shape]);
+  out.r    = determineValue(size.r, counter[shape]);
+
   return out;
 }//----------------------------------------------------------------------------
 
 //Figure out an object position based on its shape configuration---------------
-function determinePosition(oid, shape) {
+function determinePosition(shape) {
   let out = Object.create(null);
   let pos = svgconf.shapes[shape].position;
-  let i   = counter[shape];
-  let rx  = i % pos.cx.rate;
-  let ry  = i % pos.cy.rate;
 
-  switch (pos.cx.kind) {
-    case random:      out.cx = randomInt(pos.cx.min, pos.cy.max ? pos.maxx : WIDTH ); break;
-    case fixed:       out.cx = pos.cx.val=='middle' ? roundInt( WIDTH/2, 1) : pos.cx.val; break;
-    case ongrid:      out.cx = GRID[i].x; break;
-    case incremental: out.cx = pos.cx.val + (rx ? 0 : roundInt((i * pos.cx.delta),1)); break;   
-    case exponential: out.cx = pos.cx.val + (rx ? 0 : roundInt((((i-1) * (pos.cx.delta * Math.pow(pos.cx.scaler,i)))/i))); break;      
-    default:          out.cx = roundInt( WIDTH/2, 1);
-  }
-
-  switch (pos.cy.kind) {
-    case random:      out.cy = randomInt(pos.cx.min, pos.cy.max ? pos.maxy : HEIGHT); break;
-    case fixed:       out.cy = pos.cy.val=='middle' ? roundInt(HEIGHT/2, 1) : pos.cy.val; break;
-    case ongrid:      out.cy = GRID[i].y; break;
-    case incremental: out.cy = pos.cy.val + (ry ? 0 : roundInt((i * pos.cy.delta),1)); break;   
-    case exponential: out.cy = pos.cy.val + (rx ? 0 : roundInt((((i-1) * (pos.cy.delta * Math.pow(pos.cy.scaler,i)))/i))); break;     
-    default:          out.cy = roundInt(HEIGHT/2, 1);
-  }
+  out.cx  = determineValue(pos.cx, counter[shape]);
+  out.cy  = determineValue(pos.cy, counter[shape]);
+  out.cx  = isNaN(out.cx) ? out.cx.x : out.cx; //since ongrid resturns a x,y point
+  out.cy  = isNaN(out.cy) ? out.cy.y : out.cy; //since ongrid resturns a x,y point
 
   return out;
 }//----------------------------------------------------------------------------
 
 //Figure out an object position based on its shape configuration---------------
-function determineRotation(oid, shape) {
-  let out = Object.create(null);
-  let rot = svgconf.shapes[shape].rotation;
-  let ra  = i % rot.a.rate;
+function determineRotation(shape) {
+  return determineValue(svgconf.shapes[shape].rotation.a, counter[shape]);
+}//----------------------------------------------------------------------------
 
-  switch (rot.a.kind) {
-    case none:        out.degs = 0;                               break;
-    case random:      out.degs = randomInt(rot.a.min, rot.a.max); break;
-    case fixed:       out.degs = rot.a.val;                       break;
-    case incremental: out.degs = rot.a.val + (ra ? 0 : roundInt((oid * rot.a.delta) ,1)); break;
-    case exponential: out.degs = rot.a.val + (ra ? 0 : roundInt((rot.a.val * Math.pow(rot.a.scaler,oid)),1)); break;
-    default:          out.degs = 0;
-  }
-  return out.degs;
+//Figure out an object skew based on its shape configuration-------------------
+function determineSkew(shape) {
+  let out  = Object.create(null);
+  let skew = svgconf.shapes[shape].skew;
+
+  out.x    = determineValue(skew.x, counter[shape]);
+  out.y    = determineValue(skew.y, counter[shape]);
+
+  return out;
 }//----------------------------------------------------------------------------
 
 //Generates a random #RRGGBBAA color-------------------------------------------
@@ -1297,6 +1277,23 @@ function RC(pal='') {
   return randomColor(pal);  
 }//----------------------------------------------------------------------------
 
+//
+function hex2rgb(hex='') {
+  let out = { r:0, g:0, b:0, a:0 };
+
+  if (color) {
+    out.r = hex.substring(0,2);
+    out.g = hex.substring(2,2);
+    out.b = hex.substring(4,2);
+    out.a = hex.substring(6,2);
+    out.r = out.r.toString(10);
+    out.g = out.g.toString(10);
+    out.b = out.b.toString(10);
+    out.a = out.a.toString(10);    
+  } console.log(out);
+
+  return out;
+}//----------------------------------------------------------------------------
 
 /******************************************************************************
 *********************** Below are all the SVG filters *************************
@@ -1743,8 +1740,8 @@ function svgCartesianGrid(diagnal = false) {
 //Normal Left to right---------------------------------------------------------
 function svgGridOrderNormal(dx=160, dy=160, rows=10, cols=6) {
   let pos    = Object.create(null);
-  let table  = ['ignore-row-zero'];
-  let points = ['ignore-zero'];
+  let table  = [zero];
+  let points = [zero];
   let num    = 1;
   let x      = dx;
   let y      = dy;
@@ -1770,7 +1767,7 @@ function svgGridOrderNormal(dx=160, dy=160, rows=10, cols=6) {
 function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
   let pos    = Object.create(null);
   let table  = [];
-  let points = ['ignore-zero'];
+  let points = [zero];
   let num    = 1;
   let x      = dx;
   let y      = dy;
@@ -1800,7 +1797,7 @@ function svgGridOrderBackward(dx=160, dy=160, rows=10, cols=6) {
 //Vertical Top Left to Bottom Right--------------------------------------------
 function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
   let pos    = Object.create(null);
-  let points = ['ignore-zero'];
+  let points = [zero];
   let num    = 1;
   let r      = 1;
   let c      = 1;
@@ -1824,8 +1821,8 @@ function svgGridOrderVertical(dx=160, dy=160, rows=10, cols=6){
 //Reverse Vertical Bottom Right to Top Left------------------------------------
 function svgGridOrderVertiBack(dx=160, dy=160, rows=10, cols=6){
   let points = svgGridOrderVertical(dx,dy,rows,cols);
-  points.shift();  //Gets rid of 'ignore-zero'
-  let reversed = ['ignore-zero', ...points.reverse()];  //console.log(reversed); //DEBUG
+  points.shift();  //Gets rid of zero
+  let reversed = [zero, ...points.reverse()];  //console.log(reversed); //DEBUG
   return reversed;
 }//----------------------------------------------------------------------------
 
@@ -2149,15 +2146,17 @@ function svgContent() {
     options['filter'   ] = filter;
     options['fill'     ] = fill;
     options['grid'     ] = svgconf.shapes[shape].grid;
-    options['size'     ] = determineSize(oid, shape);
-    options['position' ] = determinePosition(oid, shape);
+    options['size'     ] = determineSize(shape);
+    options['position' ] = determinePosition(shape);
     options['events'   ] = ' onclick="this.style.fill = randomColor()" '; 
 
-    let transform = '';
-    let rotation  = determineRotation(oid, shape);
-    transform    += rotation ? ' transform-origin="center center" ' : '';
-    transform    += rotation ? ' transform="rotate('+rotation+')" ' : '';
 
+    let skew      = determineSkew(shape);
+    let rotation  = determineRotation(shape);
+    let transform = (rotation || skew) ? ' transform="' : '';
+    transform    += rotation ? 'rotate('+rotation+') ' : '';
+    transform    += skew ? 'skewX('+skew.x+') skewY('+skew.y+') ' : '';
+    transform    += transform ? '" transform-origin="center center" ' : '';
     options['transform'] = transform;  
     //console.log(options);  //DEBUG
 
@@ -2406,6 +2405,19 @@ class Color {
     this.palette = pal;
     this.hex     = randomColor(pal);
   }
+
+  steps(steps=10, goal=RC()) {
+    let out = [];
+    start = hex2rgb(this.hex);
+    end   = hex2rgb(goal);
+   
+    for (s=1; s<=steps; s++) {
+
+
+    }
+
+    
+  }
 }//----------------------------------------------------------------------------
 
 //Every shape can have its own Cartesian, Radial or Spiral grid----------------
@@ -2467,7 +2479,8 @@ class Scale {
 //Skew parameters of a shape---------------------------------------------------
 class Skew {
   constructor() {
-    this.q = new Val('quantity', { val:1.5, min:0, max:5, kind:none, delta:1, scaler:1.1 });
+    this.x = new Val('quantity', { val:1.5, min:0, max:5, kind:none, delta:1, scaler:1.1 });
+    this.y = new Val('quantity', { val:1.5, min:0, max:5, kind:none, delta:1, scaler:1.1 });
   }
 }//----------------------------------------------------------------------------
 
@@ -2543,21 +2556,6 @@ const fixed         = 'fixed';
 const solid         = 'solid';
 const both          = 'both';
 const kind          = 'kind';
-const degs          = 'degs';  //Degrees
-const mina          = 'mina';  //Angle
-const maxa          = 'maxa';  //Angle
-const minr          = 'minr';  //Radius
-const maxr          = 'maxr';  //Radius
-const mins          = 'mins';  //Scaler
-const maxs          = 'maxs';  //Scaler
-const minh          = 'minh';  //Height
-const maxh          = 'maxh';  //Height
-const minw          = 'minw';  //Width
-const maxw          = 'maxw';  //Width
-const minx          = 'minx';  //Position
-const maxx          = 'maxx';  //Position
-const miny          = 'miny';  //Position
-const maxy          = 'maxy';  //Position
 const none          =  null ;
 const zero          = 'zero';
 const min           = 'min';   //Value
@@ -2700,8 +2698,6 @@ const opt      = defaultOptions();
 const filters  = Object.keys(svgconf.filters);
 const scount   = Object.keys(svgconf.shapes).length; //Number of enabled shapes
 const fcount   = filters.length;                     //Number of enabled filters
-const width    = svgconf.width;
-const height   = svgconf.height;
 const WIDTH    = svgconf.width;
 const HEIGHT   = svgconf.height;
 const colors   = svgconf.colors;
