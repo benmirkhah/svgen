@@ -1,4 +1,4 @@
-let version = '0.045'; //Commits + 1
+let version = '0.046'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
@@ -62,7 +62,7 @@ function defaultGrids() {
 //out.kind  =     normal;
 //out.kind  =     radial;
 //out.kind  =     spiral;
-  out.show  =      false;
+out.show  =      false;
 //out.end.y.val =    0;
 //out.order =   backward;
   console.log(out);
@@ -78,9 +78,9 @@ function defaultShapes() {
   });//----------------------------------------------------
   
   //Enabled Shapes-----------------------------------------
-  shapes[corner   ].count                   =            4;
-  shapes[square   ].count                   =            0;
+  //shapes[square   ].count                   =          105;
   shapes[hexagon  ].count                   =            0;
+  shapes[corner   ].count                   =            4;
   shapes[circle   ].count                   =            7;
   shapes[pentagon ].count                   =            1;
   shapes[flower   ].count                   =            1;
@@ -241,20 +241,20 @@ function defaultShapes() {
     shapes[ square    ].position.cy.delta   =         22.5;
     shapes[ square    ].position.cx.scaler  =        1.175;
     shapes[ square    ].position.cy.scaler  =      -1.0695;
-    shapes[ square    ].rotation.a.kind     =        fixed; //Rotation
-    shapes[ square    ].rotation.a.val      =           45;
+    shapes[ square    ].rotation.a.kind     =         none; //Rotation
+    shapes[ square    ].rotation.a.val      =            0;
     shapes[ square    ].rotation.a.delta    =           15;
     shapes[ square    ].rotation.a.scaler   =         1.25;
-    shapes[ square    ].rotation.a.rate     =            1;
+    shapes[ square    ].rotation.a.rate     =            6;
     shapes[ square    ].scale.x.kind        =        fixed; //Scale
     shapes[ square    ].scale.y.kind        =        fixed;
-    shapes[ square    ].size.h.kind         =        fixed; //Size
-    shapes[ square    ].size.h.val          =          114;
+    shapes[ square    ].size.h.kind         =    alternate; //Size
+    shapes[ square    ].size.h.val          =           90;
     shapes[ square    ].size.h.min          =           40;
     shapes[ square    ].size.h.max          =          500;
-    shapes[ square    ].size.h.delta        =            3;
+    shapes[ square    ].size.h.delta        =           30;
     shapes[ square    ].size.h.scaler       =        1.115;
-    shapes[ square    ].size.h.rate         =            1;
+    shapes[ square    ].size.h.rate         =            2;
     shapes[ square    ].skew.x.kind         =         none; //Skew X
     shapes[ square    ].skew.x.val          =           -1;
     shapes[ square    ].skew.x.delta        =            1;
@@ -265,9 +265,9 @@ function defaultShapes() {
     shapes[ square    ].skew.y.delta        =            1;
     shapes[ square    ].skew.y.scaler       =        1.025;
     shapes[ square    ].skew.y.rate         =            1;
-    shapes[ square    ].stroke.swidth       =            1; //Stroke
+    shapes[ square    ].stroke.swidth       =            2; //Stroke
     shapes[ square    ].stroke.scolor       =         gold;    
-    shapes[ square    ].stroke.opacity      =         0.35;    
+    shapes[ square    ].stroke.opacity      =         0.75;    
   }//------------------------------------------------------
   if (      star      ) {//---------------------------STARS
     shapes[ star      ].filter              =        dance;
@@ -1125,6 +1125,7 @@ function determineValue(thing, count) {
     case none:        out = 0;          break;
     case fixed:       out = thing.val;  break;
     case ongrid:      out = svgconf.enabled.grid  ?  GRID[count]  : WIDTH/2;              break;
+    case alternate:   out = rate ? thing.val : thing.val + thing.delta;                   break;
     case incremental: out = thing.val + (rate ? 0 :  thing.delta  * (count - 1)        ); break;
     case exponential: out = thing.val + (rate ? 0 : (thing.scaler ** count) * thing.val); break;      
     default:          out = WIDTH/2;
@@ -1175,8 +1176,8 @@ function determineSkew(shape) {
 }//----------------------------------------------------------------------------
 
 function determineFill(shape) {
-  let ben = new Color({hex:'#FFCC0099'});
-  let out = ben.steps(total,'#6600CC66');
+  let ben = new Color({hex:'#FF990099'});
+  let out = ben.steps(total,'#9900FF99');
   return out[counter[shape]];
 }
 
@@ -1746,17 +1747,17 @@ function svgCartesianGrid(grid = new Grid) {
   let cols    = Math.trunc(xlength / dx); //Number of cols
 
   switch (grid.order) { 
-    case 'normal':    points = svgGridOrderNormal(   dx,dy,rows,cols); break;
-    case 'backward':  points = svgGridOrderBackward( dx,dy,rows,cols); break;
-    case 'vertical':  points = svgGridOrderVertical( dx,dy,rows,cols); break;
+    case 'normal'   : points = svgGridOrderNormal(   dx,dy,rows,cols); break;
+    case 'backward' : points = svgGridOrderBackward( dx,dy,rows,cols); break;
+    case 'vertical' : points = svgGridOrderVertical( dx,dy,rows,cols); break;
     case 'vertiback': points = svgGridOrderVertiBack(dx,dy,rows,cols); break;
-    // case 'snake':
-    // case 'vsnake':
-    // case 'spiral':
+  //case 'snake'    : //TODO
+  //case 'vsnake'   : //TODO
+  //case 'spiral'   : //TODO
   }
-  points.shift(); //get rid of zero to insert cx, cy
+  points.shift(); //get rid of zero to insert cx, cy instead
   points.unshift({ z:zero, cx:cx , cy:cy });
-  console.log(points);
+  //console.log(points); //Debug
   return points;
 }//----------------------------------------------------------------------------
 
@@ -2611,6 +2612,7 @@ var anchorall       = '';
 const incremental   = 'incremental';
 const exponential   = 'exponential';
 const functional    = 'functional';
+const alternate     = 'alternate';
 const backward      = 'backward';
 const diagonal      = 'diagonal';
 const monotone      = 'monotone';
@@ -2682,7 +2684,7 @@ const filterTypes   = new Array(
   gaussianblur ,
 );
 //Color related syntax sugars  
-const color         = '#333F';  //Default BG color
+const color         = '#222F';  //Default BG color
 const black         = 'black';
 const white         = 'white';
 const green         = 'green';
