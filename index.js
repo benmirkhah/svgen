@@ -1,18 +1,18 @@
-let version = '0.042'; //Commits + 1
+let version = '0.043'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
 Debug:        Fix strict mode
-Stroke:       Make Parametric
-Petals:       Make Parametric
+Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
 Shape grids:  Allowing each shape to snap to its internal grid system
 Back button:  Allowing saving previous renders
 Config UI:    Allowing non technical user interaction
 More shapes:  Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
 More filters: Ideally one filter per shape
+Filters:      A way for a filter to NOT get randomly assigned to a certain shape type
 Events:       Configurable OnClick, RightClick, hover, etc. to run actions
 Actions:      Change Color, Size, Position, Rotation upon events.
 Variants:     Slightly different replicas of a shape
@@ -42,14 +42,14 @@ function defaultCanvas() {
 function defaultEnabled() {
   let out = Object.create(null);
   out['text'     ] = FF06;   //true, false, or color
-  out['grids'    ] = FF06;  //true, false, or color
+  out['grids'    ] = FF06;   //true, false, or color
   out['stroke'   ] = true;   //true, false, or color
   out['points'   ] = false;  //true, false, or color
   out['centers'  ] = false;  //true, false, or color
   out['anchors'  ] = false;  //true, false, or color
   out['position' ] = false;  //true, false, or color
   out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
-  out['filters'  ] =  true;
+  out['filters'  ] = true;
   out['variants' ] = false;  //TODO
   out['gradients'] = true;
   out['animation'] = false;  //TODO
@@ -59,7 +59,7 @@ function defaultEnabled() {
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
   let out   = new   Grid;
-out.kind  =     spiral;
+  out.kind  =     spiral;
 //out.kind  =     radial;
 //out.cy    =        600;
   out.show  =      false;
@@ -70,10 +70,10 @@ out.kind  =     spiral;
 //Default properties of each shape type----------------------------------------
 function defaultShapes() {
   let shapes = Object.create(null);
-  //Create a default object for every type of shape--------
+  //Create a default object for every shape type-----------
   shapeTypes.forEach(kind => { 
     shapes[kind] = new Shape(kind);
-  });
+  });//----------------------------------------------------
   
   //Shape Counts-------------------------------------------
   shapes[corner   ].count                   =            4;
@@ -374,113 +374,58 @@ function defaultShapeTemplate() {
   out['kind'    ] = normal; 
   out['fill'    ] = random;
   out['filter'  ] = random;
-  out['size'    ] = defaultShapeSizeTemplate();
-  out['skew'    ] = defaultShapeSkewTemplate();
-  out['scale'   ] = defaultShapeScaleTemplate();
+  out['size'    ] = new Size;
+  out['skew'    ] = new Skew;
+  out['scale'   ] = new Scale;
   out['stroke'  ] = defaultShapeStrokeTemplate();
-  out['position'] = defaultShapePositionTemplate();
-  out['rotation'] = defaultShapeRotationTemplate();
+  out['position'] = new Position;
+  out['rotation'] = new Rotation;
   //console.log(out);  //DEBUG
   return out;  
 }//----------------------------------------------------------------------------
 
-//Default template for a shape's size object-----------------------------------
-function defaultShapeSizeTemplate() {
-  let out  = Object.create(null);
-  out['w'] = new Val('width' );
-  out['h'] = new Val('height');
-  out['r'] = new Val('radius');
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default template for a shape's stroke object---------------------------------
-function defaultShapeStrokeTemplate() {
-  let out = Object.create(null);
-  out['scolor'] = RC(opaque);
-  out['dc'    ] = '11000011'; //#RRGGBBAA delta
-  out['swidth'] = random;
-  out[opacity ] =   0.25;
-  out['dw'    ] =      5; //Delta
-  out['oe'    ] =      1; //Once every
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default template for a shape's position object-------------------------------
-function defaultShapePositionTemplate() {
-  let out   = Object.create(null);
-  out['cx'] = new Position('cx');
-  out['cy'] = new Position('cy');
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default template for a shape's rotation object-------------------------------
-function defaultShapeRotationTemplate() {
-  let out = Object.create(null);
-  out[a]  = new Val('angle');
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default template for a shape's scale object----------------------------------
-function defaultShapeScaleTemplate() {
-  let out = Object.create(null);
-  out[s]  = new Val('amount');
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default template for a shape's skew object----------------------------------
-function defaultShapeSkewTemplate() {
+//Default templates for a shape object's properties----------------------------
+function defaultShapeSizeTemplate()     { return new Size;     }
+function defaultShapeStrokeTemplate()   { return new Stroke;   }
+function defaultShapePositionTemplate() { return new Position; }
+function defaultShapeRotationTemplate() { return new Rotation; }
+function defaultShapeScaleTemplate()    { return new Scale;    }
+function defaultShapeSkewTemplate()     {
   let out = Object.create(null);
   out[q]  = new Val('quantity');
-  return out;
+  return new Skew;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's grid object-----------------------------------
 function defaultShapeGridTemplate(){
   let out = Object.create(null);
   //Cartesian Grids
-  out['kind' ] = radial;  //true = normal, radial, spiral (TODO: diagonal)
-  out['show' ] =      1;
-  out['text' ] =      0;  //FF06;
-  out['bound'] =  false;  //false = keep / true = delete positions that fall outside of artbox boundry  
-  out['order'] = normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
+  out['kind' ] =    radial;  //true = normal, radial, spiral (TODO: diagonal)
+  out['show' ] =         1;
+  out['text' ] =         0;  //FF06;
+  out['bound'] =     false;  //false = keep / true = delete positions that fall outside of artbox boundry  
+  out['order'] =    normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
   out['start'] = new Point; 
   out['end'  ] = new Point; 
-  out['dx'   ] =    160; 
-  out['dy'   ] =    160;
+  out['dx'   ] =       160; 
+  out['dy'   ] =       160;
   //Radial/Spiral Grids (order kinds: normal, backward, outward, inward)
-  out['r'    ] =    800; 
-  out['a'    ] =      0;
-  out['dr'   ] =    100;
-  out['da'   ] =     30;
-  out['cx'   ] =      0;
-  out['cy'   ] =      0; 
-  out['sr'   ] =      1;  //Spirals
-  out['sa'   ] =      2;  //Spirals
+  out['r'    ] =       800; 
+  out['a'    ] =         0;
+  out['dr'   ] =       100;
+  out['da'   ] =        30;
+  out['cx'   ] =         0;
+  out['cy'   ] =         0; 
+  out['sr'   ] =         1;  //Spirals
+  out['sa'   ] =         2;  //Spirals
   //console.log(out);  //DEBUG
   return out;
 }//----------------------------------------------------------------------------
 
-//Default properties of variants-----------------------------------------------
-function defaultVariants() { //NOT IN USE YET
-  let out = Object.create(null);
-  //TODO: For doings transforms on replicates various shapes
-  out[min     ] =      1;
-  out[max     ] =     10;
-  out[system  ] =      0;
-  out[selected] = random;
-  return out;
-}//----------------------------------------------------------------------------
-
-//Default animation duration---------------------------------------------------
-function defaultDuration() { //NOT IN USE YET
-  let out = Object.create(null);
-  //TODO: Animation will be the last piece of the project
-  out[min     ] =    100;
-  out[max     ] =  36000;
-  out[system  ] =      0;
-  out[selected] = random;
-  return out;
-}//----------------------------------------------------------------------------
+//Variants and Duration are not in use yet-------------------------------------
+function defaultVariants() { return Object.create(null); }
+function defaultDuration() { return Object.create(null); }
+//-----------------------------------------------------------------------------
 
 //Default options for calling shape generator functions------------------------
 function defaultOptions() {
@@ -2649,13 +2594,10 @@ class Skew {
 //Stroke parameters of a shape-------------------------------------------------
 class Stroke {
   constructor() {
+    this.color   =  new Color; //To replace SCOLOR
     this.scolor  = RC(opaque);
-    this.dc      = '11000011'; //#RRGGBBAA Color Delta
     this.swidth  =     random;
     this.opacity =       0.25;
-    this.dt      =          5; //Incremental Delta
-    this.st      =          5; //Exponential Scaler
-    this.oe      =          1; //Once every    
   }
 }//----------------------------------------------------------------------------
 
