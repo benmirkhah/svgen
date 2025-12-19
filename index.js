@@ -1,4 +1,4 @@
-let version = '0.043'; //Commits + 1
+let version = '0.044'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
@@ -75,7 +75,7 @@ function defaultShapes() {
     shapes[kind] = new Shape(kind);
   });//----------------------------------------------------
   
-  //Shape Counts-------------------------------------------
+  //Enabled Shapes-----------------------------------------
   shapes[corner   ].count                   =            4;
   shapes[hexagon  ].count                   =            2;
   shapes[pentagon ].count                   =            1;
@@ -85,21 +85,22 @@ function defaultShapes() {
   shapes[oddagon  ].count                   =            2;
   shapes[cloud    ].count                   =            1;
   shapes[rectangle].count                   =            3;
-//shapes[star     ].count                   =            1;
-//shapes[nautilus ].count                   =            1;
-//shapes[triangle ].count                   =            2;
-//shapes[blob     ].count                   =            1;
-//shapes[claw     ].count                   =            1;
-//shapes[flame    ].count                   =            1;
-//shapes[pollen   ].count                   =            1;
-//shapes[ellipse  ].count                   =            1;
-//shapes[mountain ].count                   =            1;
-//shapes[octagon  ].count                   =            1;
-//shapes[polygon  ].count                   =            1;
-//shapes[dexagon  ].count                   =            1;
-//shapes[randogon ].count                   =            1;
-//shapes[umbrella ].count                   =            1;
-//---------------------------------------------------------
+  shapes[triangle ].count                   =            1;
+  //Disabled Shapes----------------------------------------
+  shapes[star     ].count                   =            0;
+  shapes[nautilus ].count                   =            0;
+  shapes[blob     ].count                   =            0;
+  shapes[claw     ].count                   =            0;
+  shapes[flame    ].count                   =            0;
+  shapes[pollen   ].count                   =            0;
+  shapes[ellipse  ].count                   =            0;
+  shapes[mountain ].count                   =            0;
+  shapes[octagon  ].count                   =            0;
+  shapes[polygon  ].count                   =            0;
+  shapes[dexagon  ].count                   =            0;
+  shapes[randogon ].count                   =            0;
+  shapes[umbrella ].count                   =            0;
+  //-------------------------------------------------------
   //Adjust each shape's specific parameters----------------
   //Always true if statements used to allow code folding---
   //-------------------------------------------------------
@@ -241,7 +242,8 @@ function defaultShapes() {
     shapes[ square    ].rotation.a.delta    =          7.5;
     shapes[ square    ].rotation.a.scaler   =         1.25;
     shapes[ square    ].rotation.a.rate     =            1;
-    shapes[ square    ].scale.s.kind        =        fixed; //Scale
+    shapes[ square    ].scale.x.kind        =        fixed; //Scale
+    shapes[ square    ].scale.y.kind        =        fixed;
     shapes[ square    ].size.h.kind         =       random; //Size
     shapes[ square    ].size.h.val          =            1;
     shapes[ square    ].size.h.min          =           30;
@@ -368,32 +370,20 @@ function defaultObjects() {
 //Default shape object template that all shape kinds share---------------------
 function defaultShapeTemplate() {
   let out = Object.create(null);
-  out['count'   ] =      0;
-  out['max'     ] =     10;
-  out['points'  ] =      1;  
-  out['kind'    ] = normal; 
-  out['fill'    ] = random;
-  out['filter'  ] = random;
-  out['size'    ] = new Size;
-  out['skew'    ] = new Skew;
-  out['scale'   ] = new Scale;
-  out['stroke'  ] = defaultShapeStrokeTemplate();
+  out[     'max'] =     10;
+  out[   'count'] =      0;
+  out[  'points'] =      1;  
+  out[  'filter'] = random;
+  out[    'fill'] = random;
+  out[    'kind'] = normal; 
+  out[    'size'] = new Size;
+  out[    'skew'] = new Skew;
+  out[   'scale'] = new Scale;
+  out[  'stroke'] = new Stroke;
   out['position'] = new Position;
   out['rotation'] = new Rotation;
   //console.log(out);  //DEBUG
   return out;  
-}//----------------------------------------------------------------------------
-
-//Default templates for a shape object's properties----------------------------
-function defaultShapeSizeTemplate()     { return new Size;     }
-function defaultShapeStrokeTemplate()   { return new Stroke;   }
-function defaultShapePositionTemplate() { return new Position; }
-function defaultShapeRotationTemplate() { return new Rotation; }
-function defaultShapeScaleTemplate()    { return new Scale;    }
-function defaultShapeSkewTemplate()     {
-  let out = Object.create(null);
-  out[q]  = new Val('quantity');
-  return new Skew;
 }//----------------------------------------------------------------------------
 
 //Default template for a shape's grid object-----------------------------------
@@ -430,14 +420,17 @@ function defaultDuration() { return Object.create(null); }
 //Default options for calling shape generator functions------------------------
 function defaultOptions() {
   let out = Object.create(null);
-  out['oid'     ] = 777; 
-  out['name'    ] = 'unknown'; 
-  out['fill'    ] = '';
-  out['filters' ] = ''; 
-  out['events'  ] = '';
-  out['size'    ] = defaultShapeSizeTemplate();
-  out['stroke'  ] = defaultShapeStrokeTemplate();
-  out['position'] = defaultShapePositionTemplate();
+  out[     'oid'] = 777; 
+  out[    'name'] = 'unknown'; 
+  out[    'fill'] = '';
+  out[  'events'] = '';
+  out[ 'filters'] = ''; 
+  out[    'size'] = new Size;
+  out[    'skew'] = new Skew;
+  out[   'scale'] = new Scale;
+  out[  'stroke'] = new Stroke;
+  out['position'] = new Position;
+  out['rotation'] = new Rotation;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -457,6 +450,15 @@ function svgDefaults() {
   out['gradients'] = defaultGradients();
   return out;
 }//----------------------------------------------------------------------------
+
+//Default templates for a shape object's properties----------------------------
+//function defaultShapeSizeTemplate()     { return new Size;     }
+//function defaultShapeSkewTemplate()     { return new Skew;     }
+//function defaultShapeScaleTemplate()    { return new Scale;    }
+//function defaultShapeStrokeTemplate()   { return new Stroke;   }
+//function defaultShapePositionTemplate() { return new Position; }
+//function defaultShapeRotationTemplate() { return new Rotation; }
+//----------------------------------------------------------------------------
 
 /******************************************************************************
 ************* Below are all the functions that generate shapes ****************
@@ -2579,7 +2581,8 @@ class Rotation {
 //Scale parameters of a shape---------------------------------------------------
 class Scale {
   constructor() {
-    this.s = new Val('amount', { val:1.5, min:0, max:5, kind:none, delta:0.1, scaler:1.01 });
+    this.x = new Val('amount', { val:1.5, min:0, max:5, kind:none, delta:0.1, scaler:1.01 });
+    this.y = new Val('amount', { val:1.5, min:0, max:5, kind:none, delta:0.1, scaler:1.01 });    
   }
 }//----------------------------------------------------------------------------
 
@@ -2608,10 +2611,10 @@ class Shape {
     this.n        =      0;  //Iterator number
     this.count    =      0;  //Number of instance
     this.pcount   =      1;  //Number of points
-    this.points   = [ new Point ];  //All shapes have cx,cy
-    this.kind     = normal;  //Normal (Boxy) or Radial
     this.fill     = random;
     this.filter   = random;
+    this.kind     = normal;  //Normal (Boxy) or Radial
+    this.points   = [ new Point ]; //Index zero of points is the shape's cx,cy
     this.grid     = new Grid(name);
     this.size     = new Size;
     this.skew     = new Skew;
