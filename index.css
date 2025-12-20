@@ -31,3 +31,20 @@ svg { width: 100%; }
   color: black;  /* used by SVG bounding box */
   overflow: hidden;
 }
+
+#svgen-ui {
+  position: absolute;
+  width: 79%;
+  height: 100vh;
+  top: 0;
+  left: -78.75%;
+  background: black;
+  background: linear-gradient(135deg, #444, #333, #222, #111);
+  border-right: 1px solid gold;
+  transition-duration: 50ms;
+  
+  &:hover {
+    left: -20%;
+  }
+
+}

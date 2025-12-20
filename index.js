@@ -1,4 +1,4 @@
-let version = '0.046'; //Commits + 1
+let version = '0.047'; //Commits + 1
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
@@ -49,23 +49,21 @@ function defaultEnabled() {
   out['anchors'  ] = false;  //true, false, or color
   out['position' ] = false;  //true, false, or color
   out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
-  out['filters'  ] = true;
+  out['filters'  ] =  true;
   out['variants' ] = false;  //TODO
-  out['gradients'] = true;
+  out['gradients'] =  true;
   out['animation'] = false;  //TODO
   return out;
 }//----------------------------------------------------------------------------
 
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
-  let out   = new   Grid;
-//out.kind  =     normal;
-//out.kind  =     radial;
-//out.kind  =     spiral;
-out.show  =      false;
-//out.end.y.val =    0;
-//out.order =   backward;
-  console.log(out);
+  let out  = new Grid(system); 
+  out.kind =     normal;
+  out.kind =     spiral;
+  out.kind =     radial;
+  out.show =       true;
+  out.show =      false;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -78,16 +76,16 @@ function defaultShapes() {
   });//----------------------------------------------------
   
   //Enabled Shapes-----------------------------------------
-  //shapes[square   ].count                   =          105;
-  shapes[hexagon  ].count                   =            0;
+  shapes[square   ].count                   =            3;
   shapes[corner   ].count                   =            4;
+  shapes[hexagon  ].count                   =            2;
   shapes[circle   ].count                   =            7;
+  shapes[triangle ].count                   =            2;
   shapes[pentagon ].count                   =            1;
   shapes[flower   ].count                   =            1;
   shapes[oddagon  ].count                   =            2;
   shapes[cloud    ].count                   =            1;
-  shapes[rectangle].count                   =            3;
-  shapes[triangle ].count                   =            2;
+  shapes[rectangle].count                   =            2;
   //Disabled Shapes----------------------------------------
   shapes[star     ].count                   =            0;
   shapes[nautilus ].count                   =            0;
@@ -106,38 +104,61 @@ function defaultShapes() {
   //Adjust each shape's specific parameters----------------
   //Always true if statements used to allow code folding---
   //-------------------------------------------------------
-  if (      circle    ) {//-------------------------CIRCLES
-    shapes[ circle    ].position.cx.kind    =       random;
-    shapes[ circle    ].position.cy.kind    =       random;
+  if (      circle    ) {//-------------------------CIRCLES  
+  //shapes[ circle    ].fill                =           '';
+    //--------------------------------------POSITION-------
+  //shapes[ circle    ].position.cx.kind    =       ongrid;
+  //shapes[ circle    ].position.cy.kind    =       ongrid;
     shapes[ circle    ].position.cx.max     =         1600;
     shapes[ circle    ].position.cy.max     =          900;
-    shapes[ circle    ].position.cx.val     =          500;
+    shapes[ circle    ].position.cx.val     =          980;
     shapes[ circle    ].position.cy.val     =          500;
-    shapes[ circle    ].position.cx.delta   =          100;
-    shapes[ circle    ].position.cy.delta   =          -25;
+    shapes[ circle    ].position.cx.delta   =           -3;
+    shapes[ circle    ].position.cy.delta   =            2;
     shapes[ circle    ].position.cx.scaler  =        1.125;
     shapes[ circle    ].position.cy.scaler  =       -1.125;
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
+  //shapes[ circle    ].size.r.kind         =        fixed;
+    shapes[ circle    ].size.r.val          =          135;
     shapes[ circle    ].size.r.min          =           30;
     shapes[ circle    ].size.r.max          =          400;
-    shapes[ circle    ].stroke.opacity      =         0.15;    
+    shapes[ circle    ].size.r.delta        =            3;
+    //--------------------------------------SKEW-----------
+    shapes[ circle    ].skew.y.kind         =         none;
+    shapes[ circle    ].skew.y.val          =            1;
+    shapes[ circle    ].skew.y.delta        =            5;
+    shapes[ circle    ].skew.y.rate         =            1;
+    //--------------------------------------STROKE---------
+  //shapes[ circle    ].stroke.swidth       =            0;
+  //shapes[ circle    ].stroke.scolor       =  '#550099';
+  //shapes[ circle    ].stroke.opacity      =         0.10;
   }//------------------------------------------------------
   if (      corner    ) {//-------------------------CORNERS
     shapes[ corner    ].filter              =           '';
+    //--------------------------------------STROKE---------
     shapes[ corner    ].stroke.swidth       =            0;
     shapes[ corner    ].stroke.opacity      =            0;      
   }//------------------------------------------------------    
   if (      flower    ) {//-------------------------FLOWERS
     shapes[ flower    ].filter              =         glow;
+    //--------------------------------------POSITION-------
     shapes[ flower    ].position.cx.max     =         1400;
     shapes[ flower    ].position.cy.max     =          700;
+    //--------------------------------------ROTATION-------
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
     shapes[ flower    ].size.r.max          =          140;
     shapes[ flower    ].size.r.max          =           40;
+    //--------------------------------------SKEW-----------
+    //--------------------------------------STROKE---------
     shapes[ flower    ].stroke.swidth       =            0;    
   }//------------------------------------------------------
   if (      hexagon   ) {//------------------------HEXAGONS
-    shapes[ hexagon   ].fill                =         solid;
-    shapes[ hexagon   ].position.cx.kind    =       ongrid;
-    shapes[ hexagon   ].position.cy.kind    =       ongrid;
+  //shapes[ hexagon   ].fill                =        solid;
+    //--------------------------------------POSITION-------
+  //shapes[ hexagon   ].position.cx.kind    =       ongrid;
+  //shapes[ hexagon   ].position.cy.kind    =       ongrid;
     shapes[ hexagon   ].position.cx.max     =         1600;
     shapes[ hexagon   ].position.cy.max     =          900;
     shapes[ hexagon   ].position.cx.val     =          900;
@@ -148,15 +169,19 @@ function defaultShapes() {
     shapes[ hexagon   ].position.cy.delta   =          -10;
     shapes[ hexagon   ].position.cy.scaler  =        1.083;
     shapes[ hexagon   ].position.cy.rate    =            1;
-    shapes[ hexagon   ].rotation.a.kind     =        fixed;
+    //--------------------------------------ROTATION-------
+  //shapes[ hexagon   ].rotation.a.kind     =        fixed;
     shapes[ hexagon   ].rotation.a.val      =           15;
     shapes[ hexagon   ].rotation.a.delta    =          -10;
     shapes[ hexagon   ].rotation.a.rate     =            1;
-    shapes[ hexagon   ].size.r.kind         =        fixed;
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
+  //shapes[ hexagon   ].size.r.kind         =        fixed;
     shapes[ hexagon   ].size.r.val          =           98;
     shapes[ hexagon   ].size.r.delta        =           -6;
     shapes[ hexagon   ].size.r.scaler       =       -1.090;
     shapes[ hexagon   ].size.r.rate         =            1;
+    //--------------------------------------SKEW-----------
     shapes[ hexagon   ].skew.x.kind         =         none;
     shapes[ hexagon   ].skew.x.val          =          -10;
     shapes[ hexagon   ].skew.x.delta        =         0.25;
@@ -165,31 +190,45 @@ function defaultShapes() {
     shapes[ hexagon   ].skew.y.delta        =        -0.25;
     shapes[ hexagon   ].skew.y.scaler       =       -1.025;
     shapes[ hexagon   ].skew.y.rate         =            1;
-    shapes[ hexagon   ].stroke.swidth       =            2;
+    //--------------------------------------STROKE---------
+  //shapes[ hexagon   ].stroke.swidth       =            2;
     shapes[ hexagon   ].stroke.scolor       =        color;
     shapes[ hexagon   ].stroke.opacity      =         0.15;
   }//------------------------------------------------------
   if (      nautilus  ) {//-------------------------NAUTILI
+    //--------------------------------------POSITION-------
     shapes[ nautilus  ].position.cx.max     =         1600;
     shapes[ nautilus  ].position.cy.max     =          900;
+    //--------------------------------------ROTATION-------
     shapes[ nautilus  ].rotation.a.kind     =       random;
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
     shapes[ nautilus  ].size.r.min          =          180;
     shapes[ nautilus  ].size.r.max          =          420;
     shapes[ nautilus  ].size.r.val          =          240;
     shapes[ nautilus  ].size.r.delta        =           60;
     shapes[ nautilus  ].size.r.scaler       =            1;
+    //--------------------------------------SKEW-----------
+    //--------------------------------------STROKE---------
     shapes[ nautilus  ].stroke.opacity      =         0.10;    
   }//------------------------------------------------------
   if (      oddagon   ) {//------------------------ODDAGONS
     shapes[ oddagon   ].filter              =        dance;
+    //--------------------------------------POSITION-------
     shapes[ oddagon   ].position.cx.max     =         1900;
     shapes[ oddagon   ].position.cy.max     =          900;
+    //--------------------------------------ROTATION-------
     shapes[ oddagon   ].rotation.a.kind     =       random;
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
     shapes[ oddagon   ].size.r.min          =           30;
     shapes[ oddagon   ].size.r.max          =          130;
+    //--------------------------------------SKEW-----------
+    //--------------------------------------STROKE---------
   }//------------------------------------------------------
   if (      pentagon  ) {//-----------------------PENTAGONS
     shapes[ pentagon  ].fill                =       random;
+    //--------------------------------------POSITION-------
     shapes[ pentagon  ].position.cx.kind    =       random;
     shapes[ pentagon  ].position.cy.kind    =       random;
     shapes[ pentagon  ].position.cx.max     =         1900;
@@ -202,16 +241,22 @@ function defaultShapes() {
     shapes[ pentagon  ].position.cy.delta   =           -5;
     shapes[ pentagon  ].position.cy.scaler  =        1.083;
     shapes[ pentagon  ].position.cy.rate    =            1;
+    //--------------------------------------ROTATION-------
     shapes[ pentagon  ].rotation.a.kind     =       random;
     shapes[ pentagon  ].rotation.a.val      =        -17.5;
     shapes[ pentagon  ].rotation.a.delta    =           72;
     shapes[ pentagon  ].rotation.a.rate     =            5;
+    //--------------------------------------SCALE----------
+    shapes[ pentagon  ].scale.x.kind        =         none;
+    shapes[ pentagon  ].scale.y.kind        =         none;
+    //--------------------------------------SIZE-----------
     shapes[ pentagon  ].size.r.kind         =       random;
     shapes[ pentagon  ].size.r.max          =          100;
     shapes[ pentagon  ].size.r.val          =            4;
     shapes[ pentagon  ].size.r.delta        =          -14;
     shapes[ pentagon  ].size.r.scaler       =       -1.089;
     shapes[ pentagon  ].size.r.rate         =            1;
+    //--------------------------------------SKEW-----------
     shapes[ pentagon  ].skew.x.kind         =         none;
     shapes[ pentagon  ].skew.x.val          =          -15;
     shapes[ pentagon  ].skew.x.delta        =         0.25;
@@ -220,68 +265,131 @@ function defaultShapes() {
     shapes[ pentagon  ].skew.y.delta        =        -0.25;
     shapes[ pentagon  ].skew.y.scaler       =       -1.025;
     shapes[ pentagon  ].skew.y.rate         =            2;    
+    //--------------------------------------STROKE---------
     shapes[ pentagon  ].stroke.swidth       =       random;
     shapes[ pentagon  ].stroke.opacity      =         0.35;
   }//------------------------------------------------------
   if (      rectangle ) {//----------------------RECTANGLES
     shapes[ rectangle ].fill                =   RC(sunset);
     shapes[ rectangle ].filter              =     oblivion;
+    //--------------------------------------POSITION-------
+    //--------------------------------------ROTATION-------
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
     shapes[ rectangle ].size.w.min          =          400;
     shapes[ rectangle ].size.h.min          =          300;
     shapes[ rectangle ].size.w.max          =            0;
-    shapes[ rectangle ].size.h.max          =            0;    
+    shapes[ rectangle ].size.h.max          =            0;
+    //--------------------------------------SKEW-----------
+    //--------------------------------------STROKE---------
   }//------------------------------------------------------
   if (      square    ) {//-------------------------SQUARES
-    shapes[ square    ].fill                =    ''; //RC(clear);
-    shapes[ square    ].position.cx.kind    =       ongrid; //Position
-    shapes[ square    ].position.cy.kind    =       ongrid;
+    shapes[ square    ].fill                ='#99000033'; //RC(clear);
+    //--------------------------------------CORNER---------
+    shapes[ square    ].corner.rx.kind      =        fixed;
+    shapes[ square    ].corner.ry.kind      =        fixed;
+    shapes[ square    ].corner.rx.val       =           20;
+    shapes[ square    ].corner.ry.val       =           20;
+    shapes[ square    ].corner.rx.delta     =            1;
+    shapes[ square    ].corner.ry.delta     =            1;
+    //--------------------------------------POSITION-------
+  //shapes[ square    ].position.cx.kind    =       ongrid;
+  //shapes[ square    ].position.cy.kind    =       ongrid;
     shapes[ square    ].position.cx.val     =           20;
     shapes[ square    ].position.cy.val     =           20;
     shapes[ square    ].position.cx.delta   =           76;
     shapes[ square    ].position.cy.delta   =         22.5;
     shapes[ square    ].position.cx.scaler  =        1.175;
     shapes[ square    ].position.cy.scaler  =      -1.0695;
-    shapes[ square    ].rotation.a.kind     =         none; //Rotation
+    //--------------------------------------ROTATION-------
+  //shapes[ square    ].rotation.a.kind     =    alternate;
     shapes[ square    ].rotation.a.val      =            0;
-    shapes[ square    ].rotation.a.delta    =           15;
+    shapes[ square    ].rotation.a.delta    =           45;
     shapes[ square    ].rotation.a.scaler   =         1.25;
-    shapes[ square    ].rotation.a.rate     =            6;
-    shapes[ square    ].scale.x.kind        =        fixed; //Scale
-    shapes[ square    ].scale.y.kind        =        fixed;
-    shapes[ square    ].size.h.kind         =    alternate; //Size
-    shapes[ square    ].size.h.val          =           90;
-    shapes[ square    ].size.h.min          =           40;
-    shapes[ square    ].size.h.max          =          500;
-    shapes[ square    ].size.h.delta        =           30;
+    shapes[ square    ].rotation.a.rate     =            2;
+    //--------------------------------------SCALE----------
+  //shapes[ square    ].scale.x.kind        =       random;
+  //shapes[ square    ].scale.y.kind        =       random;
+    //--------------------------------------SIZE-----------
+  //shapes[ square    ].size.h.kind         =    alternate;
+    shapes[ square    ].size.h.val          =           83;
+    shapes[ square    ].size.h.min          =           50;
+    shapes[ square    ].size.h.max          =          400;
+    shapes[ square    ].size.h.delta        =          118;
     shapes[ square    ].size.h.scaler       =        1.115;
     shapes[ square    ].size.h.rate         =            2;
-    shapes[ square    ].skew.x.kind         =         none; //Skew X
-    shapes[ square    ].skew.x.val          =           -1;
-    shapes[ square    ].skew.x.delta        =            1;
+    //--------------------------------------SKEW-----------
+    shapes[ square    ].skew.x.kind         =         none;
+    shapes[ square    ].skew.x.val          =            0;
+    shapes[ square    ].skew.x.delta        =           18;
     shapes[ square    ].skew.x.scaler       =        1.225;
-    shapes[ square    ].skew.x.rate         =            1;
-    shapes[ square    ].skew.y.kind         =         none; //Skew Y
-    shapes[ square    ].skew.y.val          =           -1;
-    shapes[ square    ].skew.y.delta        =            1;
+    shapes[ square    ].skew.x.rate         =            6;
+    shapes[ square    ].skew.y.kind         =         none;
+    shapes[ square    ].skew.y.val          =            0;
+    shapes[ square    ].skew.y.delta        =          -40;
     shapes[ square    ].skew.y.scaler       =        1.025;
-    shapes[ square    ].skew.y.rate         =            1;
-    shapes[ square    ].stroke.swidth       =            2; //Stroke
-    shapes[ square    ].stroke.scolor       =         gold;    
-    shapes[ square    ].stroke.opacity      =         0.75;    
+    shapes[ square    ].skew.y.rate         =            4;
+    //--------------------------------------STROKE---------
+    shapes[ square    ].stroke.swidth       =            2;
+    shapes[ square    ].stroke.scolor       =         gold;
+    shapes[ square    ].stroke.opacity      =         0.25;
   }//------------------------------------------------------
   if (      star      ) {//---------------------------STARS
     shapes[ star      ].filter              =        dance;
+    //--------------------------------------POSITION-------
+    //--------------------------------------ROTATION-------
     shapes[ star      ].rotation.a.kind     =       random;
+    //--------------------------------------SCALE----------
+    //--------------------------------------SIZE-----------
     shapes[ star      ].size.r.min          =           20;
     shapes[ star      ].size.r.max          =          200;
-    shapes[ star      ].stroke.swidth       =            0;    
+    //--------------------------------------SKEW-----------
+    //--------------------------------------STROKE---------
+    shapes[ star      ].stroke.swidth       =            0;
   }//------------------------------------------------------
   if (      triangle  ) {//-----------------------TRIANGLES
+  //shapes[ triangle  ].fill                = '#99000033'; //RC(clear);
     shapes[ triangle  ].filter              =         glow;
-    shapes[ triangle  ].rotation.a.kind     =       random;    
+    //--------------------------------------POSITION-------
+    shapes[ triangle  ].position.cx.kind    =       random;
+    shapes[ triangle  ].position.cy.kind    =       random;
+    shapes[ triangle  ].position.cx.max     =         1600;
+    shapes[ triangle  ].position.cy.max     =          900;
+    shapes[ triangle  ].position.cx.val     =          980;
+    shapes[ triangle  ].position.cy.val     =          500;
+    shapes[ triangle  ].position.cx.delta   =            0;
+    shapes[ triangle  ].position.cy.delta   =            0;
+    //--------------------------------------ROTATION-------
+    shapes[ triangle  ].rotation.a.kind     =       random;
+    shapes[ triangle  ].rotation.a.val      =            0;
+    shapes[ triangle  ].rotation.a.delta    =           15;
+    //--------------------------------------SCALE----------
+    shapes[ triangle  ].scale.x.kind        =         none;
+    shapes[ triangle  ].scale.y.kind        =         none;
+    //--------------------------------------SIZE-----------
+    shapes[ triangle  ].size.r.kind         =       random;
+    shapes[ triangle  ].size.r.val          =           50;
+    shapes[ triangle  ].size.r.min          =           30;
+    shapes[ triangle  ].size.r.max          =          400;
+    shapes[ triangle  ].size.r.delta        =            3;
+    //--------------------------------------SKEW-----------
+    shapes[ triangle  ].skew.x.kind         =         none;
+    shapes[ triangle  ].skew.y.kind         =         none;
+    //--------------------------------------STROKE---------
+  //shapes[ triangle  ].stroke.swidth       =            0;
   }//------------------------------------------------------
   if (      umbrella  ) {//-----------------------UMBRELLAS
+    //--------------------------------------POSITION-------
+    shapes[ umbrella  ].position.cx.kind    =       random;
+    //--------------------------------------ROTATION-------
     shapes[ umbrella  ].rotation.a.kind     =       random;
+    //--------------------------------------SCALE----------
+    shapes[ umbrella  ].scale.x.kind        =         none;
+    //--------------------------------------SIZE-----------
+    shapes[ umbrella  ].size.r.kind         =       random;
+    //--------------------------------------SKEW-----------
+    shapes[ umbrella  ].skew.x.kind         =         none;
+    //--------------------------------------STROKE---------
   }//------------------------------------------------------
 //if (      blob      ) {//---------------------------BLOBS}
 //if (      bullet    ) {//-------------------------BULLETS}
@@ -299,6 +407,12 @@ function defaultShapes() {
 //if (      polygon   ) {//------------------------POLYGONS}
 //if (      randogon  ) {//-----------------------RANDOGONS}
 //if (      wave      ) {//---------------------------WAVES}
+//--------------------------------------POSITION-------
+//--------------------------------------ROTATION-------
+//--------------------------------------SCALE----------
+//--------------------------------------SIZE-----------
+//--------------------------------------SKEW-----------
+//--------------------------------------STROKE---------
   //-------------------------------------------------------
   //console.log(shapes); //DEBUG
   return shapes;
@@ -368,35 +482,6 @@ function defaultObjects() {
   return out;
 }//----------------------------------------------------------------------------
 
-/******************************************************************************
-*********************** Object template defaults below ************************
-******************************************************************************/
-
-//Default shape object template that all shape kinds share---------------------
-function defaultShapeTemplate() {
-  let out = Object.create(null);
-  out[     'max'] =     10;
-  out[   'count'] =      0;
-  out[  'points'] =      1;  
-  out[  'filter'] = random;
-  out[    'fill'] = random;
-  out[    'kind'] = normal; 
-  out[    'grid'] = new Grid;
-  out[    'size'] = new Size;
-  out[    'skew'] = new Skew;
-  out[   'scale'] = new Scale;
-  out[  'stroke'] = new Stroke;
-  out['position'] = new Position;
-  out['rotation'] = new Rotation;
-  //console.log(out);  //DEBUG
-  return out;  
-}//----------------------------------------------------------------------------
-
-//Variants and Duration are not in use yet-------------------------------------
-function defaultVariants() { return Object.create(null); }
-function defaultDuration() { return Object.create(null); }
-//-----------------------------------------------------------------------------
-
 //Default options for calling shape generator functions------------------------
 function defaultOptions() {
   let out = Object.create(null);
@@ -432,15 +517,10 @@ function svgDefaults() {
   return out;
 }//----------------------------------------------------------------------------
 
-//Default templates for a shape object's properties----------------------------
-//function defaultShapeGridTemplate()     { return new Grid;     }
-//function defaultShapeSizeTemplate()     { return new Size;     }
-//function defaultShapeSkewTemplate()     { return new Skew;     }
-//function defaultShapeScaleTemplate()    { return new Scale;    }
-//function defaultShapeStrokeTemplate()   { return new Stroke;   }
-//function defaultShapePositionTemplate() { return new Position; }
-//function defaultShapeRotationTemplate() { return new Rotation; }
-//----------------------------------------------------------------------------
+//NOT IN USE YET: Variants and Duration----------------------------------------
+function defaultVariants() { return Object.create(null); }
+function defaultDuration() { return Object.create(null); }
+//-----------------------------------------------------------------------------
 
 /******************************************************************************
 ************* Below are all the functions that generate shapes ****************
@@ -525,6 +605,8 @@ function svgRect (oid = 'no-order-id', square = false, options = opt) {
   let w         = square ? h : options.size.w; //Make w = h when squares are requested
   let cx        = options.position.cx;
   let cy        = options.position.cy;
+  let rx        = options.corner.rx;
+  let ry        = options.corner.ry;
   let x         = roundInt(cx - (w/2), 1);
   let y         = roundInt(cy - (h/2), 1);
   let transform = options.transform;
@@ -548,6 +630,8 @@ function svgRect (oid = 'no-order-id', square = false, options = opt) {
   render += open;
   render += `x="${x}" `;
   render += `y="${y}" `;
+  render += `rx="${rx}" `;
+  render += `ry="${ry}" `;
   render +=  `width="${w}" `;
   render += `height="${h}" `;
   render += fill;
@@ -980,8 +1064,6 @@ function svgNautilus(oid = 'no-order-id', options = opt) {
   return output;
 }//----------------------------------------------------------------------------
 
-
-
 /******************************************************************************
 ************* Below are all the miscellaneous helper functions ****************
 ******************************************************************************/
@@ -1175,12 +1257,31 @@ function determineSkew(shape) {
   return out;
 }//----------------------------------------------------------------------------
 
-function determineFill(shape) {
-  let ben = new Color({hex:'#FF990099'});
-  let out = ben.steps(total,'#9900FF99');
-  return out[counter[shape]];
-}
+//Figure out an object scale based on its shape configuration-------------------
+function determineScale(shape) {
+  let out   = Object.create(null);
+  let scale = svgconf.shapes[shape].scale;
+  //Round to 2 decimal points
+  out.x     = determineValue(scale.x, counter[shape]);
+  out.y     = determineValue(scale.y, counter[shape]);
+  return out;
+}//----------------------------------------------------------------------------
 
+//Figure out an object corner rounding based on its shape configuration--------
+function determineCorner(shape) {
+  let out    = Object.create(null);
+  let corner = svgconf.shapes[shape].corner;
+  out.rx     = roundInt(determineValue(corner.rx, counter[shape]),1);
+  out.ry     = roundInt(determineValue(corner.ry, counter[shape]),1);
+  return out;
+}//----------------------------------------------------------------------------
+
+//Figure out an object fill color based on its shape configuration-------------
+function determineFill(shape) {
+  let ben = new Color({hex:'#FF990011'});
+  let out = ben.steps(TOTAL,'#55008866');
+  return out[counter[shape]];
+}//----------------------------------------------------------------------------
 
 //Generates a random #RRGGBBAA color-------------------------------------------
 function cornerColor(alpha=true, rs=0, re=256, gs=0, ge=256, bs=0, be=256, as=0, ae=256) {
@@ -1919,7 +2020,7 @@ function parseConf() {
     alert('Warning: number of objects exceed ' + d.objects.max);
   }
 
-  total = t; //Copy the total shapes count value into a global variable
+  TOTAL = t; //Copy the total shapes count value into a global variable
 
   //Now that we know our total number of shapes let's decipher the rest of variable
   Object.keys(shapes).forEach(shape => {
@@ -1931,7 +2032,7 @@ function parseConf() {
   
     if (shapes[shape].fill) { //Determine what kind of fill to use per shape
       if (shapes[shape].fill === true  ) shapes[shape].fill = solid; //true means solid
-      if (shapes[shape].fill === solid ) shapes[shape].fill = 'var(--c'+randomInt(1, total)+')';
+      if (shapes[shape].fill === solid ) shapes[shape].fill = 'var(--c'+randomInt(1, TOTAL)+')';
       if (shapes[shape].fill === system) shapes[shape].fill = objects.fill;
       if (shapes[shape].fill === none  ) shapes[shape].fill = false;
       //All else means it's either set to random or a preselected #color
@@ -2054,7 +2155,7 @@ function svgGradients(kind = 'L') {
   }
 
   if (svgconf.enabled.gradients) {
-    for (let i=1; i <= total; i++) {
+    for (let i=1; i <= TOTAL; i++) {
       output += svgGrad(svgid+'-'+i, ((i % 2) ? 'L' : 'R'));
     }
   } else {
@@ -2171,15 +2272,18 @@ function svgContent() {
     options['filter'   ] = filter;
     options['fill'     ] = fill;
     options['grid'     ] = svgconf.shapes[shape].grid;
-    options['size'     ] = determineSize(shape);
+    options['size'     ] = determineSize(    shape);
     options['position' ] = determinePosition(shape);
-    options['events'   ] = ' onclick="this.style.fill = RC()" ';
+    options['corner'   ] = determineCorner(  shape);
+    options['events'   ] = ' onclick="this.style.fill = RC(sunset)" ';
 
-    let skew      = determineSkew(shape);
+    let skew      = determineSkew(    shape);
+    let scale     = determineScale(   shape);
     let rotation  = determineRotation(shape);
     let transform = (rotation || skew) ? ' transform="' : '';
-    transform    += rotation ? 'rotate('+rotation+') ' : '';
-    transform    += skew ? 'skewX('+skew.x+') skewY('+skew.y+') ' : '';
+    transform    += rotation ? 'rotate('+rotation+') ':'';
+  //transform    += scale    ? 'scaleX('+scale.x +') '+'scaleY('+scale.y+') ' : '';
+    transform    += skew     ?  'skewX('+ skew.x +') '+ 'skewY('+ skew.y+') ' : '';
     transform    += transform ? '" transform-origin="center center" ' : '';
     options['transform'] = transform;  
     //console.log(options);  //DEBUG
@@ -2215,11 +2319,11 @@ function svgContent() {
   return output
 }//----------------------------------------------------------------------------
 
+//Show the grid cross marks if enabled----------------------------------------- 
 function svgShowGrid() {
   let output  = '';
   if (svgconf.enabled.grid) {
-    GRID = svgGridPoints(svgconf.grid);
-    //console.log(GRID); //DEBUG
+    GRID = svgGridPoints(svgconf.grid);  //console.log(GRID); //DEBUG
 
     for (let i=1; i<GRID.length; i++) {
       let x = GRID[i].x;
@@ -2339,7 +2443,7 @@ const initializeSVGen = svgOnce(function() {
   info += "-----------------------\r\n";
   info += "[ svgen ver : "+String(version).padStart(5, ' ')+'   ]\r\n';
   info += "[ instances : "+String(icount ).padStart(5, ' ')+'   ]\r\n';
-  info += "[  elements : "+String(total  ).padStart(5, ' ')+'   ]\r\n';
+  info += "[  elements : "+String(TOTAL  ).padStart(5, ' ')+'   ]\r\n';
   info += "[   filters : "+String(fcount ).padStart(5, ' ')+'   ]\r\n';
   info += "[    shapes : "+String(scount ).padStart(5, ' ')+'   ]\r\n';
   info += "[    colors : "+String(colors ).padStart(5, ' ')+'   ]\r\n';
@@ -2358,11 +2462,52 @@ const initializeSVGen = svgOnce(function() {
 *************** Class definitions for the various objects below ***************
 ******************************************************************************/
 
+class Interval {
+  constructor(count=1000, kind='random') {
+    this.count = count;
+    this.kind  =  kind;
+    this.no    =     1;
+  }
+}
+
+//Any value needing constraints, or incremental, exponential functions---------
+class Val {
+  constructor(name=       'anon', {
+    kind          =       random,
+    val           =            0,
+    min           =            0,
+    max           =            0,
+    sys           =            0,
+    num           =            0,
+    func          =         null,
+    rate          =            1,
+    delta         =            0,
+    scaler        =            0,
+    angular       =            0,
+    on            = new Interval,
+    off           = new Interval,
+  } = {}) {
+    this.name     =    name;
+    this.kind     =    kind;
+    this.val      =     val;
+    this.min      =     min;
+    this.max      =     max;
+    this.sys      =     sys;
+    this.num      =     num;
+    this.on       =      on;
+    this.off      =     off;
+    this.func     =    func;
+    this.rate     =    rate;
+    this.delta    =   delta;
+    this.scaler   =  scaler;
+    this.angular  = angular;
+  }  
+}//----------------------------------------------------------------------------
+
 //Any point on either a Cartesian or Radial grid-------------------------------
 class Point {
-  // Constructor
-  constructor() {
-    this.id = ''; //Name
+  constructor(id='') {
+    this.id = id; //Name
     this.cx = 0;  //Center X
     this.cy = 0;  //Center Y
     this.n  = 0;  //Itaration number
@@ -2389,34 +2534,12 @@ class Point {
   } 
 }//----------------------------------------------------------------------------
 
-//Any value needing constraints, incremental, exponential or angular functions-
-class Val {
-  constructor(name=  'anon', {
-    kind          =  random,
-    val           =       0, 
-    min           =       0, 
-    max           =       0,
-    sys           =       0,
-    num           =       0,
-    func          =    null,
-    rate          =       1,
-    delta         =       0,
-    scaler        =       0,
-    angular       =       0,
-  } = {}) {
-    this.name     =    name;
-    this.kind     =    kind;
-    this.val      =     val; 
-    this.min      =     min;
-    this.max      =     max;
-    this.sys      =     sys;
-    this.num      =     num;
-    this.func     =    func;
-    this.rate     =    rate;
-    this.delta    =   delta;
-    this.scaler   =  scaler;
-    this.angular  = angular;
-  }  
+//Contains specifications of rounded corners-----------------------------------
+class Corner {
+  constructor(maxr=50) {
+    this.rx = new Val('rx',{'max': maxr});  //Corner X
+    this.ry = new Val('ry',{'max': maxr});  //Corner Y
+  }
 }//----------------------------------------------------------------------------
 
 //Color in either RGBA or HSLA format------------------------------------------
@@ -2575,6 +2698,8 @@ class Stroke {
 
 //Generic shape template for other shapes to inherit their structure from------
 class Shape {
+  static counter = 0;
+
   constructor(name) {
     this.name     = name ?? shapor;  //Any name in shapeTypes
     this.n        =      0;  //Iterator number
@@ -2589,9 +2714,11 @@ class Shape {
     this.skew     = new Skew;
     this.color    = new Color;
     this.scale    = new Scale;
+    this.corner   = new Corner;
     this.stroke   = new Stroke;
     this.position = new Position;
     this.rotation = new Rotation;
+    this.counter++;
   }
 }//----------------------------------------------------------------------------
 
@@ -2605,39 +2732,51 @@ var svgid           = '123456789';
 var elements        = []; //Keeps track of each element data and rendered outputs
 var idStack         = []; //Keeps track of previous render 
 var GRID            = []; //Global Grid points
-var total           = 0;
+var TOTAL           = 0;
 var lastIndex       = 0;
 var anchorall       = '';
-//Syntax sugars to reduce typing ''
-const incremental   = 'incremental';
-const exponential   = 'exponential';
-const functional    = 'functional';
-const alternate     = 'alternate';
+//Deterministic function types-----------------------------
+const incremental   = 'incremental';  //Current value + its delta
+const exponential   = 'exponential';  //Current value * its scaler
+const functional    = 'functional';   //NOT IN USE YET / eval your own fuction
+const alternate     = 'alternate';    //Alternates between fixed and incremental based on rate  
+const intervals     = 'intervals';    //NOT IN USE YET / few of this type, few of that
+const selfgrid      = 'selfgrid';     //NOT IN USE YET / Snap to shape type's own grid 
+const surprise      = 'surprise';     //NOT IN USE YET / Pick one from this list, except self  
+const angular       = 'angular';      //NOT IN USE YET / For sin & cos style wave functions
+const sysgrid       = 'sysgrid';      //NOT IN USE YET / Replacement for ongrid
+const ongrid        = 'ongrid';       //On system's main grid
+const random        = 'random';       //Pick a random value between min & max
+const fixed         = 'fixed';        //Stick to a predetermined value
+const kind          = 'kind';         //Any of the items listed above
+const functionTypes = new Array(      //NOT IN USE YET / To be used by UI
+  surprise    ,  //zero index to be exculded from surprise pick
+  random      ,  //most often used
+  ongrid      ,  //second most popular 
+  fixed       ,  //third popular
+  incremental ,  //fourth
+  exponential ,  //works
+  alternate   ,  //works
+  intervals   ,  //NOT IN USE
+  selfgrid    ,  //NOT IN USE
+  angular     ,  //NOT IN USE
+  sysgrid     ,  //NOT IN USE
+  functional  ,  //NOT IN USE
+);
+//Grid related syntax sugar--------------------------------
 const backward      = 'backward';
 const diagonal      = 'diagonal';
-const monotone      = 'monotone';
-const selected      = 'selected';
-const selfgrid      = 'selfgrid';
-const tritonal      = 'tritonal';
 const vertical      = 'vertical';
-const angular       = 'angular';
-const opacity       = 'opacity';
-const palette       = 'palette';
-const sysgrid       = 'sysgrid';
-const uniform       = 'uniform';
+const radial        = 'radial';
+const spiral        = 'spiral';
+//Syntax sugars to reduce adding qoutes around them--------
+const selected      = 'selected';
 const amount        = 'amount';
 const middle        = 'middle';
 const normal        = 'normal';
-const ongrid        = 'ongrid';
-const radial        = 'radial';
-const spiral        = 'spiral';
-const random        = 'random';
 const shapor        = 'shapor';
 const system        = 'system';
-const fixed         = 'fixed';
-const solid         = 'solid';
 const both          = 'both';
-const kind          = 'kind';
 const none          =  null ;
 const zero          = 'zero';
 const min           = 'min';   //Value
@@ -2646,12 +2785,12 @@ const tlc           = 'tlc';   //Top Left Corner
 const trc           = 'trc';   //Top Right Corner
 const blc           = 'blc';   //Bottom Left Corner
 const brc           = 'brc';   //Bottom Right Corner
-//Path related syntax sugars
+//Path related syntax sugars-------------------------------
 const arc           = 'arc';
 const quad          = 'quad';
 const cube          = 'cube';
 const line          = 'line';
-//Filter related syntax sugars
+//Filter related syntax sugars-----------------------------
 const bnw           = 'bnw';
 const glow          = 'glow';
 const tile          = 'tile';
@@ -2666,7 +2805,7 @@ const motionblurx   = 'motionblurx';
 const motionblury   = 'motionblury';
 const displacement  = 'displacement';
 const gaussianblur  = 'gaussianblur';
-//Array used for iterating filters
+//Array used for iterating filters-------------------------
 const filterTypes   = new Array(
   bnw          ,
   glow         ,
@@ -2683,8 +2822,13 @@ const filterTypes   = new Array(
   displacement ,
   gaussianblur ,
 );
-//Color related syntax sugars  
-const color         = '#222F';  //Default BG color
+//Color related syntax sugars------------------------------
+const monotone      = 'monotone';
+const tritonal      = 'tritonal';
+const palette       = 'palette';
+const opacity       = 'opacity';
+const uniform       = 'uniform';
+const solid         = 'solid';
 const black         = 'black';
 const white         = 'white';
 const green         = 'green';
@@ -2695,15 +2839,16 @@ const lime          = 'lime';
 const blue          = 'blue';
 const red           = 'red';
 const pink          = 'hotpink';
-const FFF3          = '#FFF3';
-const FFF6          = '#FFF6';
-const FFF9          = '#FFF9';
-const FFFC          = '#FFFC';
-const FF03          = '#FF03';
-const FF06          = '#FF06';
-const FF09          = '#FF09';
-const FF0C          = '#FF0C';
-//Color Palette names used by randomColor();
+const FFF3          = '#FFFFFF33';
+const FFF6          = '#FFFFFF66';
+const FFF9          = '#FFFFFF99';
+const FFFC          = '#FFFFFFCC';
+const FF03          = '#FFFF0033';
+const FF06          = '#FFFF0066';
+const FF09          = '#FFFF0099';
+const FF0C          = '#FFFF00CC';
+const color         = '#222222FF';  //Default BG color
+//Color Palette names used by randomColor();---------------
 const mids          = 'mids';
 const reds          = 'reds';
 const tint          = 'tint';
@@ -2732,7 +2877,7 @@ const square        = 'square';
 const ellipse       = 'ellipse';
 const mountain      = 'mountain';
 const rectangle     = 'rectangle';
-//Radial shapes below, boxy shapes above
+//Radial shapes below, boxy shapes above-------------------
 const star          = 'star';
 const heart         = 'heart';
 const circle        = 'circle';
@@ -2748,7 +2893,7 @@ const randogon      = 'randogon';
 const pentagon      = 'pentagon';
 const triangle      = 'triangle';
 const umbrella      = 'umbrella';
-//Array used for iterating shapes
+//Array used for iterating shapes--------------------------
 const shapeTypes    = new Array(
   corner    ,  //Bottom most layer
   blob      ,  //Boxy shapes  
@@ -2778,7 +2923,7 @@ const shapeTypes    = new Array(
   triangle  ,
   umbrella  ,
 );
-//Parse the conguration and run
+//Parse the conguration and run----------------------------
 let svgconf    = parseConf();
 const opt      = defaultOptions();
 const filters  = Object.keys(svgconf.filters);
@@ -2801,3 +2946,4 @@ const BRC      = { x:WIDTH , y:HEIGHT };
 
 //Make the whole thing run just once on page load
 window.addEventListener('load', initializeSVGen);
+//-----------------------------------------------------------------------------
