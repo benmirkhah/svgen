@@ -1,11 +1,8 @@
 ![Sample parametric output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/parametrix/svg-3ff846.svg)
 
-![Sample random output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/svgenout/svg-2cf493.svg)
-
-
 # SVGen
 
-<b>Generates SVG files with parametric semi-random elements defined in configuration.</b>
+<b>Generates SVG files with parametric semi-random shapes defined in configuration.</b>
 
 I love SVG files, specially for page backgrounds, so I made a tool to generate them, <a href="https://github.benmirkhah.com/svgen/">see it in action</a>!
 
@@ -33,4 +30,6 @@ Random shapes:
   
 More shapes are planned to be added including blobs, flames, hearts, etc.
 
-No UI yet (coming soon) but the granular config object allows fine adjustment of all parameters used in generating each shape. 
+No UI yet (coming soon) but the granular config object allows fine adjustment of parameters each shape. 
+
+![Sample random output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/svgenout/svg-493379.svg)
