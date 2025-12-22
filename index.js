@@ -1,4 +1,6 @@
-let version = '0.047'; //Commits + 1
+let version = '0.048'; //Commits + 1
+let xxx = 960;
+let yyy = 480;
 
 //"use strict";  //Like college teachers!
 /******************************************************************************
@@ -7,7 +9,6 @@ COMMING SOON / TODO LIST
 Debug:        Fix strict mode
 Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
-Shape grids:  Allowing each shape to snap to its internal grid system
 Back button:  Allowing saving previous renders
 Config UI:    Allowing non technical user interaction
 More shapes:  Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
@@ -15,7 +16,6 @@ More filters: Ideally one filter per shape
 Filters:      A way for a filter to NOT get randomly assigned to a certain shape type
 Events:       Configurable OnClick, RightClick, hover, etc. to run actions
 Actions:      Change Color, Size, Position, Rotation upon events.
-Variants:     Slightly different replicas of a shape
 Animation:    Final hurdle when everything else is done
 *******************************************************************************
 ******* Below are the functions that create the default config object *********
@@ -32,7 +32,7 @@ function defaultCanvas() {
   h[min     ] =  100;
   h[max     ] = 3000;
   h[system  ] =  480;
-  h[selected] =  957;
+  h[selected] =  950;
   c['width' ] =    w;
   c['height'] =    h;
   return c;
@@ -42,15 +42,14 @@ function defaultCanvas() {
 function defaultEnabled() {
   let out = Object.create(null);
   out['text'     ] = FF06;   //true, false, or color
-  out['grid'     ] = FF06;   //true, false, or color
+  out['grid'     ] = blue;   //true, false, or color
   out['stroke'   ] = true;   //true, false, or color
   out['points'   ] = false;  //true, false, or color
   out['centers'  ] = false;  //true, false, or color
   out['anchors'  ] = false;  //true, false, or color
   out['position' ] = false;  //true, false, or color
   out['bgcolor'  ] = color;  //true (currentColor), false, or color / randomColor(darks)
-  out['filters'  ] =  true;
-  out['variants' ] = false;  //TODO
+  out['filters'  ] = false;
   out['gradients'] =  true;
   out['animation'] = false;  //TODO
   return out;
@@ -58,10 +57,10 @@ function defaultEnabled() {
 
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
-  let out  = new Grid(system); 
-  out.kind =     normal;
+  let out  = new Grid(system);
   out.kind =     spiral;
   out.kind =     radial;
+  out.kind =     normal;
   out.show =       true;
   out.show =      false;
   return out;
@@ -76,17 +75,18 @@ function defaultShapes() {
   });//----------------------------------------------------
   
   //Enabled Shapes-----------------------------------------
-  shapes[square   ].count                   =            3;
   shapes[corner   ].count                   =            4;
-  shapes[hexagon  ].count                   =            2;
-  shapes[circle   ].count                   =            7;
-  shapes[triangle ].count                   =            2;
-  shapes[pentagon ].count                   =            1;
-  shapes[flower   ].count                   =            1;
-  shapes[oddagon  ].count                   =            2;
-  shapes[cloud    ].count                   =            1;
-  shapes[rectangle].count                   =            2;
+  shapes[dozengon ].count                   =            1;
+  shapes[triangle ].count                   =           12;
+  shapes[square   ].count                   =           24;
+  shapes[pentagon ].count                   =           24;
+  shapes[hexagon  ].count                   =           24;
   //Disabled Shapes----------------------------------------
+  shapes[flower   ].count                   =            0;
+  shapes[circle   ].count                   =            0;
+  shapes[oddagon  ].count                   =            0;
+  shapes[cloud    ].count                   =            0;
+  shapes[rectangle].count                   =            0;
   shapes[star     ].count                   =            0;
   shapes[nautilus ].count                   =            0;
   shapes[blob     ].count                   =            0;
@@ -104,11 +104,22 @@ function defaultShapes() {
   //Adjust each shape's specific parameters----------------
   //Always true if statements used to allow code folding---
   //-------------------------------------------------------
-  if (      circle    ) {//-------------------------CIRCLES  
+  if (      circle    ) {//-------------------------CIRCLES
   //shapes[ circle    ].fill                =           '';
+    //---------------------------------------GRID----------
+    shapes[ circle    ].grid.kind           =       radial;
+    shapes[ circle    ].grid.show           =            0;
+    shapes[ circle    ].grid.center.cx.kind =       ongrid;
+    shapes[ circle    ].grid.center.cy.kind =       ongrid;
+    shapes[ circle    ].grid.center.cx.val  =          xxx;
+    shapes[ circle    ].grid.center.cy.val  =          yyy;
+    shapes[ circle    ].grid.center.r.val   =          540;
+    shapes[ circle    ].grid.center.r.delta =          540;
+    shapes[ circle    ].grid.center.a.val   =            0;
+    shapes[ circle    ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
-  //shapes[ circle    ].position.cx.kind    =       ongrid;
-  //shapes[ circle    ].position.cy.kind    =       ongrid;
+    shapes[ circle    ].position.cx.kind    =       random;
+    shapes[ circle    ].position.cy.kind    =       random;
     shapes[ circle    ].position.cx.max     =         1600;
     shapes[ circle    ].position.cy.max     =          900;
     shapes[ circle    ].position.cx.val     =          980;
@@ -119,35 +130,42 @@ function defaultShapes() {
     shapes[ circle    ].position.cy.scaler  =       -1.125;
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
-  //shapes[ circle    ].size.r.kind         =        fixed;
-    shapes[ circle    ].size.r.val          =          135;
+    shapes[ circle    ].size.r.kind         =    alternate;
+    shapes[ circle    ].size.r.val          =           75;
+    shapes[ circle    ].size.r.delta        =          -30;
     shapes[ circle    ].size.r.min          =           30;
     shapes[ circle    ].size.r.max          =          400;
-    shapes[ circle    ].size.r.delta        =            3;
+    shapes[ circle    ].size.r.rate        =             2;
     //--------------------------------------SKEW-----------
     shapes[ circle    ].skew.y.kind         =         none;
     shapes[ circle    ].skew.y.val          =            1;
     shapes[ circle    ].skew.y.delta        =            5;
     shapes[ circle    ].skew.y.rate         =            1;
     //--------------------------------------STROKE---------
-  //shapes[ circle    ].stroke.swidth       =            0;
-  //shapes[ circle    ].stroke.scolor       =  '#550099';
-  //shapes[ circle    ].stroke.opacity      =         0.10;
+    shapes[ circle    ].stroke.swidth       =           40;
+    //shapes[ circle    ].stroke.opacity      =         0.50;
+    //shapes[ circle    ].stroke.scolor       =        white;
   }//------------------------------------------------------
   if (      corner    ) {//-------------------------CORNERS
     shapes[ corner    ].filter              =           '';
     //--------------------------------------STROKE---------
     shapes[ corner    ].stroke.swidth       =            0;
     shapes[ corner    ].stroke.opacity      =            0;      
-  }//------------------------------------------------------    
+  }//------------------------------------------------------
   if (      flower    ) {//-------------------------FLOWERS
     shapes[ flower    ].filter              =         glow;
     //--------------------------------------POSITION-------
+    shapes[ flower    ].position.cx.kind    =        fixed;
+    shapes[ flower    ].position.cy.kind    =        fixed;
+    shapes[ flower    ].position.cx.val     =          xxx;
+    shapes[ flower    ].position.cy.val     =          yyy;
     shapes[ flower    ].position.cx.max     =         1400;
     shapes[ flower    ].position.cy.max     =          700;
     //--------------------------------------ROTATION-------
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
+    shapes[ flower    ].size.r.kind         =        fixed;
+    shapes[ flower    ].size.r.val          =           60;
     shapes[ flower    ].size.r.max          =          140;
     shapes[ flower    ].size.r.max          =           40;
     //--------------------------------------SKEW-----------
@@ -156,9 +174,20 @@ function defaultShapes() {
   }//------------------------------------------------------
   if (      hexagon   ) {//------------------------HEXAGONS
   //shapes[ hexagon   ].fill                =        solid;
+    //---------------------------------------GRID----------
+    shapes[ hexagon   ].grid.kind           =       radial;
+    shapes[ hexagon   ].grid.show           =        false;
+    shapes[ hexagon   ].grid.center.cx.kind =       ongrid;
+    shapes[ hexagon   ].grid.center.cy.kind =       ongrid;
+    shapes[ hexagon   ].grid.center.cx.val  =          xxx;
+    shapes[ hexagon   ].grid.center.cy.val  =          yyy;
+    shapes[ hexagon   ].grid.center.r.val   =          416;
+    shapes[ hexagon   ].grid.center.r.delta =          416;
+    shapes[ hexagon   ].grid.center.a.val   =            0;
+    shapes[ hexagon   ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
-  //shapes[ hexagon   ].position.cx.kind    =       ongrid;
-  //shapes[ hexagon   ].position.cy.kind    =       ongrid;
+    shapes[ hexagon   ].position.cx.kind    =       ongrid;
+    shapes[ hexagon   ].position.cy.kind    =       ongrid;
     shapes[ hexagon   ].position.cx.max     =         1600;
     shapes[ hexagon   ].position.cy.max     =          900;
     shapes[ hexagon   ].position.cx.val     =          900;
@@ -170,30 +199,24 @@ function defaultShapes() {
     shapes[ hexagon   ].position.cy.scaler  =        1.083;
     shapes[ hexagon   ].position.cy.rate    =            1;
     //--------------------------------------ROTATION-------
-  //shapes[ hexagon   ].rotation.a.kind     =        fixed;
-    shapes[ hexagon   ].rotation.a.val      =           15;
-    shapes[ hexagon   ].rotation.a.delta    =          -10;
+    shapes[ hexagon   ].rotation.a.kind     =  incremental;
+    shapes[ hexagon   ].rotation.a.val      =           30;
+    shapes[ hexagon   ].rotation.a.delta    =           15;
     shapes[ hexagon   ].rotation.a.rate     =            1;
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
-  //shapes[ hexagon   ].size.r.kind         =        fixed;
-    shapes[ hexagon   ].size.r.val          =           98;
-    shapes[ hexagon   ].size.r.delta        =           -6;
+    shapes[ hexagon   ].size.r.kind         =    alternate;
+    shapes[ hexagon   ].size.r.val          =           36;
+    shapes[ hexagon   ].size.r.delta        =           18;
     shapes[ hexagon   ].size.r.scaler       =       -1.090;
-    shapes[ hexagon   ].size.r.rate         =            1;
+    shapes[ hexagon   ].size.r.rate         =            2;
     //--------------------------------------SKEW-----------
     shapes[ hexagon   ].skew.x.kind         =         none;
-    shapes[ hexagon   ].skew.x.val          =          -10;
-    shapes[ hexagon   ].skew.x.delta        =         0.25;
     shapes[ hexagon   ].skew.y.kind         =         none;
-    shapes[ hexagon   ].skew.y.val          =            1;
-    shapes[ hexagon   ].skew.y.delta        =        -0.25;
-    shapes[ hexagon   ].skew.y.scaler       =       -1.025;
-    shapes[ hexagon   ].skew.y.rate         =            1;
     //--------------------------------------STROKE---------
-  //shapes[ hexagon   ].stroke.swidth       =            2;
-    shapes[ hexagon   ].stroke.scolor       =        color;
-    shapes[ hexagon   ].stroke.opacity      =         0.15;
+    shapes[ hexagon   ].stroke.swidth       = randomInt(1,24);
+    //shapes[ hexagon   ].stroke.scolor       =        white;
+    //shapes[ hexagon   ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
   if (      nautilus  ) {//-------------------------NAUTILI
     //--------------------------------------POSITION-------
@@ -228,9 +251,20 @@ function defaultShapes() {
   }//------------------------------------------------------
   if (      pentagon  ) {//-----------------------PENTAGONS
     shapes[ pentagon  ].fill                =       random;
+    //---------------------------------------GRID----------
+    shapes[ pentagon  ].grid.kind           =       radial;
+    shapes[ pentagon  ].grid.show           =        false;
+    shapes[ pentagon  ].grid.center.cx.kind =       ongrid;
+    shapes[ pentagon  ].grid.center.cy.kind =       ongrid;
+    shapes[ pentagon  ].grid.center.cx.val  =        xxx-3;
+    shapes[ pentagon  ].grid.center.cy.val  =          yyy;
+    shapes[ pentagon  ].grid.center.r.val   =          330;
+    shapes[ pentagon  ].grid.center.r.delta =          330;
+    shapes[ pentagon  ].grid.center.a.val   =            0;
+    shapes[ pentagon  ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
-    shapes[ pentagon  ].position.cx.kind    =       random;
-    shapes[ pentagon  ].position.cy.kind    =       random;
+    shapes[ pentagon  ].position.cx.kind    =       ongrid;
+    shapes[ pentagon  ].position.cy.kind    =       ongrid;
     shapes[ pentagon  ].position.cx.max     =         1900;
     shapes[ pentagon  ].position.cx.val     =          880;
     shapes[ pentagon  ].position.cx.delta   =           10;
@@ -242,59 +276,102 @@ function defaultShapes() {
     shapes[ pentagon  ].position.cy.scaler  =        1.083;
     shapes[ pentagon  ].position.cy.rate    =            1;
     //--------------------------------------ROTATION-------
-    shapes[ pentagon  ].rotation.a.kind     =       random;
-    shapes[ pentagon  ].rotation.a.val      =        -17.5;
-    shapes[ pentagon  ].rotation.a.delta    =           72;
-    shapes[ pentagon  ].rotation.a.rate     =            5;
+    shapes[ pentagon  ].rotation.a.kind     =  incremental;
+    shapes[ pentagon  ].rotation.a.val      =           36;
+    shapes[ pentagon  ].rotation.a.delta    =           15;
+    shapes[ pentagon  ].rotation.a.rate     =            1;
     //--------------------------------------SCALE----------
     shapes[ pentagon  ].scale.x.kind        =         none;
     shapes[ pentagon  ].scale.y.kind        =         none;
     //--------------------------------------SIZE-----------
-    shapes[ pentagon  ].size.r.kind         =       random;
+    shapes[ pentagon  ].size.r.kind         =    alternate;
     shapes[ pentagon  ].size.r.max          =          100;
-    shapes[ pentagon  ].size.r.val          =            4;
-    shapes[ pentagon  ].size.r.delta        =          -14;
+    shapes[ pentagon  ].size.r.val          =           48;
+    shapes[ pentagon  ].size.r.delta        =          -24;
     shapes[ pentagon  ].size.r.scaler       =       -1.089;
-    shapes[ pentagon  ].size.r.rate         =            1;
+    shapes[ pentagon  ].size.r.rate         =            2;
     //--------------------------------------SKEW-----------
     shapes[ pentagon  ].skew.x.kind         =         none;
-    shapes[ pentagon  ].skew.x.val          =          -15;
-    shapes[ pentagon  ].skew.x.delta        =         0.25;
+    shapes[ pentagon  ].skew.x.val          =            0;
+    shapes[ pentagon  ].skew.x.delta        =           56;
+    shapes[ pentagon  ].skew.x.rate         =            2;
     shapes[ pentagon  ].skew.y.kind         =         none;
-    shapes[ pentagon  ].skew.y.val          =            1;
-    shapes[ pentagon  ].skew.y.delta        =        -0.25;
-    shapes[ pentagon  ].skew.y.scaler       =       -1.025;
+    shapes[ pentagon  ].skew.y.val          =            0;
+    shapes[ pentagon  ].skew.y.delta        =          -87;
     shapes[ pentagon  ].skew.y.rate         =            2;    
     //--------------------------------------STROKE---------
-    shapes[ pentagon  ].stroke.swidth       =       random;
-    shapes[ pentagon  ].stroke.opacity      =         0.35;
+    shapes[ pentagon  ].stroke.swidth       = randomInt(1,24);
+  //shapes[ pentagon  ].stroke.scolor       =        white;
+  //shapes[ pentagon  ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
   if (      rectangle ) {//----------------------RECTANGLES
-    shapes[ rectangle ].fill                =   RC(sunset);
-    shapes[ rectangle ].filter              =     oblivion;
+  //shapes[ rectangle ].fill                =   RC(sunset);
+  //shapes[ rectangle ].filter              =     oblivion;
+    //--------------------------------------CORNER---------
+    shapes[ rectangle ].corner.rx.kind      =         none;
+    shapes[ rectangle ].corner.ry.kind      =         none;
+    shapes[ rectangle ].corner.rx.val       =           12;
+    shapes[ rectangle ].corner.ry.val       =           12;
+    //---------------------------------------GRID----------
+    shapes[ rectangle ].grid.kind           =       radial;
+    shapes[ rectangle ].grid.show           =            0;
+    shapes[ rectangle ].grid.center.cx.kind =       ongrid;
+    shapes[ rectangle ].grid.center.cy.kind =       ongrid;
+    shapes[ rectangle ].grid.center.cx.val  =          xxx;
+    shapes[ rectangle ].grid.center.cy.val  =          yyy;
+    shapes[ rectangle ].grid.center.r.val   =          656;
+    shapes[ rectangle ].grid.center.r.delta =          656;
+    shapes[ rectangle ].grid.center.a.val   =            0;
+    shapes[ rectangle ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
+    shapes[ rectangle ].position.cx.kind    =       ongrid;
+    shapes[ rectangle ].position.cy.kind    =       ongrid;    
     //--------------------------------------ROTATION-------
+    shapes[ rectangle ].rotation.a.kind     =  incremental;
+    shapes[ rectangle ].rotation.a.val      =            0;
+    shapes[ rectangle ].rotation.a.delta    =           15;    
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
+    shapes[ rectangle ].size.w.kind         =    alternate;
+    shapes[ rectangle ].size.h.kind         =    alternate;
+    shapes[ rectangle ].size.w.val          =           40;
+    shapes[ rectangle ].size.h.val          =          220;
+    shapes[ rectangle ].size.w.delta        =           20;
+    shapes[ rectangle ].size.h.delta        =         -160;
     shapes[ rectangle ].size.w.min          =          400;
     shapes[ rectangle ].size.h.min          =          300;
     shapes[ rectangle ].size.w.max          =            0;
     shapes[ rectangle ].size.h.max          =            0;
+    shapes[ rectangle ].size.w.rate         =            2;
+    shapes[ rectangle ].size.h.rate         =            2;
     //--------------------------------------SKEW-----------
     //--------------------------------------STROKE---------
+    shapes[ rectangle ].stroke.swidth       =            2;
+    shapes[ rectangle ].stroke.scolor       =        white;
+    shapes[ rectangle ].stroke.opacity      =         0.33;    
   }//------------------------------------------------------
   if (      square    ) {//-------------------------SQUARES
-    shapes[ square    ].fill                ='#99000033'; //RC(clear);
+  //shapes[ square    ].fill                ='#99000033'; //RC(clear);
+    shapes[ square    ].grid.kind           =       radial;
+    shapes[ square    ].grid.show           =        false;
+    shapes[ square    ].grid.center.cx.kind =       ongrid;
+    shapes[ square    ].grid.center.cy.kind =       ongrid;
+    shapes[ square    ].grid.center.cx.val  =          xxx;
+    shapes[ square    ].grid.center.cy.val  =          yyy;
+    shapes[ square    ].grid.center.r.val   =          250;
+    shapes[ square    ].grid.center.r.delta =          250;
+    shapes[ square    ].grid.center.a.val   =            0;
+    shapes[ square    ].grid.center.a.delta =           15;
     //--------------------------------------CORNER---------
     shapes[ square    ].corner.rx.kind      =        fixed;
     shapes[ square    ].corner.ry.kind      =        fixed;
-    shapes[ square    ].corner.rx.val       =           20;
-    shapes[ square    ].corner.ry.val       =           20;
+    shapes[ square    ].corner.rx.val       =           12;
+    shapes[ square    ].corner.ry.val       =           12;
     shapes[ square    ].corner.rx.delta     =            1;
     shapes[ square    ].corner.ry.delta     =            1;
     //--------------------------------------POSITION-------
-  //shapes[ square    ].position.cx.kind    =       ongrid;
-  //shapes[ square    ].position.cy.kind    =       ongrid;
+    shapes[ square    ].position.cx.kind    =       ongrid;
+    shapes[ square    ].position.cy.kind    =       ongrid;
     shapes[ square    ].position.cx.val     =           20;
     shapes[ square    ].position.cy.val     =           20;
     shapes[ square    ].position.cx.delta   =           76;
@@ -302,20 +379,20 @@ function defaultShapes() {
     shapes[ square    ].position.cx.scaler  =        1.175;
     shapes[ square    ].position.cy.scaler  =      -1.0695;
     //--------------------------------------ROTATION-------
-  //shapes[ square    ].rotation.a.kind     =    alternate;
-    shapes[ square    ].rotation.a.val      =            0;
-    shapes[ square    ].rotation.a.delta    =           45;
+    shapes[ square    ].rotation.a.kind     =  incremental;
+    shapes[ square    ].rotation.a.val      =           45;
+    shapes[ square    ].rotation.a.delta    =           15;
     shapes[ square    ].rotation.a.scaler   =         1.25;
-    shapes[ square    ].rotation.a.rate     =            2;
+    shapes[ square    ].rotation.a.rate     =            1;
     //--------------------------------------SCALE----------
   //shapes[ square    ].scale.x.kind        =       random;
   //shapes[ square    ].scale.y.kind        =       random;
     //--------------------------------------SIZE-----------
-  //shapes[ square    ].size.h.kind         =    alternate;
-    shapes[ square    ].size.h.val          =           83;
+    shapes[ square    ].size.h.kind         =    alternate;
+    shapes[ square    ].size.h.val          =           16;
     shapes[ square    ].size.h.min          =           50;
     shapes[ square    ].size.h.max          =          400;
-    shapes[ square    ].size.h.delta        =          118;
+    shapes[ square    ].size.h.delta        =           60;
     shapes[ square    ].size.h.scaler       =        1.115;
     shapes[ square    ].size.h.rate         =            2;
     //--------------------------------------SKEW-----------
@@ -330,13 +407,16 @@ function defaultShapes() {
     shapes[ square    ].skew.y.scaler       =        1.025;
     shapes[ square    ].skew.y.rate         =            4;
     //--------------------------------------STROKE---------
-    shapes[ square    ].stroke.swidth       =            2;
-    shapes[ square    ].stroke.scolor       =         gold;
-    shapes[ square    ].stroke.opacity      =         0.25;
+    shapes[ square    ].stroke.swidth       = randomInt(1,24);
+  //shapes[ square    ].stroke.scolor       =        white;
+  //shapes[ square    ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
   if (      star      ) {//---------------------------STARS
+    shapes[ star      ].grid.kind           =       normal;
     shapes[ star      ].filter              =        dance;
     //--------------------------------------POSITION-------
+    shapes[ star      ].position.cx.kind    =       ongrid;
+    shapes[ star      ].position.cy.kind    =       ongrid;
     //--------------------------------------ROTATION-------
     shapes[ star      ].rotation.a.kind     =       random;
     //--------------------------------------SCALE----------
@@ -350,9 +430,18 @@ function defaultShapes() {
   if (      triangle  ) {//-----------------------TRIANGLES
   //shapes[ triangle  ].fill                = '#99000033'; //RC(clear);
     shapes[ triangle  ].filter              =         glow;
+    //--------------------------------------GRID-----------
+    shapes[ triangle  ].grid.kind           =       radial;
+    shapes[ triangle  ].grid.show           =        false;
+    shapes[ triangle  ].grid.center.cx.kind =       ongrid;
+    shapes[ triangle  ].grid.center.cy.kind =       ongrid;
+    shapes[ triangle  ].grid.center.cx.val  =          xxx-11;
+    shapes[ triangle  ].grid.center.cy.val  =          yyy;
+    shapes[ triangle  ].grid.center.r.val   =          200;
+    shapes[ triangle  ].grid.center.r.delta =          200;
     //--------------------------------------POSITION-------
-    shapes[ triangle  ].position.cx.kind    =       random;
-    shapes[ triangle  ].position.cy.kind    =       random;
+    shapes[ triangle  ].position.cx.kind    =       ongrid;
+    shapes[ triangle  ].position.cy.kind    =       ongrid;
     shapes[ triangle  ].position.cx.max     =         1600;
     shapes[ triangle  ].position.cy.max     =          900;
     shapes[ triangle  ].position.cx.val     =          980;
@@ -360,14 +449,14 @@ function defaultShapes() {
     shapes[ triangle  ].position.cx.delta   =            0;
     shapes[ triangle  ].position.cy.delta   =            0;
     //--------------------------------------ROTATION-------
-    shapes[ triangle  ].rotation.a.kind     =       random;
+    shapes[ triangle  ].rotation.a.kind     =  incremental;
     shapes[ triangle  ].rotation.a.val      =            0;
-    shapes[ triangle  ].rotation.a.delta    =           15;
+    shapes[ triangle  ].rotation.a.delta    =           30;
     //--------------------------------------SCALE----------
     shapes[ triangle  ].scale.x.kind        =         none;
     shapes[ triangle  ].scale.y.kind        =         none;
     //--------------------------------------SIZE-----------
-    shapes[ triangle  ].size.r.kind         =       random;
+    shapes[ triangle  ].size.r.kind         =        fixed;
     shapes[ triangle  ].size.r.val          =           50;
     shapes[ triangle  ].size.r.min          =           30;
     shapes[ triangle  ].size.r.max          =          400;
@@ -376,7 +465,26 @@ function defaultShapes() {
     shapes[ triangle  ].skew.x.kind         =         none;
     shapes[ triangle  ].skew.y.kind         =         none;
     //--------------------------------------STROKE---------
-  //shapes[ triangle  ].stroke.swidth       =            0;
+    shapes[ triangle  ].stroke.swidth       = randomInt(1,16);
+  //shapes[ triangle  ].stroke.scolor       =        white;
+  //shapes[ triangle  ].stroke.opacity      =          0.5;
+  }//------------------------------------------------------
+  if (      dozengon  ) {//-----------------------DOZENGONS
+    //--------------------------------------POSITION-------
+    shapes[ dozengon  ].position.cx.kind    =        fixed;
+    shapes[ dozengon  ].position.cy.kind    =        fixed;
+    shapes[ dozengon  ].position.cx.val     =          xxx;
+    shapes[ dozengon  ].position.cy.val     =          yyy;
+    //--------------------------------------SIZE-----------
+    shapes[ dozengon  ].size.r.kind         =        fixed;
+    shapes[ dozengon  ].size.r.val          =          150;
+    //--------------------------------------ROTATION-------
+    shapes[ dozengon  ].rotation.a.kind     =        fixed;
+    shapes[ dozengon  ].rotation.a.val      =           15;
+    //--------------------------------------STROKE---------
+    shapes[ dozengon  ].stroke.swidth       = randomInt(1,20);
+  //shapes[ dozengon  ].stroke.scolor       =        white;
+  //shapes[ dozengon  ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
   if (      umbrella  ) {//-----------------------UMBRELLAS
     //--------------------------------------POSITION-------
@@ -423,6 +531,7 @@ function defaultFilters() {
   let out = Object.create(null);
   filterTypes.forEach(kind => { out[kind] = true; });
   //Exceptions to being enabled by default
+  out[tile       ] = false;
   out[pixelate   ] = false;  //<-- not working right now
   out[chaotic    ] = false;
   out[watercolor ] = false;
@@ -505,23 +614,15 @@ function svgDefaults() {
   let out = Object.create(null);
   out[     'grid'] = defaultGrids();    
   out[    'paths'] = defaultPaths();    
-  out[   'canvas'] = defaultCanvas();   
+  out[   'canvas'] = defaultCanvas();  
   out[   'colors'] = defaultColors();   
   out[   'shapes'] = defaultShapes();   
   out[  'enabled'] = defaultEnabled();  
   out[  'filters'] = defaultFilters();  
   out[  'objects'] = defaultObjects();  
-  out[ 'variants'] = defaultVariants(); 
-  out[ 'duration'] = defaultDuration(); 
   out['gradients'] = defaultGradients();
   return out;
 }//----------------------------------------------------------------------------
-
-//NOT IN USE YET: Variants and Duration----------------------------------------
-function defaultVariants() { return Object.create(null); }
-function defaultDuration() { return Object.create(null); }
-//-----------------------------------------------------------------------------
-
 /******************************************************************************
 ************* Below are all the functions that generate shapes ****************
 ******************************************************************************/
@@ -893,9 +994,10 @@ function svgPolygon(oid='no-order-id', pcount=6, options=opt) {
 function svgStar(oid='no-order-id', options=opt, pcount=0) {
   pcount        = pcount ? pcount : ((randomInt(5,14) % 2) ? pcount+1 : pcount); //Only odd
   let sid       = svgid+'-'+oid;
-  let points    = svgRadialPoints(pcount);
-  let cx        = points[0].x;
-  let cy        = points[0].y;
+  let cx        = options.position.cx;
+  let cy        = options.position.cy;
+  let r         = options.size.r;
+  let points    = svgRadialPoints(pcount, cx, cy, r);
   let open      = '<path ';
   let close     = '</path>';
   let render    = '';
@@ -1194,7 +1296,7 @@ function resetCounter(){
 }//----------------------------------------------------------------------------
 
 //Figure out the value of Val objects based on its configuration---------------
-function determineValue(thing, count) {
+function determineValue(thing, count, grid=GRID) {
   let out  = 0;
   let rate = count % thing.rate;
 
@@ -1206,7 +1308,7 @@ function determineValue(thing, count) {
       break;
     case none:        out = 0;          break;
     case fixed:       out = thing.val;  break;
-    case ongrid:      out = svgconf.enabled.grid  ?  GRID[count]  : WIDTH/2;              break;
+    case ongrid:      out = svgconf.enabled.grid ? grid[count] : WIDTH/2;                 break;
     case alternate:   out = rate ? thing.val : thing.val + thing.delta;                   break;
     case incremental: out = thing.val + (rate ? 0 :  thing.delta  * (count - 1)        ); break;
     case exponential: out = thing.val + (rate ? 0 : (thing.scaler ** count) * thing.val); break;      
@@ -1217,7 +1319,7 @@ function determineValue(thing, count) {
 }//----------------------------------------------------------------------------
 
 //Figure out an object size based on its shape configuration-------------------
-function determineSize(shape=square) {
+function determineSize(shape) {
   let out  = Object.create(null);
   let size = svgconf.shapes[shape].size;
 
@@ -1230,13 +1332,14 @@ function determineSize(shape=square) {
 
 //Figure out an object position based on its shape configuration---------------
 function determinePosition(shape) {
-  let out = Object.create(null);
-  let pos = svgconf.shapes[shape].position;
-
-  out.cx  = determineValue(pos.cx, counter[shape]);
-  out.cy  = determineValue(pos.cy, counter[shape]);
-  out.cx  = roundInt((isNaN(out.cx) ? out.cx.x : out.cx), 1); //since ongrid resturns a x,y point
-  out.cy  = roundInt((isNaN(out.cy) ? out.cy.y : out.cy), 1); //since ongrid resturns a x,y point
+  let out  = Object.create(null);
+  let pos  = svgconf.shapes[shape].position;
+  let grid = svgGridPoints(svgconf.shapes[shape].grid); 
+  //console.log(svgconf.shapes[shape]);  //DEBUG
+  out.cx   = determineValue(pos.cx, counter[shape], grid );
+  out.cy   = determineValue(pos.cy, counter[shape], grid );
+  out.cx   = roundInt((isNaN(out.cx) ? out.cx.x : out.cx), 1); //since ongrid resturns a x,y point
+  out.cy   = roundInt((isNaN(out.cy) ? out.cy.y : out.cy), 1); //since ongrid resturns a x,y point
 
   return out;
 }//----------------------------------------------------------------------------
@@ -1278,8 +1381,13 @@ function determineCorner(shape) {
 
 //Figure out an object fill color based on its shape configuration-------------
 function determineFill(shape) {
-  let ben = new Color({hex:'#FF990011'});
-  let out = ben.steps(TOTAL,'#55008866');
+  let c1  = '#FF990099';
+  let c2  = '#550088CC';
+  let one = new Color({hex:c1});
+  let two = new Color({hex:c2});
+  let p1  = one.steps(svgconf.shapes[shape].count/2,c2);
+  let p2  = two.steps(svgconf.shapes[shape].count/2,c1);
+  let out = [...p1, ...p2, ] ;
   return out[counter[shape]];
 }//----------------------------------------------------------------------------
 
@@ -1970,12 +2078,10 @@ function parseConf() {
   let objects  = Object.create(null);
   let filters  = Object.create(null);
   let d        = Object.create(null);
-  let c, u, v, g, w, h, f, t;
+  let c, g, w, h, f, t;
 
   d       = svgDefaults();
   c       = d.colors.selected;
-  u       = d.duration.selected;
-  v       = d.variants.selected;
   g       = d.gradients.selected;
   w       = d.canvas.width.selected;
   h       = d.canvas.height.selected;
@@ -1987,13 +2093,12 @@ function parseConf() {
   f       = 0; //Total number of enabled filters
   t       = 0; //Total number of objects (shapes * variations of each shape)
 
-  if (isNaN(w)) w = (w == random) ? roundX(canvas.width.min,  canvas.width.max  ) : canvas.width.system;
-  if (isNaN(h)) h = (h == random) ? roundY(canvas.height.min, canvas.height.max ) : canvas.height.system;
-  if (isNaN(c)) c = (c == random) ? randomInt(d.colors.min,      d.colors.max   ) : d.colors.system;
-  if (isNaN(u)) u = (u == random) ? randomInt(d.duration.min,    d.duration.max ) : d.duration.system;
-  if (isNaN(v)) v = (v == random) ? randomInt(d.variants.min,    d.variants.max ) : d.variants.system;
-  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) : d.gradients.system;
+  if (isNaN(w)) w = (w == random) ? roundX(  canvas.width.min,  canvas.width.max) :  canvas.width.system;
+  if (isNaN(h)) h = (h == random) ? roundY( canvas.height.min, canvas.height.max) : canvas.height.system;
+  if (isNaN(c)) c = (c == random) ? randomInt(   d.colors.min,      d.colors.max) :      d.colors.system;
+  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) :   d.gradients.system;
 
+  //FILTERS------------------------------------------------
   if (d.enabled.filters) {  //Only if filters are enabled
     Object.keys(d.filters).forEach(filter => { //Only keep the enabled filters, discared others
       if (d.filters[filter]) {
@@ -2002,7 +2107,7 @@ function parseConf() {
       }
     }); 
   }
-  
+  //SHAPES-------------------------------------------------
   Object.keys(d.shapes).forEach(shape => { //Go through each shape kind
     if (isNaN(d.shapes[shape].count)) {    //Assign requested random/default values
       d.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(d.objects.min, shapes[shape].max) : d.objects.system;
@@ -2047,8 +2152,6 @@ function parseConf() {
   parsed['width'    ] = w;
   parsed['height'   ] = h;
   parsed['colors'   ] = c;
-  parsed['variants' ] = v;
-  parsed['duration' ] = u;
   parsed['gradients'] = g;
   parsed['grid'     ] = grid;
   parsed['paths'    ] = paths;
@@ -2220,14 +2323,20 @@ function svgContent() {
   let stroke  = '';
   let shape   = '';
   let fill    = '';
-  let grid    = '';
   let luck    = 0;
   let rr      = randomInt(3,16);  //For Randogons
   let oo      = randomInt(3,15);  //For Oddagons
   oo = (oo % 2) ? oo : oo-1; //Only odd
 
+  let shapetemplate = '';
+  shapeTypes.forEach(shape => {
+    shapetemplate = svgconf.shapes[shape] ?? 0;
+    if (shapetemplate) {  //TODO: switch from red to shape color
+      render += shapetemplate.grid.show ? svgShowGrid(shapetemplate.grid, red) : '';
+    }  
+  });
+
   for (oid=1; oid < svgconf.order.length; oid++) {
-    render = '';
     stroke = '';
     filter = '';
     fill   = '';
@@ -2239,13 +2348,8 @@ function svgContent() {
     shape  = svgconf.order[oid];
     elements[oid] = { z:oid, render:render, data:data }; //Insert blank data
     counter[shape]++;
-
-    if (svgconf.shapes[shape].filter) { 
-      filter = svgconf.shapes[shape].filter; //Preselected filter
-      filter = (filter == 'random') ? filters[randomInt(0, fcount)] : filter;
-      filter = ' filter="url(#'+filter+')" ';
-    } else filter = '';
-        
+    
+    //FILL-------------------------------------------------        
     if (svgconf.shapes[shape].fill) { 
       //fill = determineFill(shape);
       fill = svgconf.shapes[shape].fill; //Preselected fill
@@ -2253,6 +2357,14 @@ function svgContent() {
       fill = ' fill="'+fill+'" ';
     } else fill = '';
 
+    //FILTER-----------------------------------------------
+    if (svgconf.shapes[shape].filter) { 
+      filter = svgconf.shapes[shape].filter; //Preselected filter
+      filter = (filter == 'random') ? filters[randomInt(0, fcount)] : filter;
+      filter = ' filter="url(#'+filter+')" ';
+    } else filter = '';
+
+    //STROKE-----------------------------------------------
     swidth = svgconf.shapes[shape].stroke.swidth; //Random = half none / half stroke 
     swidth = (swidth == 'random') ? ((luck % 2) ? thick : 0) : swidth;
 
@@ -2265,20 +2377,21 @@ function svgContent() {
       stroke += (svgconf.shapes[shape].stroke.opacity != 1) ? ' stroke-opacity="'+svgconf.shapes[shape].stroke.opacity+'" ' : ' ';
     } else stroke = '';
 
+    //OPTIONS----------------------------------------------
     let options         = Object.create(null);
     options['oid'      ] = oid;
     options['name'     ] = shape;
     options['stroke'   ] = stroke;
     options['filter'   ] = filter;
     options['fill'     ] = fill;
-    options['grid'     ] = svgconf.shapes[shape].grid;
-    options['size'     ] = determineSize(    shape);
+    options['size'     ] = determineSize(shape);
     options['position' ] = determinePosition(shape);
-    options['corner'   ] = determineCorner(  shape);
+    options['corner'   ] = determineCorner(shape);
     options['events'   ] = ' onclick="this.style.fill = RC(sunset)" ';
 
-    let skew      = determineSkew(    shape);
-    let scale     = determineScale(   shape);
+    //TRANSFORMS-------------------------------------------
+    let skew      = determineSkew(shape);
+    let scale     = determineScale(shape);
     let rotation  = determineRotation(shape);
     let transform = (rotation || skew) ? ' transform="' : '';
     transform    += rotation ? 'rotate('+rotation+') ':'';
@@ -2308,30 +2421,29 @@ function svgContent() {
       case hexagon   : render += svgPolygon(oid, 6,options); break;
       case octagon   : render += svgPolygon(oid, 8,options); break;
       case dexagon   : render += svgPolygon(oid,10,options); break;
+      case dozengon  : render += svgPolygon(oid,12,options); break;
       case oddagon   : render += svgPolygon(oid,oo,options); break;
       case randogon  : render += svgPolygon(oid,rr,options); break;
-      case nautilus  : render += svgNautilus(oid,  options); break
+      case nautilus  : render += svgNautilus(oid,  options); break;
     }
     elements[oid].render = render;
     output += render;
+    render  = '';
   } //console.log(elements);  //DEBUG
 
   return output
 }//----------------------------------------------------------------------------
 
 //Show the grid cross marks if enabled----------------------------------------- 
-function svgShowGrid() {
-  let output  = '';
+function svgShowGrid(gridconf=svgconf.grid, color=gcolor) {
+  let out  = '';
+  let grid = gridconf.points();
   if (svgconf.enabled.grid) {
-    GRID = svgGridPoints(svgconf.grid);  //console.log(GRID); //DEBUG
-
-    for (let i=1; i<GRID.length; i++) {
-      let x = GRID[i].x;
-      let y = GRID[i].y;
-      output += svgconf.grid.show ? svgXMark ( x, y, 4, svgconf.enabled.grid, 'grid', i) : '';
+    for (let i=1; i<grid.length; i++) {
+      out += gridconf.show ? svgXMark ( grid[i].x, grid[i].y, 4, color, 'grid', i) : '';
     }
   }
-  return output;
+  return out;
 }//----------------------------------------------------------------------------
 
 //Wraps everything in the <svg> element tag------------------------------------
@@ -2530,7 +2642,8 @@ class Point {
     out += this.r  ?  'r:'+this.r +' ' : '';
     out += this.a  ?  'a:'+this.a +' ' : '';
     out += ']';
-    console.log(out)
+    console.log(out);
+    return out;
   } 
 }//----------------------------------------------------------------------------
 
@@ -2614,7 +2727,7 @@ class Grid {
   constructor(name) {
     this.name            =         name ?? 'Cartesian';
     this.kind            =         normal;  //true = normal, radial, spiral (TODO: diagonal)
-    this.show            =              1;
+    this.show            =              0;
     this.text            =              0;  //false or color;
     this.bound           =          false;  //true = delete points that fall outside of bounding box, false = keep  
     this.order           =         normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
@@ -2623,11 +2736,11 @@ class Grid {
     this.center.cx       =  new Val('cx');
     this.center.cy       =  new Val('cy');
     this.center.r        =  new Val( 'r');
-    this.center.r.val    =            420;
-    this.center.r.delta  =            140;
+    this.center.r.val    =            100;
+    this.center.r.delta  =            100;
     this.center.a        =  new Val( 'a');
     this.center.a.val    =              0;
-    this.center.a.delta  =             15;
+    this.center.a.delta  =             30;
     this.center.a.scaler =              5;
     //Cartesian & Isometric specifics-----
     this.start           =      new Point;
@@ -2636,7 +2749,7 @@ class Grid {
     this.start.y         = new Val('sty');
     this.end.x           = new Val('end');
     this.end.y           = new Val('end');
-    this.interval        =            120;
+    this.interval        =            240;
     this.start.x.val     =              0;
     this.start.x.val     =              0;
     this.start.x.delta   =  this.interval;
@@ -2644,6 +2757,8 @@ class Grid {
     this.end.x.val       =              0;
     this.end.y.val       =              0;
   }
+
+  points() { return svgGridPoints(this); }
 }//----------------------------------------------------------------------------
 
 //Size parameters of a shape---------------------------------------------------
@@ -2731,7 +2846,6 @@ var svgFiles        = Object.create(null); //Final rendered file output
 var svgid           = '123456789';
 var elements        = []; //Keeps track of each element data and rendered outputs
 var idStack         = []; //Keeps track of previous render 
-var GRID            = []; //Global Grid points
 var TOTAL           = 0;
 var lastIndex       = 0;
 var anchorall       = '';
@@ -2750,18 +2864,18 @@ const random        = 'random';       //Pick a random value between min & max
 const fixed         = 'fixed';        //Stick to a predetermined value
 const kind          = 'kind';         //Any of the items listed above
 const functionTypes = new Array(      //NOT IN USE YET / To be used by UI
-  surprise    ,  //zero index to be exculded from surprise pick
-  random      ,  //most often used
-  ongrid      ,  //second most popular 
-  fixed       ,  //third popular
-  incremental ,  //fourth
-  exponential ,  //works
-  alternate   ,  //works
-  intervals   ,  //NOT IN USE
-  selfgrid    ,  //NOT IN USE
-  angular     ,  //NOT IN USE
-  sysgrid     ,  //NOT IN USE
-  functional  ,  //NOT IN USE
+  surprise          ,  //zero index to be exculded from surprise pick
+  random            ,  //most often used
+  ongrid            ,  //second most popular 
+  fixed             ,  //third popular
+  incremental       ,  //fourth
+  exponential       ,  //works
+  alternate         ,  //works
+  intervals         ,  //NOT IN USE
+  selfgrid          ,  //NOT IN USE
+  angular           ,  //NOT IN USE
+  sysgrid           ,  //NOT IN USE
+  functional        ,  //NOT IN USE
 );
 //Grid related syntax sugar--------------------------------
 const backward      = 'backward';
@@ -2769,7 +2883,7 @@ const diagonal      = 'diagonal';
 const vertical      = 'vertical';
 const radial        = 'radial';
 const spiral        = 'spiral';
-//Syntax sugars to reduce adding qoutes around them--------
+//Syntax sugars to avoid adding qoutes around them---------
 const selected      = 'selected';
 const amount        = 'amount';
 const middle        = 'middle';
@@ -2807,20 +2921,20 @@ const displacement  = 'displacement';
 const gaussianblur  = 'gaussianblur';
 //Array used for iterating filters-------------------------
 const filterTypes   = new Array(
-  bnw          ,
-  glow         ,
-  tile         ,
-  dance        ,
-  mboss        ,
-  chaotic      ,
-  oblivion     ,
-  pixelate     ,
-  watercolor   ,
-  pointlight   ,
-  motionblurx  ,
-  motionblury  ,
-  displacement ,
-  gaussianblur ,
+  bnw               ,
+  glow              ,
+  tile              ,
+  dance             ,
+  mboss             ,
+  chaotic           ,
+  oblivion          ,
+  pixelate          ,
+  watercolor        ,
+  pointlight        ,
+  motionblurx       ,
+  motionblury       ,
+  displacement      ,
+  gaussianblur      ,
 );
 //Color related syntax sugars------------------------------
 const monotone      = 'monotone';
@@ -2888,6 +3002,7 @@ const octagon       = 'octagon';
 const oddagon       = 'oddagon';
 const polygon       = 'polygon';
 const dexagon       = 'dexagon';
+const dozengon      = 'dozengon';
 const nautilus      = 'nautilus';
 const randogon      = 'randogon';
 const pentagon      = 'pentagon';
@@ -2895,53 +3010,55 @@ const triangle      = 'triangle';
 const umbrella      = 'umbrella';
 //Array used for iterating shapes--------------------------
 const shapeTypes    = new Array(
-  corner    ,  //Bottom most layer
-  blob      ,  //Boxy shapes  
-  claw      ,
-  wave      ,
-  cloud     ,
-  flame     ,
-  bullet    ,
-  letter    ,
-  square    ,
-  ellipse   ,
-  mountain  ,
-  rectangle ,
-  star      ,  //Radial shapes 
-  heart     ,
-  circle    ,
-  flower    ,
-  pollen    ,
-  hexagon   ,
-  octagon   ,
-  oddagon   ,
-  polygon   ,
-  dexagon   ,
-  nautilus  ,
-  randogon  ,
-  pentagon  ,
-  triangle  ,
-  umbrella  ,
+  corner            ,  //Bottom most layer
+  blob              ,  //Boxy shapes  
+  claw              ,
+  wave              ,
+  cloud             ,
+  flame             ,
+  bullet            ,
+  letter            ,
+  square            ,
+  ellipse           ,
+  mountain          ,
+  rectangle         ,
+  star              ,  //Radial shapes 
+  heart             ,
+  circle            ,
+  flower            ,
+  pollen            ,
+  hexagon           ,
+  octagon           ,
+  oddagon           ,
+  polygon           ,
+  dexagon           ,
+  dozengon          ,
+  nautilus          ,
+  randogon          ,
+  pentagon          ,
+  triangle          ,
+  umbrella          ,
 );
 //Parse the conguration and run----------------------------
-let svgconf    = parseConf();
-const opt      = defaultOptions();
-const filters  = Object.keys(svgconf.filters);
-const scount   = Object.keys(svgconf.shapes).length; //Number of enabled shapes
-const fcount   = filters.length;                     //Number of enabled filters
-const WIDTH    = svgconf.width;
-const HEIGHT   = svgconf.height;
-const colors   = svgconf.colors;
-const pcolor   = svgconf.enabled.points;  //Point  color
-const center   = svgconf.enabled.centers; //Center color
-const acolor   = svgconf.enabled.anchors; //Anchor color
-const gcolor   = svgconf.enabled.grid;    //Grid   color
-const MIDX     = roundInt(WIDTH/2,1);
-const MIDY     = roundInt(HEIGHT/2,1);
-const TLC      = { x:0     , y:0      };
-const TRC      = { x:WIDTH , y:0      };
-const BLC      = { x:0     , y:HEIGHT };
-const BRC      = { x:WIDTH , y:HEIGHT };
+let svgconf         = parseConf();
+const opt           = defaultOptions();
+const filters       = Object.keys(svgconf.filters);
+const scount        = Object.keys(svgconf.shapes).length; //Number of enabled shapes
+const fcount        = filters.length;                     //Number of enabled filters
+const WIDTH         = svgconf.width;
+const HEIGHT        = svgconf.height;
+const colors        = svgconf.colors;
+const pcolor        = svgconf.enabled.points;  //Point  color
+const center        = svgconf.enabled.centers; //Center color
+const acolor        = svgconf.enabled.anchors; //Anchor color
+const gcolor        = svgconf.enabled.grid;    //Grid   color
+const GRID          = svgGridPoints(svgconf.grid)
+const MIDX          = roundInt(WIDTH/2,1);
+const MIDY          = roundInt(HEIGHT/2,1);
+const TLC           = { x:0     , y:0      };
+const TRC           = { x:WIDTH , y:0      };
+const BLC           = { x:0     , y:HEIGHT };
+const BRC           = { x:WIDTH , y:HEIGHT };
 //console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load

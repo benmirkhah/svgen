@@ -6,11 +6,15 @@
 
 I love SVG files, specially for page backgrounds, so I made a tool to generate them, <a href="https://github.benmirkhah.com/svgen/">see it in action</a>!
 
-This is a work in progress, so far it includes random colors, gradients and filters, parametric size, position and rotation, and most importantly...
+The goal is to add a UI so one can use this software as a tool to:
+- A) Generate random SVG backgrounds with various shapes and effects
+- B) Generate parametric designs using the included shapes and grids
+
+This is a work in progress, so far it includes random colors, gradients and filters, parametric grids, size, position and rotation, and most importantly...
 
 Random shapes:
 - Flowers ( 5 - 15 petals)
-- Stars (5 & 11 points)
+- Stars (5 - 15 points)
 - Fluffy Clouds
 - Circles
 - Squares 
@@ -21,6 +25,7 @@ Random shapes:
 - Octagons (8 sides)
 - Oddagons (random odd numbered sides) 
 - Dexagons (10 sides)
+- Dozengons (12 sides)
 - Randogons (random numbers of sides)
   
 More shapes are planned to be added including blobs, flames, hearts, etc.
