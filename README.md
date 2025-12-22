@@ -1,7 +1,6 @@
-![Sample parametric output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/svgenout/svg-3ff846.svg)
+![Sample parametric output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/parametrix/svg-3ff846.svg)
 
 ![Sample random output of SVGen](https://raw.githubusercontent.com/benmirkhah/svgdump/refs/heads/main/svgenout/svg-2cf493.svg)
-
 
 
 # SVGen
