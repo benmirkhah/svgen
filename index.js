@@ -1,12 +1,19 @@
-let version = '0.051'; //Commits + 1
-let xxx = 960;
-let yyy = 480;
-
+const version      = '0.052'; //Commits + 1
+//---------------------------------------------------------------------------------
+const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
+const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+//Implements CSS style rounding----------------------------------------------------
+function roundInt(num = 1, factor = 10) { return factor * Math.trunc(num/factor); }
+const xxx = roundInt(windowWidth /2); //Horizontal center
+const yyy = roundInt(windowHeight/2); //Vertical center
+//-----------------------------------------------------------------------------
 //"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
-Debug:        Fix strict mode
+Classes:      Define a group class, extend each shape and each type of grid
+Debug:        Fix strict mode, Flower, Star
+Grids:        Allow for number of rings/jewls + start-r end-r, cx/cy based cartesian
 Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
 Back button:  Allowing saving previous renders
@@ -25,16 +32,17 @@ function defaultCanvas() {
   let w = Object.create(null);  //Width
   let h = Object.create(null);  //Height
   let c = Object.create(null);  //Canvas
-  w[min     ] =  100;
-  w[max     ] = 3000;
-  w[system  ] =  640;
-  w[selected] = 1920;
-  h[min     ] =  100;
-  h[max     ] = 3000;
-  h[system  ] =  480;
-  h[selected] =  950;
-  c['width' ] =    w;
-  c['height'] =    h;
+  w[val] =  windowWidth;
+  h[val] = windowHeight;
+  w[min] =          100;
+  h[min] =          100;
+  w[max] =         3000;
+  h[max] =         3000;
+  w[sys] =          640;  //default when w.val = 0
+  h[sys] =          480;  //default when h.val = 0 
+  //Return canvas object 
+  c['width' ] =       w;
+  c['height'] =       h;
   return c;
 }//----------------------------------------------------------------------------
 
@@ -57,7 +65,7 @@ function defaultEnabled() {
 
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
-  let out  = new Grid(system);
+  let out  = new Grid(sys);
   out.kind =     spiral;
   out.kind =     radial;
   out.kind =     normal;
@@ -555,7 +563,7 @@ function defaultGradients() {
   let out = Object.create(null);
   out[min     ] = 2;
   out[max     ] = 9;
-  out[system  ] = 3;
+  out[sys  ] = 3;
   out[selected] = 5;
   out[kind    ] = both; //TODO: horiz, vertical, both, aligned, random
   return out;
@@ -564,21 +572,21 @@ function defaultGradients() {
 //Default color palette properties---------------------------------------------
 function defaultColors() {
   let out = Object.create(null);
-  out[min     ] =    3;
-  out[max     ] =  256;
-  out[system  ] =   10;
-  out[selected] =  100;
+  out[min   ] =    3;
+  out[max   ] =  256;
+  out[sys] =   10;
+  out[val   ] =  100;
   return out;
 }//----------------------------------------------------------------------------
 
 //Default properties of objects------------------------------------------------
 function defaultObjects() {
   let out = Object.create(null);
-  //Used only when shape properties are undefined or set to 'system'
+  //Used only when shape properties are undefined or set to 'sys'
   out['min'     ] =      1;
   out['max'     ] =    250;
   out['maxshape'] =     50;
-  out['system'  ] =      5;  //NOT IN USE
+  out['sys'  ] =      5;  //NOT IN USE
   out['selected'] =     10;  //NOT IN USE
   out['swidth'  ] =      4;  //Stroke width defualt
   out['scolor'  ] =   lime;  //Stroke color default
@@ -1179,11 +1187,6 @@ function epoch(n = 8) { //last 8 hex digits by default
 //Needs to be a builtin JS function, grumble-----------------------------------
 function randomInt(min = 0, max = 100) {
   return Math.floor(min + (Math.random() * (max - min)));
-}//----------------------------------------------------------------------------
-
-//Implements CSS style rounding------------------------------------------------
-function roundInt(num = 10, factor = 10) {
-  return factor * Math.trunc(num/factor);
 }//----------------------------------------------------------------------------
 
 //Sugar syntax wrapper for generating random X cords---------------------------
@@ -2081,10 +2084,10 @@ function parseConf() {
   let c, g, w, h, f, t;
 
   d       = svgDefaults();
-  c       = d.colors.selected;
-  g       = d.gradients.selected;
-  w       = d.canvas.width.selected;
-  h       = d.canvas.height.selected;
+  c       = d.colors.val;
+  g       = d.gradients.val;
+  w       = d.canvas.width.val;
+  h       = d.canvas.height.val;
   grid    = d.grid;
   paths   = d.paths;
   canvas  = d.canvas;
@@ -2093,10 +2096,10 @@ function parseConf() {
   f       = 0; //Total number of enabled filters
   t       = 0; //Total number of objects (shapes * variations of each shape)
 
-  if (isNaN(w)) w = (w == random) ? roundX(  canvas.width.min,  canvas.width.max) :  canvas.width.system;
-  if (isNaN(h)) h = (h == random) ? roundY( canvas.height.min, canvas.height.max) : canvas.height.system;
-  if (isNaN(c)) c = (c == random) ? randomInt(   d.colors.min,      d.colors.max) :      d.colors.system;
-  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) :   d.gradients.system;
+  if (isNaN(w)) w = (w == random) ? roundX(  canvas.width.min,  canvas.width.max) :  canvas.width.sys;
+  if (isNaN(h)) h = (h == random) ? roundY( canvas.height.min, canvas.height.max) : canvas.height.sys;
+  if (isNaN(c)) c = (c == random) ? randomInt(   d.colors.min,      d.colors.max) :      d.colors.sys;
+  if (isNaN(g)) g = (g == random) ? randomInt(d.gradients.min,   d.gradients.max) :   d.gradients.sys;
 
   //FILTERS------------------------------------------------
   if (d.enabled.filters) {  //Only if filters are enabled
@@ -2110,7 +2113,7 @@ function parseConf() {
   //SHAPES-------------------------------------------------
   Object.keys(d.shapes).forEach(shape => { //Go through each shape kind
     if (isNaN(d.shapes[shape].count)) {    //Assign requested random/default values
-      d.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(d.objects.min, shapes[shape].max) : d.objects.system;
+      d.shapes[shape].count = (shapes[shape].count == 'random') ? randomInt(d.objects.min, shapes[shape].max) : d.objects.sys;
     }
 
     if (d.shapes[shape].count) { //Only keep the enabled shapes, discard others
@@ -2136,10 +2139,10 @@ function parseConf() {
     } else { shapes[shape].filter = false; } //No filter if filters are disabled globally
   
     if (shapes[shape].fill) { //Determine what kind of fill to use per shape
-      if (shapes[shape].fill === true  ) shapes[shape].fill = solid; //true means solid
-      if (shapes[shape].fill === solid ) shapes[shape].fill = 'var(--c'+randomInt(1, TOTAL)+')';
-      if (shapes[shape].fill === system) shapes[shape].fill = objects.fill;
-      if (shapes[shape].fill === none  ) shapes[shape].fill = false;
+      if (shapes[shape].fill === true ) shapes[shape].fill = solid; //true means solid
+      if (shapes[shape].fill === solid) shapes[shape].fill = 'var(--c'+randomInt(1, TOTAL)+')';
+      if (shapes[shape].fill === sys  ) shapes[shape].fill = objects.fill;
+      if (shapes[shape].fill === none ) shapes[shape].fill = false;
       //All else means it's either set to random or a preselected #color
     }  
   });
@@ -2731,7 +2734,7 @@ class Grid {
     this.text            =              0;  //false or color;
     this.bound           =          false;  //true = delete points that fall outside of bounding box, false = keep  
     this.order           =         normal;  //normal (horizontal), backward, vertical, vertiback, (TODO: snake, vsnake, outward, inward)
-    //Radial & Spiral Grid specifics------
+    //Radial & Spiral Grid specifics------  //TODO: adjust defalut values based on radial vs spiral
     this.center          =      new Point;
     this.center.cx       =  new Val('cx');
     this.center.cy       =  new Val('cy');
@@ -2816,7 +2819,7 @@ class Shape {
   static counter = 0;
 
   constructor(name) {
-    this.name     = name ?? shapor;  //Any name in shapeTypes
+    this.name     = name ?? generic;  //Any name in shapeTypes
     this.n        =      0;  //Iterator number
     this.count    =      0;  //Number of instance
     this.pcount   =      1;  //Number of points
@@ -2885,16 +2888,17 @@ const radial        = 'radial';
 const spiral        = 'spiral';
 //Syntax sugars to avoid adding qoutes around them---------
 const selected      = 'selected';
+const generic       = 'generic';
 const amount        = 'amount';
 const middle        = 'middle';
 const normal        = 'normal';
-const shapor        = 'shapor';
-const system        = 'system';
 const both          = 'both';
 const none          =  null ;
-const zero          = 'zero';
+const zero          = 'zero';  //ignore index zero in arrays
 const min           = 'min';   //Value
 const max           = 'max';   //Value
+const sys           = 'sys';   //System default
+const val           = 'val';   //Active value 
 const tlc           = 'tlc';   //Top Left Corner
 const trc           = 'trc';   //Top Right Corner
 const blc           = 'blc';   //Bottom Left Corner
