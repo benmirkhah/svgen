@@ -1,13 +1,15 @@
 "use strict"; //Like college professors!
-const version = '0.053'; //Commits + 1
-//---------------------------------------------------------------------------------
+const version = '0.054'; //Commits + 1
+
+//Make SVG fit current screen size-------------------------------------------------
 const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
 const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
 //Implements CSS style rounding----------------------------------------------------
 function roundInt(num = 1, factor = 10) { return factor * Math.trunc(num/factor); }
+//---------------------------------------------------------------------------------
 const xxx = roundInt(windowWidth /2); //Horizontal center
 const yyy = roundInt(windowHeight/2); //Vertical center
-//-----------------------------------------------------------------------------
+
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
@@ -51,7 +53,7 @@ function defaultEnabled() {
   let out = Object.create(null);
   out['text'     ] = FF06;   //true, false, or color
   out['grid'     ] = blue;   //true, false, or color
-  out['stroke'   ] = true;   //true, false, or color
+  out['stroke'   ] = false;  //true, false, or color  <--NOT IN USE
   out['points'   ] = false;  //true, false, or color
   out['centers'  ] = false;  //true, false, or color
   out['anchors'  ] = false;  //true, false, or color
@@ -65,12 +67,12 @@ function defaultEnabled() {
 
 //Normal, Radial and Spiral grids defaults-------------------------------------
 function defaultGrids() {
-  let out  = new Grid(sys);
-  out.kind =     spiral;
-  out.kind =     radial;
-  out.kind =     normal;
-  out.show =       true;
-  out.show =      false;
+  let out  = new Grid(sys);  //Default system grid
+  out.kind =        spiral;
+  out.kind =        radial;
+  out.kind =        normal;
+  out.show =          true;
+  out.show =         false;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -87,7 +89,7 @@ function defaultShapes() {
   shapes[dozengon ].count                   =            1;
   shapes[triangle ].count                   =           12;
   shapes[square   ].count                   =           24;
-  shapes[pentagon ].count                   =           24;
+  shapes[pentagon ].count                   =            0;
   shapes[hexagon  ].count                   =           24;
   //Disabled Shapes----------------------------------------
   shapes[flower   ].count                   =            0;
@@ -150,7 +152,7 @@ function defaultShapes() {
     shapes[ circle    ].skew.y.delta        =            5;
     shapes[ circle    ].skew.y.rate         =            1;
     //--------------------------------------STROKE---------
-    shapes[ circle    ].stroke.swidth       =           40;
+    //shapes[ circle    ].stroke.swidth       =            1;
     //shapes[ circle    ].stroke.opacity      =         0.50;
     //shapes[ circle    ].stroke.scolor       =        white;
   }//------------------------------------------------------
@@ -184,13 +186,13 @@ function defaultShapes() {
   //shapes[ hexagon   ].fill                =        solid;
     //---------------------------------------GRID----------
     shapes[ hexagon   ].grid.kind           =       radial;
-    shapes[ hexagon   ].grid.show           =        false;
+    shapes[ hexagon   ].grid.show           =            0;
     shapes[ hexagon   ].grid.center.cx.kind =       ongrid;
     shapes[ hexagon   ].grid.center.cy.kind =       ongrid;
     shapes[ hexagon   ].grid.center.cx.val  =          xxx;
     shapes[ hexagon   ].grid.center.cy.val  =          yyy;
-    shapes[ hexagon   ].grid.center.r.val   =          416;
-    shapes[ hexagon   ].grid.center.r.delta =          416;
+    shapes[ hexagon   ].grid.center.r.val   =          350;
+    shapes[ hexagon   ].grid.center.r.delta =          350;
     shapes[ hexagon   ].grid.center.a.val   =            0;
     shapes[ hexagon   ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
@@ -208,23 +210,23 @@ function defaultShapes() {
     shapes[ hexagon   ].position.cy.rate    =            1;
     //--------------------------------------ROTATION-------
     shapes[ hexagon   ].rotation.a.kind     =  incremental;
-    shapes[ hexagon   ].rotation.a.val      =           30;
+    shapes[ hexagon   ].rotation.a.val      =            0;
     shapes[ hexagon   ].rotation.a.delta    =           15;
     shapes[ hexagon   ].rotation.a.rate     =            1;
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
     shapes[ hexagon   ].size.r.kind         =    alternate;
-    shapes[ hexagon   ].size.r.val          =           36;
-    shapes[ hexagon   ].size.r.delta        =           18;
+    shapes[ hexagon   ].size.r.val          =           80;
+    shapes[ hexagon   ].size.r.delta        =          -72;
     shapes[ hexagon   ].size.r.scaler       =       -1.090;
     shapes[ hexagon   ].size.r.rate         =            2;
     //--------------------------------------SKEW-----------
     shapes[ hexagon   ].skew.x.kind         =         none;
     shapes[ hexagon   ].skew.y.kind         =         none;
     //--------------------------------------STROKE---------
-    shapes[ hexagon   ].stroke.swidth       = randomInt(1,24);
-    //shapes[ hexagon   ].stroke.scolor       =        white;
-    //shapes[ hexagon   ].stroke.opacity      =         0.33;
+    shapes[ hexagon   ].stroke.swidth       = randomInt(1,12);
+  //shapes[ hexagon   ].stroke.scolor       =        white;
+  //shapes[ hexagon   ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
   if (      nautilus  ) {//-------------------------NAUTILI
     //--------------------------------------POSITION-------
@@ -415,7 +417,7 @@ function defaultShapes() {
     shapes[ square    ].skew.y.scaler       =        1.025;
     shapes[ square    ].skew.y.rate         =            4;
     //--------------------------------------STROKE---------
-    shapes[ square    ].stroke.swidth       = randomInt(1,24);
+    shapes[ square    ].stroke.swidth       = randomInt(1,12);
   //shapes[ square    ].stroke.scolor       =        white;
   //shapes[ square    ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
@@ -2127,9 +2129,7 @@ function parseConf() {
     }
   }); 
   
-  if (t > d.objects.max) { 
-    alert('Warning: number of objects exceed ' + d.objects.max);
-  }
+  //if (t > d.objects.max) { alert('Warning: number of objects exceed ' + d.objects.max); }
 
   TOTAL = t; //Copy the total shapes count value into a global variable
 
@@ -2167,7 +2167,7 @@ function parseConf() {
   parsed['enabled'  ] = enabled;
   parsed['order'    ] = ['zero', ...order];
 //parsed['order'    ] = ['zero', ...randomize(order)];
-  
+  //console.log(JSON.stringify(parsed)); //DEBUG
   return parsed;
 }//----------------------------------------------------------------------------
 
@@ -2481,6 +2481,7 @@ function svgTag() {
   //-------------------------------------------------------
   idStack.unshift('svg-'+svgid);   //Adds newest id on top
   svgFiles['svg-'+svgid] = output; //console.log(svgFiles); //DEBUG
+  let tokill = null;
   if (idStack.length > 10) {       //Only keep 10 files in stack 
     tokill = idStack.pop();        //console.log(tokill); //DEBUG
     delete svgFiles[tokill];
@@ -2822,11 +2823,11 @@ class Stroke {
 
 //Generic shape template for other shapes to inherit their structure from------
 class Shape {
-  static counter = 0;
+  static n = 0; //Number of instances
 
   constructor(name) {
     this.name     = name ?? generic;  //Any name in shapeTypes
-    this.n        =      0;  //Iterator number
+    this.i        =      0;  //Iterator number
     this.count    =      0;  //Number of instance
     this.pcount   =      1;  //Number of points
     this.fill     = random;
@@ -2842,11 +2843,31 @@ class Shape {
     this.stroke   = new Stroke;
     this.position = new Position;
     this.rotation = new Rotation;
-    this.counter++;
+    this.n++;
   }
 }//----------------------------------------------------------------------------
 
+//Generic element template to build other elements from------------------------
+class Element {
+  static n = 0; //Number of instances
 
+  constructor ({
+    name  = generic,
+    id    = String(),
+    cname = String(), //class name
+    open  = String(),
+    close = String(),
+    html  = String(),
+  } = {}){
+    this.id    =    id;
+    this.name  =  name;
+    this.cname = cname;
+    this.open  =  open;
+    this.close = close;
+    this.html  =  html;
+    this.n++;
+  }
+}//----------------------------------------------------------------------------
 
 
 //Initialize the global variables and syntax sugars----------------------------
