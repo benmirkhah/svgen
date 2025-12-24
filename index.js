@@ -1,4 +1,5 @@
-const version      = '0.052'; //Commits + 1
+"use strict"; //Like college professors!
+const version = '0.053'; //Commits + 1
 //---------------------------------------------------------------------------------
 const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
 const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
@@ -7,12 +8,11 @@ function roundInt(num = 1, factor = 10) { return factor * Math.trunc(num/factor)
 const xxx = roundInt(windowWidth /2); //Horizontal center
 const yyy = roundInt(windowHeight/2); //Vertical center
 //-----------------------------------------------------------------------------
-//"use strict";  //Like college teachers!
 /******************************************************************************
 COMMING SOON / TODO LIST
 ------------------------
 Classes:      Define a group class, extend each shape and each type of grid
-Debug:        Fix strict mode, Flower, Star
+Debug:        Fix Flower, Star, Nautilus bug
 Grids:        Allow for number of rings/jewls + start-r end-r, cx/cy based cartesian
 Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
@@ -978,12 +978,12 @@ function svgPolygon(oid='no-order-id', pcount=6, options=opt) {
   let points    = svgRadialPoints(pcount,cx,cy,r); //console.log(points); //DEBUG
   
   cname   += ((polyn == 'oddagon') || (polyn == 'randogon')) ? ' poly'+pcount : '';
-  render  += open+'id="'+sid+'-'+i+'" ';
+  render  += open+'id="'+sid+'" ';
   render  += 'class="'+cname+'"';
   render  += fill+stroke+filter+transform+events+' points="';
   anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair( cx, cy, 5, center, 'center mark', oid) : '';
 
-  for (i=1; i<=pcount; i++) {
+  for (let i=1; i<=pcount; i++) {
     render  += points[i].x+','+points[i].y+' ';     
     anchors += (svgconf.enabled.points) ? '  '+svgDrawPoint(points[i].x, points[i].y, 3, pcolor, 'point' ) : '';
   }
@@ -1055,7 +1055,9 @@ function svgCorner(oid='no-order-id', options = opt) {
   let stroke  = options.stroke;
   let cname   = 'corner';
   let cx      = 0;
-  let cy      = 0;    
+  let cy      = 0;
+  let qx      = 0;
+  let qy      = 0;
   let xm      = 0; //X multiplier
   let ym      = 0; //Y multiplier
   let sp      = 0; //Starting point
@@ -1293,7 +1295,7 @@ function randomize(ar) {
 
 //Sets the counter for all shapes to zero--------------------------------------
 function resetCounter(){
-  out = Object.create(null); //Keep count of each shape's renders
+  let out = Object.create(null); //Keep count of each shape's renders
   shapeTypes.forEach(shape => { out[shape] = 0; });
   return out;
 }//----------------------------------------------------------------------------
@@ -2075,6 +2077,7 @@ function parseConf() {
   let order    = Array();
   let grid     = Object.create(null);
   let paths    = Object.create(null);
+  let canvas   = Object.create(null);
   let shapes   = Object.create(null);
   let parsed   = Object.create(null);
   let enabled  = Object.create(null);
@@ -2119,7 +2122,7 @@ function parseConf() {
     if (d.shapes[shape].count) { //Only keep the enabled shapes, discard others
       shapes[shape] = d.shapes[shape];
       //Create orders for each requested count of the enabled shape kinds
-      for (i=0; i < shapes[shape].count; i++) order[t+i] = shape; 
+      for (let i=0; i < shapes[shape].count; i++) order[t+i] = shape; 
       t += shapes[shape].count;
     }
   }); 
@@ -2212,9 +2215,9 @@ function svgGrad(gid, gkind = 'L') {
     close   = '  </radialGradient>\r\n';
   }
 
-  let g                    = `    <stop offset="0.00"` +        ` stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;
-  for (i=2; i < c; i++) g += `    <stop offset="0.${(i-1)*nudge}" stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;  
-  g                       += `    <stop offset="1.00"` +        ` stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;
+  let g                        = `    <stop offset="0.00"` +        ` stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;
+  for (let i=2; i < c; i++) g += `    <stop offset="0.${(i-1)*nudge}" stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;  
+  g                           += `    <stop offset="1.00"` +        ` stop-color="var(--c${randomInt(1, colors)})"/>\r\n`;
 
   return open + g + close;
 }//----------------------------------------------------------------------------
@@ -2324,8 +2327,11 @@ function svgContent() {
   let render  = '';
   let filter  = '';
   let stroke  = '';
+  let swidth  =  0;
+  let thick   =  0;
   let shape   = '';
   let fill    = '';
+  let data    = '';
   let luck    = 0;
   let rr      = randomInt(3,16);  //For Randogons
   let oo      = randomInt(3,15);  //For Oddagons
@@ -2339,7 +2345,7 @@ function svgContent() {
     }  
   });
 
-  for (oid=1; oid < svgconf.order.length; oid++) {
+  for (let oid=1; oid < svgconf.order.length; oid++) {
     stroke = '';
     filter = '';
     fill   = '';
