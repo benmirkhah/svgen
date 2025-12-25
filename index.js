@@ -1,5 +1,5 @@
 "use strict"; //Like college professors!
-const version = '0.054'; //Commits + 1
+const version = '0.055'; //Commits + 1
 
 //Make SVG fit current screen size-------------------------------------------------
 const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
@@ -192,7 +192,7 @@ function defaultShapes() {
     shapes[ hexagon   ].grid.center.cx.val  =          xxx;
     shapes[ hexagon   ].grid.center.cy.val  =          yyy;
     shapes[ hexagon   ].grid.center.r.val   =          350;
-    shapes[ hexagon   ].grid.center.r.delta =          350;
+    shapes[ hexagon   ].grid.center.r.delta = randomInt(250,350);
     shapes[ hexagon   ].grid.center.a.val   =            0;
     shapes[ hexagon   ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
@@ -216,8 +216,8 @@ function defaultShapes() {
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
     shapes[ hexagon   ].size.r.kind         =    alternate;
-    shapes[ hexagon   ].size.r.val          =           80;
-    shapes[ hexagon   ].size.r.delta        =          -72;
+    shapes[ hexagon   ].size.r.val          = randomInt(30,80)
+    shapes[ hexagon   ].size.r.delta        = randomInt(10,shapes.hexagon.size.r.val);
     shapes[ hexagon   ].size.r.scaler       =       -1.090;
     shapes[ hexagon   ].size.r.rate         =            2;
     //--------------------------------------SKEW-----------
@@ -369,7 +369,7 @@ function defaultShapes() {
     shapes[ square    ].grid.center.cx.val  =          xxx;
     shapes[ square    ].grid.center.cy.val  =          yyy;
     shapes[ square    ].grid.center.r.val   =          250;
-    shapes[ square    ].grid.center.r.delta =          250;
+    shapes[ square    ].grid.center.r.delta = randomInt(160,240);
     shapes[ square    ].grid.center.a.val   =            0;
     shapes[ square    ].grid.center.a.delta =           15;
     //--------------------------------------CORNER---------
@@ -399,10 +399,10 @@ function defaultShapes() {
   //shapes[ square    ].scale.y.kind        =       random;
     //--------------------------------------SIZE-----------
     shapes[ square    ].size.h.kind         =    alternate;
-    shapes[ square    ].size.h.val          =           16;
-    shapes[ square    ].size.h.min          =           50;
-    shapes[ square    ].size.h.max          =          400;
-    shapes[ square    ].size.h.delta        =           60;
+    shapes[ square    ].size.h.val          =           10;
+    shapes[ square    ].size.h.min          =           10;
+    shapes[ square    ].size.h.max          =           40;
+    shapes[ square    ].size.h.delta        = randomInt(10,60);
     shapes[ square    ].size.h.scaler       =        1.115;
     shapes[ square    ].size.h.rate         =            2;
     //--------------------------------------SKEW-----------
@@ -445,10 +445,10 @@ function defaultShapes() {
     shapes[ triangle  ].grid.show           =        false;
     shapes[ triangle  ].grid.center.cx.kind =       ongrid;
     shapes[ triangle  ].grid.center.cy.kind =       ongrid;
-    shapes[ triangle  ].grid.center.cx.val  =          xxx-11;
+    shapes[ triangle  ].grid.center.cx.val  =          xxx-6;
     shapes[ triangle  ].grid.center.cy.val  =          yyy;
     shapes[ triangle  ].grid.center.r.val   =          200;
-    shapes[ triangle  ].grid.center.r.delta =          200;
+    shapes[ triangle  ].grid.center.r.delta = randomInt(100,200);
     //--------------------------------------POSITION-------
     shapes[ triangle  ].position.cx.kind    =       ongrid;
     shapes[ triangle  ].position.cy.kind    =       ongrid;
@@ -467,9 +467,9 @@ function defaultShapes() {
     shapes[ triangle  ].scale.y.kind        =         none;
     //--------------------------------------SIZE-----------
     shapes[ triangle  ].size.r.kind         =        fixed;
-    shapes[ triangle  ].size.r.val          =           50;
-    shapes[ triangle  ].size.r.min          =           30;
-    shapes[ triangle  ].size.r.max          =          400;
+    shapes[ triangle  ].size.r.val          = randomInt(10,50);
+    shapes[ triangle  ].size.r.min          =           10;
+    shapes[ triangle  ].size.r.max          =           50;
     shapes[ triangle  ].size.r.delta        =            3;
     //--------------------------------------SKEW-----------
     shapes[ triangle  ].skew.x.kind         =         none;
@@ -486,13 +486,14 @@ function defaultShapes() {
     shapes[ dozengon  ].position.cx.val     =          xxx;
     shapes[ dozengon  ].position.cy.val     =          yyy;
     //--------------------------------------SIZE-----------
-    shapes[ dozengon  ].size.r.kind         =        fixed;
-    shapes[ dozengon  ].size.r.val          =          150;
+    shapes[ dozengon  ].size.r.kind         =       random;
+    shapes[ dozengon  ].size.r.min          =           20;
+    shapes[ dozengon  ].size.r.max          =          280;
     //--------------------------------------ROTATION-------
     shapes[ dozengon  ].rotation.a.kind     =        fixed;
     shapes[ dozengon  ].rotation.a.val      =           15;
     //--------------------------------------STROKE---------
-    shapes[ dozengon  ].stroke.swidth       = randomInt(1,20);
+  //shapes[ dozengon  ].stroke.swidth       =           20;
   //shapes[ dozengon  ].stroke.scolor       =        white;
   //shapes[ dozengon  ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
