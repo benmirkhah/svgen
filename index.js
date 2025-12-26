@@ -1,5 +1,5 @@
 "use strict"; //Like college professors!
-const version = '0.055'; //Commits + 1
+const version = '0.056'; //Commits + 1
 
 //Make SVG fit current screen size-------------------------------------------------
 const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
@@ -7,8 +7,8 @@ const windowHeight = (window.innerHeight || document.documentElement.clientHeigh
 //Implements CSS style rounding----------------------------------------------------
 function roundInt(num = 1, factor = 10) { return factor * Math.trunc(num/factor); }
 //---------------------------------------------------------------------------------
-const xxx = roundInt(windowWidth /2); //Horizontal center
-const yyy = roundInt(windowHeight/2); //Vertical center
+const midx = roundInt(windowWidth /2); //Horizontal center
+const midy = roundInt(windowHeight/2); //Vertical center
 
 /******************************************************************************
 COMMING SOON / TODO LIST
@@ -87,11 +87,11 @@ function defaultShapes() {
   //Enabled Shapes-----------------------------------------
   shapes[corner   ].count                   =            4;
   shapes[dozengon ].count                   =            1;
-  shapes[triangle ].count                   =           12;
   shapes[square   ].count                   =           24;
-  shapes[pentagon ].count                   =            0;
   shapes[hexagon  ].count                   =           24;
   //Disabled Shapes----------------------------------------
+  shapes[triangle ].count                   =            0;
+  shapes[pentagon ].count                   =            0;
   shapes[flower   ].count                   =            0;
   shapes[circle   ].count                   =            0;
   shapes[oddagon  ].count                   =            0;
@@ -121,8 +121,8 @@ function defaultShapes() {
     shapes[ circle    ].grid.show           =            0;
     shapes[ circle    ].grid.center.cx.kind =       ongrid;
     shapes[ circle    ].grid.center.cy.kind =       ongrid;
-    shapes[ circle    ].grid.center.cx.val  =          xxx;
-    shapes[ circle    ].grid.center.cy.val  =          yyy;
+    shapes[ circle    ].grid.center.cx.val  =         midx;
+    shapes[ circle    ].grid.center.cy.val  =         midy;
     shapes[ circle    ].grid.center.r.val   =          540;
     shapes[ circle    ].grid.center.r.delta =          540;
     shapes[ circle    ].grid.center.a.val   =            0;
@@ -167,8 +167,8 @@ function defaultShapes() {
     //--------------------------------------POSITION-------
     shapes[ flower    ].position.cx.kind    =        fixed;
     shapes[ flower    ].position.cy.kind    =        fixed;
-    shapes[ flower    ].position.cx.val     =          xxx;
-    shapes[ flower    ].position.cy.val     =          yyy;
+    shapes[ flower    ].position.cx.val     =         midx;
+    shapes[ flower    ].position.cy.val     =         midy;
     shapes[ flower    ].position.cx.max     =         1400;
     shapes[ flower    ].position.cy.max     =          700;
     //--------------------------------------ROTATION-------
@@ -189,10 +189,10 @@ function defaultShapes() {
     shapes[ hexagon   ].grid.show           =            0;
     shapes[ hexagon   ].grid.center.cx.kind =       ongrid;
     shapes[ hexagon   ].grid.center.cy.kind =       ongrid;
-    shapes[ hexagon   ].grid.center.cx.val  =          xxx;
-    shapes[ hexagon   ].grid.center.cy.val  =          yyy;
+    shapes[ hexagon   ].grid.center.cx.val  =         midx;
+    shapes[ hexagon   ].grid.center.cy.val  =         midy;
     shapes[ hexagon   ].grid.center.r.val   =          350;
-    shapes[ hexagon   ].grid.center.r.delta = randomInt(250,350);
+    shapes[ hexagon   ].grid.center.r.delta =  RI(250,350);
     shapes[ hexagon   ].grid.center.a.val   =            0;
     shapes[ hexagon   ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
@@ -216,15 +216,15 @@ function defaultShapes() {
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
     shapes[ hexagon   ].size.r.kind         =    alternate;
-    shapes[ hexagon   ].size.r.val          = randomInt(30,80)
-    shapes[ hexagon   ].size.r.delta        = randomInt(10,shapes.hexagon.size.r.val);
+    shapes[ hexagon   ].size.r.val          =    RI(10,80);
+    shapes[ hexagon   ].size.r.delta        = RI(1,shapes.hexagon.size.r.val);
     shapes[ hexagon   ].size.r.scaler       =       -1.090;
     shapes[ hexagon   ].size.r.rate         =            2;
     //--------------------------------------SKEW-----------
     shapes[ hexagon   ].skew.x.kind         =         none;
     shapes[ hexagon   ].skew.y.kind         =         none;
     //--------------------------------------STROKE---------
-    shapes[ hexagon   ].stroke.swidth       = randomInt(1,12);
+    shapes[ hexagon   ].stroke.swidth       =     RI(1,12);
   //shapes[ hexagon   ].stroke.scolor       =        white;
   //shapes[ hexagon   ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
@@ -266,10 +266,10 @@ function defaultShapes() {
     shapes[ pentagon  ].grid.show           =        false;
     shapes[ pentagon  ].grid.center.cx.kind =       ongrid;
     shapes[ pentagon  ].grid.center.cy.kind =       ongrid;
-    shapes[ pentagon  ].grid.center.cx.val  =        xxx-3;
-    shapes[ pentagon  ].grid.center.cy.val  =          yyy;
-    shapes[ pentagon  ].grid.center.r.val   =          330;
-    shapes[ pentagon  ].grid.center.r.delta =          330;
+    shapes[ pentagon  ].grid.center.cx.val  =         midx;
+    shapes[ pentagon  ].grid.center.cy.val  =         midy;
+    shapes[ pentagon  ].grid.center.r.val   =          350;
+    shapes[ pentagon  ].grid.center.r.delta =  RI(100,350);
     shapes[ pentagon  ].grid.center.a.val   =            0;
     shapes[ pentagon  ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
@@ -310,7 +310,7 @@ function defaultShapes() {
     shapes[ pentagon  ].skew.y.delta        =          -87;
     shapes[ pentagon  ].skew.y.rate         =            2;    
     //--------------------------------------STROKE---------
-    shapes[ pentagon  ].stroke.swidth       = randomInt(1,24);
+    shapes[ pentagon  ].stroke.swidth       =     RI(1,24);
   //shapes[ pentagon  ].stroke.scolor       =        white;
   //shapes[ pentagon  ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
@@ -327,23 +327,23 @@ function defaultShapes() {
     shapes[ rectangle ].grid.show           =            0;
     shapes[ rectangle ].grid.center.cx.kind =       ongrid;
     shapes[ rectangle ].grid.center.cy.kind =       ongrid;
-    shapes[ rectangle ].grid.center.cx.val  =          xxx;
-    shapes[ rectangle ].grid.center.cy.val  =          yyy;
+    shapes[ rectangle ].grid.center.cx.val  =         midx;
+    shapes[ rectangle ].grid.center.cy.val  =         midy;
     shapes[ rectangle ].grid.center.r.val   =          656;
     shapes[ rectangle ].grid.center.r.delta =          656;
     shapes[ rectangle ].grid.center.a.val   =            0;
     shapes[ rectangle ].grid.center.a.delta =           15;
     //--------------------------------------POSITION-------
-    shapes[ rectangle ].position.cx.kind    =       ongrid;
-    shapes[ rectangle ].position.cy.kind    =       ongrid;    
+    shapes[ rectangle ].position.cx.kind    =       random;
+    shapes[ rectangle ].position.cy.kind    =       random;    
     //--------------------------------------ROTATION-------
-    shapes[ rectangle ].rotation.a.kind     =  incremental;
+    shapes[ rectangle ].rotation.a.kind     =         none;
     shapes[ rectangle ].rotation.a.val      =            0;
     shapes[ rectangle ].rotation.a.delta    =           15;    
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
-    shapes[ rectangle ].size.w.kind         =    alternate;
-    shapes[ rectangle ].size.h.kind         =    alternate;
+    shapes[ rectangle ].size.w.kind         =       random;
+    shapes[ rectangle ].size.h.kind         =       random;
     shapes[ rectangle ].size.w.val          =           40;
     shapes[ rectangle ].size.h.val          =          220;
     shapes[ rectangle ].size.w.delta        =           20;
@@ -356,9 +356,9 @@ function defaultShapes() {
     shapes[ rectangle ].size.h.rate         =            2;
     //--------------------------------------SKEW-----------
     //--------------------------------------STROKE---------
-    shapes[ rectangle ].stroke.swidth       =            2;
-    shapes[ rectangle ].stroke.scolor       =        white;
-    shapes[ rectangle ].stroke.opacity      =         0.33;    
+    shapes[ rectangle ].stroke.swidth       =       random;
+  //shapes[ rectangle ].stroke.scolor       =        white;
+  //shapes[ rectangle ].stroke.opacity      =         0.33;    
   }//------------------------------------------------------
   if (      square    ) {//-------------------------SQUARES
   //shapes[ square    ].fill                ='#99000033'; //RC(clear);
@@ -366,10 +366,10 @@ function defaultShapes() {
     shapes[ square    ].grid.show           =        false;
     shapes[ square    ].grid.center.cx.kind =       ongrid;
     shapes[ square    ].grid.center.cy.kind =       ongrid;
-    shapes[ square    ].grid.center.cx.val  =          xxx;
-    shapes[ square    ].grid.center.cy.val  =          yyy;
+    shapes[ square    ].grid.center.cx.val  =         midx;
+    shapes[ square    ].grid.center.cy.val  =         midy;
     shapes[ square    ].grid.center.r.val   =          250;
-    shapes[ square    ].grid.center.r.delta = randomInt(160,240);
+    shapes[ square    ].grid.center.r.delta =  RI(120,240);
     shapes[ square    ].grid.center.a.val   =            0;
     shapes[ square    ].grid.center.a.delta =           15;
     //--------------------------------------CORNER---------
@@ -402,7 +402,7 @@ function defaultShapes() {
     shapes[ square    ].size.h.val          =           10;
     shapes[ square    ].size.h.min          =           10;
     shapes[ square    ].size.h.max          =           40;
-    shapes[ square    ].size.h.delta        = randomInt(10,60);
+    shapes[ square    ].size.h.delta        =    RI(10,60);
     shapes[ square    ].size.h.scaler       =        1.115;
     shapes[ square    ].size.h.rate         =            2;
     //--------------------------------------SKEW-----------
@@ -417,7 +417,7 @@ function defaultShapes() {
     shapes[ square    ].skew.y.scaler       =        1.025;
     shapes[ square    ].skew.y.rate         =            4;
     //--------------------------------------STROKE---------
-    shapes[ square    ].stroke.swidth       = randomInt(1,12);
+    shapes[ square    ].stroke.swidth       =     RI(1,12);
   //shapes[ square    ].stroke.scolor       =        white;
   //shapes[ square    ].stroke.opacity      =         0.33;
   }//------------------------------------------------------
@@ -445,10 +445,10 @@ function defaultShapes() {
     shapes[ triangle  ].grid.show           =        false;
     shapes[ triangle  ].grid.center.cx.kind =       ongrid;
     shapes[ triangle  ].grid.center.cy.kind =       ongrid;
-    shapes[ triangle  ].grid.center.cx.val  =          xxx-6;
-    shapes[ triangle  ].grid.center.cy.val  =          yyy;
+    shapes[ triangle  ].grid.center.cx.val  =         midx;
+    shapes[ triangle  ].grid.center.cy.val  =         midy;
     shapes[ triangle  ].grid.center.r.val   =          200;
-    shapes[ triangle  ].grid.center.r.delta = randomInt(100,200);
+    shapes[ triangle  ].grid.center.r.delta =   RI(30,200);
     //--------------------------------------POSITION-------
     shapes[ triangle  ].position.cx.kind    =       ongrid;
     shapes[ triangle  ].position.cy.kind    =       ongrid;
@@ -467,7 +467,7 @@ function defaultShapes() {
     shapes[ triangle  ].scale.y.kind        =         none;
     //--------------------------------------SIZE-----------
     shapes[ triangle  ].size.r.kind         =        fixed;
-    shapes[ triangle  ].size.r.val          = randomInt(10,50);
+    shapes[ triangle  ].size.r.val          =   RI(10,100);
     shapes[ triangle  ].size.r.min          =           10;
     shapes[ triangle  ].size.r.max          =           50;
     shapes[ triangle  ].size.r.delta        =            3;
@@ -475,7 +475,7 @@ function defaultShapes() {
     shapes[ triangle  ].skew.x.kind         =         none;
     shapes[ triangle  ].skew.y.kind         =         none;
     //--------------------------------------STROKE---------
-    shapes[ triangle  ].stroke.swidth       = randomInt(1,16);
+    shapes[ triangle  ].stroke.swidth       =     RI(1,16);
   //shapes[ triangle  ].stroke.scolor       =        white;
   //shapes[ triangle  ].stroke.opacity      =          0.5;
   }//------------------------------------------------------
@@ -483,12 +483,12 @@ function defaultShapes() {
     //--------------------------------------POSITION-------
     shapes[ dozengon  ].position.cx.kind    =        fixed;
     shapes[ dozengon  ].position.cy.kind    =        fixed;
-    shapes[ dozengon  ].position.cx.val     =          xxx;
-    shapes[ dozengon  ].position.cy.val     =          yyy;
+    shapes[ dozengon  ].position.cx.val     =         midx;
+    shapes[ dozengon  ].position.cy.val     =         midy;
     //--------------------------------------SIZE-----------
     shapes[ dozengon  ].size.r.kind         =       random;
-    shapes[ dozengon  ].size.r.min          =           20;
-    shapes[ dozengon  ].size.r.max          =          280;
+    shapes[ dozengon  ].size.r.min          =           10;
+    shapes[ dozengon  ].size.r.max          =          300;
     //--------------------------------------ROTATION-------
     shapes[ dozengon  ].rotation.a.kind     =        fixed;
     shapes[ dozengon  ].rotation.a.val      =           15;
@@ -510,22 +510,22 @@ function defaultShapes() {
     shapes[ umbrella  ].skew.x.kind         =         none;
     //--------------------------------------STROKE---------
   }//------------------------------------------------------
-//if (      blob      ) {//---------------------------BLOBS}
-//if (      bullet    ) {//-------------------------BULLETS}
-//if (      claw      ) {//---------------------------CLAWS}
-//if (      cloud     ) {//--------------------------CLOUDS}
-//if (      dexagon   ) {//------------------------DEXAGONS}
-//if (      ellipse   ) {//------------------------ELLIPSES}
-//if (      flame     ) {//--------------------------FLAMES}
-//if (      heart     ) {//--------------------------HEARTS}
-//if (      letter    ) {//-------------------------LETTERS}
-//if (      numeric   ) {//-------------------------NUMBERS}
-//if (      mountain  ) {//-----------------------MOUNTAINS}
-//if (      octagon   ) {//------------------------OCTAGONS}
-//if (      pollen    ) {//-------------------------POLLENS}
-//if (      polygon   ) {//------------------------POLYGONS}
-//if (      randogon  ) {//-----------------------RANDOGONS}
-//if (      wave      ) {//---------------------------WAVES}
+//if (      blob      ) {//---------------------------BLOBS
+//if (      bullet    ) {//-------------------------BULLETS
+//if (      claw      ) {//---------------------------CLAWS
+//if (      cloud     ) {//--------------------------CLOUDS
+//if (      dexagon   ) {//------------------------DEXAGONS
+//if (      ellipse   ) {//------------------------ELLIPSES
+//if (      flame     ) {//--------------------------FLAMES
+//if (      heart     ) {//--------------------------HEARTS
+//if (      letter    ) {//-------------------------LETTERS
+//if (      numeric   ) {//-------------------------NUMBERS
+//if (      mountain  ) {//-----------------------MOUNTAINS
+//if (      octagon   ) {//------------------------OCTAGONS
+//if (      pollen    ) {//-------------------------POLLENS
+//if (      polygon   ) {//------------------------POLYGONS
+//if (      randogon  ) {//-----------------------RANDOGONS
+//if (      wave      ) {//---------------------------WAVES
 //--------------------------------------POSITION-------
 //--------------------------------------ROTATION-------
 //--------------------------------------SCALE----------
@@ -1193,6 +1193,10 @@ function epoch(n = 8) { //last 8 hex digits by default
 function randomInt(min = 0, max = 100) {
   return Math.floor(min + (Math.random() * (max - min)));
 }//----------------------------------------------------------------------------
+
+//Syntax sugar for randomInt---------------------------------------------------
+function RI(min = 0, max = 100) { return randomInt(min, max); }
+//-----------------------------------------------------------------------------
 
 //Sugar syntax wrapper for generating random X cords---------------------------
 function roundX(min = 1, max = WIDTH, factor = 10) {
@@ -2854,11 +2858,11 @@ class Element {
 
   constructor ({
     name  = generic,
-    id    = String(),
-    cname = String(), //class name
-    open  = String(),
-    close = String(),
-    html  = String(),
+    id    = '',
+    cname = '', //class name
+    open  = '',
+    close = '',
+    html  = '',
   } = {}){
     this.id    =    id;
     this.name  =  name;
@@ -2870,7 +2874,25 @@ class Element {
   }
 }//----------------------------------------------------------------------------
 
-
+class Rectangle extends Element {
+  constructor({name  = 'rect',
+    id     = '',
+    cname  = '',
+    //Specific parameters
+    fill   = new Color(),
+    center = new Point(),
+    corner = new Point(),
+    stroke = new Stroke(),
+    //tform  = new Transform(),
+  } = {}){
+    super({'name':name, 'id':id, 'cname':'rect'+(cname ? ' '+cname : '') })
+    this.fill   = fill;
+    this.center = center;
+    this.corner = corner;
+    this.open   = '<rect ';
+    this.close  = '</rect>';
+  }
+}
 //Initialize the global variables and syntax sugars----------------------------
 var counter         = Object.create(null); //Keeps count of renders
 var svgFiles        = Object.create(null); //Final rendered file output
