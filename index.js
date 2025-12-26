@@ -1,50 +1,54 @@
-"use strict"; //Like college professors!
-const version = '0.056'; //Commits + 1
+"use strict";
+const version = '0.057'; //Commits + 1
 
-//Make SVG fit current screen size-------------------------------------------------
-const windowWidth  = (window.innerWidth  || document.documentElement.clientWidth );
-const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-//Implements CSS style rounding----------------------------------------------------
-function roundInt(num = 1, factor = 10) { return factor * Math.trunc(num/factor); }
-//---------------------------------------------------------------------------------
-const midx = roundInt(windowWidth /2); //Horizontal center
-const midy = roundInt(windowHeight/2); //Vertical center
+//Make SVG fit current screen size---------------------------------------------
+const windowW = (window.innerWidth  || document.documentElement.clientWidth );
+const windowH = (window.innerHeight || document.documentElement.clientHeight);
+
+//Implements CSS style rounding------------------------------------------------
+function roundInt(n = 1, factor = 10) { return factor * Math.trunc(n/factor); }
+
+//-----------------------------------------------------------------------------
+const midx = roundInt(windowW/2); //Horizontal center
+const midy = roundInt(windowH/2); //Vertical center
 
 /******************************************************************************
-COMMING SOON / TODO LIST
-------------------------
+TODO LIST
+--------------
 Classes:      Define a group class, extend each shape and each type of grid
 Debug:        Fix Flower, Star, Nautilus bug
 Grids:        Allow for number of rings/jewls + start-r end-r, cx/cy based cartesian
 Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
 Back button:  Allowing saving previous renders
-Config UI:    Allowing non technical user interaction
 More shapes:  Flame, Blob, Ellipse, Heart, Bullet, Mountain, Pollen, Letters, Numbers, Waves
 More filters: Ideally one filter per shape
 Filters:      A way for a filter to NOT get randomly assigned to a certain shape type
 Events:       Configurable OnClick, RightClick, hover, etc. to run actions
 Actions:      Change Color, Size, Position, Rotation upon events.
+Config UI:    Allowing non technical user interaction
 Animation:    Final hurdle when everything else is done
+
 *******************************************************************************
 ******* Below are the functions that create the default config object *********
 ******************************************************************************/
+
 //Default canvas properties----------------------------------------------------
 function defaultCanvas() {
   let w = Object.create(null);  //Width
   let h = Object.create(null);  //Height
   let c = Object.create(null);  //Canvas
-  w[val] =  windowWidth;
-  h[val] = windowHeight;
-  w[min] =          100;
-  h[min] =          100;
-  w[max] =         3000;
-  h[max] =         3000;
-  w[sys] =          640;  //default when w.val = 0
-  h[sys] =          480;  //default when h.val = 0 
-  //Return canvas object 
-  c['width' ] =       w;
-  c['height'] =       h;
+  w[val] = windowW;
+  h[val] = windowH;
+  w[min] =     100;
+  h[min] =     100;
+  w[max] =    3000;
+  h[max] =    3000;
+  w[sys] =     640;  //default when w.val = 0
+  h[sys] =     480;  //default when h.val = 0 
+  //Return object 
+  c['width' ] =  w;
+  c['height'] =  h;
   return c;
 }//----------------------------------------------------------------------------
 
@@ -488,7 +492,7 @@ function defaultShapes() {
     //--------------------------------------SIZE-----------
     shapes[ dozengon  ].size.r.kind         =       random;
     shapes[ dozengon  ].size.r.min          =           10;
-    shapes[ dozengon  ].size.r.max          =          300;
+    shapes[ dozengon  ].size.r.max          =          420;
     //--------------------------------------ROTATION-------
     shapes[ dozengon  ].rotation.a.kind     =        fixed;
     shapes[ dozengon  ].rotation.a.val      =           15;
@@ -564,21 +568,20 @@ function defaultPaths() {
 //Number of colors per gradient------------------------------------------------
 function defaultGradients() {
   let out = Object.create(null);
-  out[min     ] = 2;
-  out[max     ] = 9;
-  out[sys  ] = 3;
-  out[selected] = 5;
-  out[kind    ] = both; //TODO: horiz, vertical, both, aligned, random
+  out[min] = 2;
+  out[max] = 9;
+  out[sys] = 3;
+  out[val] = 5;
   return out;
 }//----------------------------------------------------------------------------
 
 //Default color palette properties---------------------------------------------
 function defaultColors() {
   let out = Object.create(null);
-  out[min   ] =    3;
-  out[max   ] =  256;
-  out[sys] =   10;
-  out[val   ] =  100;
+  out[min] =   3;
+  out[max] = 256;
+  out[sys] =  10;
+  out[val] = 100;
   return out;
 }//----------------------------------------------------------------------------
 
@@ -589,15 +592,13 @@ function defaultObjects() {
   out['min'     ] =      1;
   out['max'     ] =    250;
   out['maxshape'] =     50;
-  out['sys'  ] =      5;  //NOT IN USE
-  out['selected'] =     10;  //NOT IN USE
   out['swidth'  ] =      4;  //Stroke width defualt
   out['scolor'  ] =   lime;  //Stroke color default
   out['acolor'  ] =  white;  //Anchor color default
   out['pcolor'  ] =  black;  //Point  color default
   out['ccolor'  ] =  black;  //Center color default
   out['gcolor'  ] =  black;  //Grid   color default
-  out['tcolor'  ] =  black;  //Text   color default
+  out['tcolor'  ] =  white;  //Text   color default
   out['fill'    ] =  color;  //true, false or color
   return out;
 }//----------------------------------------------------------------------------
@@ -2120,6 +2121,7 @@ function parseConf() {
       }
     }); 
   }
+
   //SHAPES-------------------------------------------------
   Object.keys(d.shapes).forEach(shape => { //Go through each shape kind
     if (isNaN(d.shapes[shape].count)) {    //Assign requested random/default values
@@ -2134,8 +2136,6 @@ function parseConf() {
     }
   }); 
   
-  //if (t > d.objects.max) { alert('Warning: number of objects exceed ' + d.objects.max); }
-
   TOTAL = t; //Copy the total shapes count value into a global variable
 
   //Now that we know our total number of shapes let's decipher the rest of variable
@@ -2937,7 +2937,6 @@ const vertical      = 'vertical';
 const radial        = 'radial';
 const spiral        = 'spiral';
 //Syntax sugars to avoid adding qoutes around them---------
-const selected      = 'selected';
 const generic       = 'generic';
 const amount        = 'amount';
 const middle        = 'middle';
@@ -3113,7 +3112,6 @@ const TLC           = { x:0     , y:0      };
 const TRC           = { x:WIDTH , y:0      };
 const BLC           = { x:0     , y:HEIGHT };
 const BRC           = { x:WIDTH , y:HEIGHT };
-//console.log(svgconf);  //DEBUG
 
 //Make the whole thing run just once on page load
 window.addEventListener('load', initializeSVGen);
