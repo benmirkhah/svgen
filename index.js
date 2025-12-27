@@ -1,5 +1,5 @@
 "use strict";
-const version = '0.058'; //Commits + 1
+const version = '0.059'; //Commits + 1
 
 //Make SVG fit current screen size---------------------------------------------
 const windowW = (window.innerWidth  || document.documentElement.clientWidth );
@@ -494,7 +494,7 @@ function defaultShapes() {
     //--------------------------------------SIZE-----------
     shapes[ dozengon  ].size.r.kind         =       random;
     shapes[ dozengon  ].size.r.min          =           10;
-    shapes[ dozengon  ].size.r.max          =          420;
+    shapes[ dozengon  ].size.r.max          =          450;
     //--------------------------------------ROTATION-------
     shapes[ dozengon  ].rotation.a.kind     =        fixed;
     shapes[ dozengon  ].rotation.a.val      =           15;
@@ -1037,7 +1037,7 @@ function svgStar(oid='no-order-id', options=opt, n=0) {
   render  += '  M '+ring[1].x+','+ring[1].y+'\r\n';
   anchors += (svgconf.enabled.centers) ? '  '+svgCrossHair(cx, cy, 5, center, 'center mark') : '';
 
-  for (i=1; i<(pcount-1)*2; i+=2) {
+  for (let i=1; i<(pcount-1)*2; i+=2) {
     render  += '  L '+ring[i  ].x+','+ring[i  ].y+' '+ring[i+2].x+','+ring[i+2].y+'\r\n';
     anchors += (svgconf.enabled.points) ? '  '+svgDrawPoint(ring[i].x, ring[i].y, 3, pcolor, 'point' ) : '';
   }
