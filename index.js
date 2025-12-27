@@ -1,5 +1,5 @@
 "use strict";
-const version = '0.057'; //Commits + 1
+const version = '0.058'; //Commits + 1
 
 //Make SVG fit current screen size---------------------------------------------
 const windowW = (window.innerWidth  || document.documentElement.clientWidth );
@@ -16,7 +16,7 @@ const midy = roundInt(windowH/2); //Vertical center
 TODO LIST
 --------------
 Classes:      Define a group class, extend each shape and each type of grid
-Debug:        Fix Flower, Star, Nautilus bug
+Debug:        Fix Flower, Nautilus bug
 Grids:        Allow for number of rings/jewls + start-r end-r, cx/cy based cartesian
 Parameterize: Stroke, Number of Petals/Points
 Fill options: Random (gradient/palette) / Fixed (uniform/solid) / incremental
@@ -93,15 +93,15 @@ function defaultShapes() {
   shapes[dozengon ].count                   =            1;
   shapes[square   ].count                   =           24;
   shapes[hexagon  ].count                   =           24;
+  shapes[star     ].count                   =            1;
   //Disabled Shapes----------------------------------------
+  shapes[rectangle].count                   =            0;
+  shapes[circle   ].count                   =            0;
   shapes[triangle ].count                   =            0;
   shapes[pentagon ].count                   =            0;
   shapes[flower   ].count                   =            0;
-  shapes[circle   ].count                   =            0;
   shapes[oddagon  ].count                   =            0;
   shapes[cloud    ].count                   =            0;
-  shapes[rectangle].count                   =            0;
-  shapes[star     ].count                   =            0;
   shapes[nautilus ].count                   =            0;
   shapes[blob     ].count                   =            0;
   shapes[claw     ].count                   =            0;
@@ -429,14 +429,16 @@ function defaultShapes() {
     shapes[ star      ].grid.kind           =       normal;
     shapes[ star      ].filter              =        dance;
     //--------------------------------------POSITION-------
-    shapes[ star      ].position.cx.kind    =       ongrid;
-    shapes[ star      ].position.cy.kind    =       ongrid;
+    shapes[ star      ].position.cx.kind    =        fixed;
+    shapes[ star      ].position.cy.kind    =        fixed;
+    shapes[ star      ].position.cx.val     =         midx;
+    shapes[ star      ].position.cy.val     =         midy;
     //--------------------------------------ROTATION-------
-    shapes[ star      ].rotation.a.kind     =       random;
+    shapes[ star      ].rotation.a.kind     =         none;
     //--------------------------------------SCALE----------
     //--------------------------------------SIZE-----------
     shapes[ star      ].size.r.min          =           20;
-    shapes[ star      ].size.r.max          =          200;
+    shapes[ star      ].size.r.max          =          400;
     //--------------------------------------SKEW-----------
     //--------------------------------------STROKE---------
     shapes[ star      ].stroke.swidth       =            0;
@@ -1003,8 +1005,9 @@ function svgPolygon(oid='no-order-id', pcount=6, options=opt) {
 }//----------------------------------------------------------------------------
 
 //Generates Stars, 5 or 11 points by default-----------------------------------
-function svgStar(oid='no-order-id', options=opt, pcount=0) {
-  pcount        = pcount ? pcount : ((randomInt(5,14) % 2) ? pcount+1 : pcount); //Only odd
+function svgStar(oid='no-order-id', options=opt, n=0) {
+  let pcount    = (n < 5) ? randomInt(5,14) : n;
+  pcount        = (pcount % 2) ? pcount : pcount+1; //Only odd
   let sid       = svgid+'-'+oid;
   let cx        = options.position.cx;
   let cy        = options.position.cy;
@@ -1026,7 +1029,7 @@ function svgStar(oid='no-order-id', options=opt, pcount=0) {
   ring.shift(); //get rid of [0]
   ring.pop();   //get red of [last]
   points.pop(); //get red of [last]
-  ring = [...points, ...ring]; 
+  ring = [...points, ...ring];
 
   render  += open+'id="'+sid+'" ';
   render  += 'class="'+cname+' p'+pcount+'" '+transform;
@@ -2337,6 +2340,7 @@ function svgContent() {
   let shape   = '';
   let fill    = '';
   let data    = '';
+  let temp    = '';
   let luck    = 0;
   let rr      = randomInt(3,16);  //For Randogons
   let oo      = randomInt(3,15);  //For Oddagons
@@ -2355,6 +2359,7 @@ function svgContent() {
     filter = '';
     fill   = '';
     data   = '';
+    temp   = '';
     luck   = randomInt(1,100);
     thick  = randomInt(1,250);  //Random stroke thickness
     thick  = thick - randomInt(1,thick); //decrease odds of large values
@@ -2418,18 +2423,18 @@ function svgContent() {
     switch(shape) {      
     //case blob      : render += svgBlob(oid,options);       break;
     //case claw      : render += svgBearClaw(oid,options);   break;
-    //case star      : render += svgStar(oid,options);       break;
     //case flame     : render += svgFlame(oid,options);      break;
     //case corner    : render += svgCorner(oid,options);     break;
     //case pollen    : render += svgPollen(oid,options);     break;
     //case ellipse   : render += svgellipse(oid,options);    break;
+      case star      : render += svgStar(oid,options);       break;
+      case rectangle : render += svgRect(oid,false,options); break;
       case star      : render += svgStar(oid,options);       break;
       case cloud     : render += svgCloud(oid,options);      break;
       case corner    : render += svgCorner(oid,options);     break;
       case circle    : render += svgCircle(oid,options);     break;
       case flower    : render += svgFlower(oid,options);     break;
       case square    : render += svgRect(oid,true ,options); break;
-      case rectangle : render += svgRect(oid,false,options); break;
       case triangle  : render += svgPolygon(oid, 3,options); break;
       case pentagon  : render += svgPolygon(oid, 5,options); break;
       case hexagon   : render += svgPolygon(oid, 6,options); break;
@@ -2439,6 +2444,7 @@ function svgContent() {
       case oddagon   : render += svgPolygon(oid,oo,options); break;
       case randogon  : render += svgPolygon(oid,rr,options); break;
       case nautilus  : render += svgNautilus(oid,  options); break;
+      //case rectangle : temp = new Rectangle; render += temp.render(); break;
     }
     elements[oid].render = render;
     output += render;
@@ -2633,16 +2639,26 @@ class Val {
 
 //Any point on either a Cartesian or Radial grid-------------------------------
 class Point {
-  constructor(id='') {
-    this.id = id; //Name
-    this.cx = 0;  //Center X
-    this.cy = 0;  //Center Y
-    this.n  = 0;  //Itaration number
-    this.x  = 0;
-    this.y  = 0;
-    this.r  = 0;
-    this.a  = 0;
-    this.z  = 0;
+  constructor({
+    id = '',  //Name
+    cx =  0,  //Center X
+    cy =  0,  //Center Y
+    n  =  0,  //Itaration number
+    x  =  0,
+    y  =  0,
+    r  =  0,
+    a  =  0,
+    z  =  0,
+  } = {}) { //To conserve memory only x,y are assigned my default
+    this.x  =  x;
+    this.y  =  y;
+    this.cx = cx;
+    this.cy = cy;
+    if(id) this.id = id;
+    if(n)  this.n  =  n;
+    if(r)  this.r  =  r;
+    if(a)  this.a  =  a;
+    if(z)  this.z  =  z;
   }
 
   log() {
@@ -2874,25 +2890,76 @@ class Element {
   }
 }//----------------------------------------------------------------------------
 
-class Rectangle extends Element {
-  constructor({name  = 'rect',
-    id     = '',
+//Adds common properties of visual elements------------------------------------
+class VisualElement extends Element {
+  constructor({
+    name   = generic,
+    id     = 'na'+epoch(4),
     cname  = '',
-    //Specific parameters
-    fill   = new Color(),
-    center = new Point(),
-    corner = new Point(),
-    stroke = new Stroke(),
-    //tform  = new Transform(),
+    //Visual specififc parameters
+    center = new Point({'x':midx, 'y':midy}),
+    corner = new Point({'x':  10, 'y':  10}),
+    size   = new Point({'x':  40, 'y':  40}),
+    fill   = RC(sunset), //new Color(),
+    grid   = '',
+    points = '',
+    filter = '',
+    events = '',
+    stroke = '', //new Stroke(),
+    tform  = '', //new Transform(),
   } = {}){
-    super({'name':name, 'id':id, 'cname':'rect'+(cname ? ' '+cname : '') })
-    this.fill   = fill;
+    super({'name':name, 'id':id, 'cname':cname });
     this.center = center;
     this.corner = corner;
-    this.open   = '<rect ';
+    this.size   = size;
+    this.fill   = fill;
+    if(points)  this.points = points;
+    if(filter)  this.filter = filter;
+    if(stroke)  this.stroke = stroke;
+    if(events)  this.events = events;
+    if(tform)   this.tform  = tform;
+    if(grid)    this.grid   = grid;
+    this.marks  = ''; //Render of markers
+  }
+}//----------------------------------------------------------------------------
+
+//Creating the object oriented version of the shape functions------------------ 
+class Rectangle extends VisualElement {
+  constructor(args){
+    super(args);
+    this.name   = 'rect';
+    this.open   = '<rect   id="'+this.id+'" ';
     this.close  = '</rect>';
   }
-}
+
+  render() {
+    let out = this.open;
+    out += `x="${roundInt(this.center.x - (this.size.x/2), 1)}" `;
+    out += `y="${roundInt(this.center.y - (this.size.y/2), 1)}" `;
+    out += `rx="${    this.corner.x}" `;
+    out += `ry="${    this.corner.y}" `;
+    out +=  `width="${this.size.x  }" `;
+    out += `height="${this.size.y  }" `;
+    out += `fill="${  this.fill    }" `;
+    out += this.filter ? `filter="${this.filter  }" ` : '';
+    //out += stroke;
+    //out += events;
+    //out += transform;
+    out += 'class="'+this.name+(this.cname ? ' '+this.cname : '')+'" >';
+    //out += animation;
+    out += this.close;
+    this.html = out;
+    return out;
+  }
+
+  markers() {
+    let out = '<g id="'+id+'-markers" class="markers">';
+    out += '</g>';
+    this.marks = out;
+    return out;
+  }
+}//----------------------------------------------------------------------------
+
 //Initialize the global variables and syntax sugars----------------------------
 var counter         = Object.create(null); //Keeps count of renders
 var svgFiles        = Object.create(null); //Final rendered file output
